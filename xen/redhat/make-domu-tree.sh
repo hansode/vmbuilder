@@ -42,7 +42,18 @@ case ${dist} in
   fedora)
     dist_snake=Fedora
     ### fedora ###
-    baseurl=http://srv2.ftp.ne.jp/Linux/packages/${dist}/archive/releases/${ver}/${dist_snake}/${arch}/os/
+    baseurl=http://srv2.ftp.ne.jp/Linux/packages/${dist}
+    case ${ver} in
+    [1-6])
+      baseurl=${baseurl}/core/${ver}/i386/os/
+      ;;
+    [78])
+      baseurl=${baseurl}/archive/releases/${ver}/${dist_snake}/${arch}/os/
+      ;;
+    1[12])
+      baseurl=${baseurl}/releases/${ver}/${dist_snake}/${arch}/os/
+      ;;
+    esac 
     gpgkey="${baseurl}/RPM-GPG-KEY-${dist} ${baseurl}/RPM-GPG-KEY"
     ;;
   *)
