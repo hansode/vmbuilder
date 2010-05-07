@@ -36,8 +36,18 @@ case ${dist} in
   centos)
     dist_snake=CentOS
     ### centos ###
-    baseurl=http://srv2.ftp.ne.jp/Linux/packages/${dist_snake}/${ver}/os/${arch}/
-    gpgkey="${baseurl}/RPM-GPG-KEY-${dist_snake}-${ver} ${baseurl}/RPM-GPG-KEY-beta"
+    baseurl=http://srv2.ftp.ne.jp/Linux/packages/${dist_snake}/${ver}/os/${arch}
+    case ${ver} in
+    3|3.*)
+      gpgkey="${baseurl}/RPM-GPG-KEY-${dist_snake}-3 ${baseurl}/RPM-GPG-KEY"
+      ;;
+    4|4.*)
+      gpgkey="${baseurl}/RPM-GPG-KEY-${dist}4 ${baseurl}/RPM-GPG-KEY"
+      ;;
+    5|5.*)
+      gpgkey="${baseurl}/RPM-GPG-KEY-${dist_snake}-5 ${baseurl}/RPM-GPG-KEY-beta"
+      ;;
+    esac
     ;;
   fedora)
     dist_snake=Fedora
