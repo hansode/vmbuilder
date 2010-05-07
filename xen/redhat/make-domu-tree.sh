@@ -119,7 +119,7 @@ mount --bind /proc ${fakeroot}/proc
 # /dev
 mkdir ${fakeroot}/dev
 for i in console null tty1 tty2 tty3 tty4 zero; do
- /dev/MAKEDEV -d ${fakeroot}/dev -x $i
+ /sbin/MAKEDEV -d ${fakeroot}/dev -x $i
 done
 
 
