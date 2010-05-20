@@ -37,7 +37,7 @@ esac
 
 # linux module
 module_path=http://s3.amazonaws.com/ec2-downloads
-module_file=ec2-modules-2.6.21.7-2.ec2.v1.2.fc8xen-i686.tgz
+module_file=ec2-modules-2.6.21.7-2.ec2.v1.2.fc8xen-${module_arch}.tgz
 module_uri=${module_path}/${module_file}
 kernel_ver=2.6.21.7-2.fc8xen-ec2-v1.0
 
