@@ -258,8 +258,10 @@ done
  done
 
 #
-rsync -a ${fakeroot}/usr/share/grub/${arch}-redhat/ ${fakeroot}/boot/grub/
-
+for grub_src_dir in redhat unknown; do
+  [ -d ${fakeroot}/usr/share/grub/${grub_src_dir}/ ] || continue
+  rsync -a ${fakeroot}/usr/share/grub/${grub_src_dir}/ ${fakeroot}/boot/grub/
+done
 
 #
 # clean-up
