@@ -22,6 +22,7 @@ case $arg in
   --arch=*) arch=${arg##--arch=} ;;
   --dist=*) dist=${arg##--dist=} ;;
   --ver=*)  ver=${arg##--ver=} ;;
+  --batch=*) batch=${arg##--batch=} ;;
 esac
 done
 
@@ -66,9 +67,13 @@ ver:  ${ver}
 EOS
 
 #exit 0
-echo -n "OK? [y/n] "
-read yorn
-echo ${yorn}
+[ -n "${batch}" ] && {
+  yorn=y
+} || {
+  echo -n "OK? [y/n] "
+  read yorn
+  echo ${yorn}
+}
 
 case ${yorn} in
   n|N|no|NO) exit 1;;
