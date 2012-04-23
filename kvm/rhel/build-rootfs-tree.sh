@@ -1,14 +1,14 @@
-#!/bin/sh
+#!/bin/bash
 #
 export PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
 #
 # vars
 #
-arch=x86_64
-ver=6
-dist=centos
-root_dev=/dev/sda1
+distro_arch=${distro_arch:-x86_64}
+distro_ver=${distro_ver:-6}
+distro_name=${distro_name:-centos}
+root_dev=${root_dev:-/dev/sda1}
 
 # check
 which yum >/dev/null 2>&1 || {
@@ -19,40 +19,42 @@ which yum >/dev/null 2>&1 || {
 # main
 for arg in $*; do
 case $arg in
-  --arch=*) arch=${arg##--arch=} ;;
-  --dist=*) dist=${arg##--dist=} ;;
-  --ver=*)  ver=${arg##--ver=} ;;
+  --distro_arch=*) distro_arch=${arg##--distro_arch=} ;;
+  --distro_name=*) distro_name=${arg##--distro_name=} ;;
+  --distro_ver=*)  distro_ver=${arg##--distro_ver=} ;;
   --batch=*) batch=${arg##--batch=} ;;
 esac
 done
 
 # validate
-case ${arch} in
+case ${distro_arch} in
   i386|x86_64) ;;
-  *) arch=i386 ;;
+  *) distro_arch=i386 ;;
 esac
 
-case ${dist} in
+case ${distro_name} in
   centos)
-    dist_snake=CentOS
-    baseurl=http://ftp.riken.go.jp/pub/Linux/centos/${ver}/os/${arch}
-    case ${ver} in
+    distro_short=centos
+    distro_snake=CentOS
+    baseurl=http://ftp.riken.go.jp/pub/Linux/centos/${distro_ver}/os/${distro_arch}
+    case ${distro_ver} in
     6|6.*)
-      gpgkey="${baseurl}/RPM-GPG-KEY-${dist_snake}-6 ${baseurl}/RPM-GPG-KEY-beta"
+      gpgkey="${baseurl}/RPM-GPG-KEY-${distro_snake}-6 ${baseurl}/RPM-GPG-KEY-beta"
       ;;
     esac
     ;;
   sl|scientific|scientificlinux)
-    dist_snake="Scientific Linux"
-    baseurl=http://srv2.ftp.ne.jp/Linux/packages/scientificlinux/${ver}/${arch}/os
-    case ${ver} in
+    distro_short=sl
+    distro_snake="Scientific Linux"
+    baseurl=http://srv2.ftp.ne.jp/Linux/packages/scientificlinux/${distro_ver}/${distro_arch}/os
+    case ${distro_ver} in
     6|6.*)
       gpgkey="${baseurl}/RPM-GPG-KEY-sl ${baseurl}/RPM-GPG-KEY-dawson"
       ;;
     esac
     ;;
   *)
-    echo "no mutch" >&2
+    echo "no mutch distro" >&2
     exit 1;
 esac
 
@@ -60,9 +62,9 @@ esac
 # dump vars
 cat <<EOS
 --------------------
-arch: ${arch}
-dist: ${dist} ${dist_snake}
-ver:  ${ver}
+distro_arch: ${distro_arch}
+distro_name: ${distro_name} ${distro_snake}
+distro_ver:  ${distro_ver}
 --------------------
 EOS
 
@@ -85,13 +87,13 @@ esac
 #
 #
 pwd=$(cd $(dirname $0) && pwd)
-fakeroot=${pwd}/${dist}-${ver}_${arch}
-repo=${pwd}/yum-${dist}-${ver}.repo
+fakeroot=${pwd}/${distro_short}-${distro_ver}_${distro_arch}
+repo=${pwd}/yum-${distro_short}-${distro_ver}.repo
 yum_cmd="
 yum \
  -c ${repo} \
  --disablerepo="\*" \
- --enablerepo="${dist}" \
+ --enablerepo="${distro_short}" \
  --installroot=${fakeroot} \
  -y
 "
@@ -128,8 +130,8 @@ installonly_limit=2
 
 # PUT YOUR REPOS HERE OR IN separate files named file.repo
 # in /etc/yum.repos.d
-[${dist}]
-name=${dist} ${ver} - ${arch}
+[${distro_short}]
+name=${distro_snake} ${distro_ver} - ${distro_arch}
 failovermethod=priority
 baseurl=${baseurl}
 enabled=1
@@ -241,7 +243,7 @@ cat <<EOS > ${fakeroot}/boot/grub/grub.conf
 default=0
 timeout=3
 hiddenmenu
-title ${dist_snake} (${modver})
+title ${distro_snake} (${modver})
         root (hd0,0)
         kernel /boot/vmlinuz-${modver} ro root=${root_dev}
         initrd /boot/initrd-${modver}.img
