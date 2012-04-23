@@ -34,8 +34,7 @@ esac
 case ${dist} in
   centos)
     dist_snake=CentOS
-    ### centos ###
-    baseurl=http://srv2.ftp.ne.jp/Linux/packages/${dist_snake}/${ver}/os/${arch}
+    baseurl=http://ftp.riken.go.jp/pub/Linux/centos/${ver}/os/${arch}
     case ${ver} in
     6|6.*)
       gpgkey="${baseurl}/RPM-GPG-KEY-${dist_snake}-6 ${baseurl}/RPM-GPG-KEY-beta"
@@ -43,8 +42,8 @@ case ${dist} in
     esac
     ;;
   sl|scientific|scientificlinux)
-    dist_snake=scientificlinux
-    baseurl=http://srv2.ftp.ne.jp/Linux/packages/${dist_snake}/${ver}/${arch}/os
+    dist_snake="Scientific Linux"
+    baseurl=http://srv2.ftp.ne.jp/Linux/packages/scientificlinux/${ver}/${arch}/os
     case ${ver} in
     6|6.*)
       gpgkey="${baseurl}/RPM-GPG-KEY-sl ${baseurl}/RPM-GPG-KEY-dawson"
