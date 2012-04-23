@@ -42,6 +42,15 @@ case ${dist} in
       ;;
     esac
     ;;
+  sl|scientific|scientificlinux)
+    dist_snake=scientificlinux
+    baseurl=http://srv2.ftp.ne.jp/Linux/packages/${dist_snake}/${ver}/${arch}/os
+    case ${ver} in
+    6|6.*)
+      gpgkey="${baseurl}/RPM-GPG-KEY-sl ${baseurl}/RPM-GPG-KEY-dawson"
+      ;;
+    esac
+    ;;
   *)
     echo "no mutch" >&2
     exit 1;
@@ -254,6 +263,7 @@ rsync -a ${fakeroot}/usr/share/grub/${arch}-redhat/ ${fakeroot}/boot/grub/
 rm -f  ${fakeroot}/boot/grub/splash.xpm.gz
 find   ${fakeroot}/var/log/ -type f | xargs rm
 rm -rf ${fakeroot}/tmp/*
+rm -f  ${repo}
 
 umount ${fakeroot}/proc
 
