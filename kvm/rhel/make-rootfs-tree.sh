@@ -5,7 +5,7 @@ export PATH=/bin:/usr/bin:/sbin:/usr/sbin
 #
 # vars
 #
-arch=i386
+arch=x86_64
 ver=6
 dist=centos
 root_dev=/dev/sda1
@@ -128,7 +128,7 @@ EOS
 # install packages
 ${yum_cmd} groupinstall Core
 ${yum_cmd} install kernel mkinitrd openssh openssh-clients openssh-server rpm yum curl dhclient
-${yum_cmd} install passwd
+${yum_cmd} install passwd grub
 ${yum_cmd} erase selinux*
 
 
@@ -243,6 +243,9 @@ done
  while read svc dummy; do
    /usr/sbin/chroot ${fakeroot} /sbin/chkconfig --del ${svc}
  done
+
+#
+rsync -a ${fakeroot}/usr/share/grub/${arch}-redhat/ ${fakeroot}/boot/grub/
 
 
 #
