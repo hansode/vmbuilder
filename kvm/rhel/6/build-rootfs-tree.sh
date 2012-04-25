@@ -5,6 +5,7 @@
 #        --distro_name=[centos | sl]
 #        --distro_ver=[6 | 6.0 | 6.2 | ... ]
 #        --batch=1
+#        --chroot_dir=/path/to/rootfs
 
 export PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
@@ -34,6 +35,9 @@ distro_arch=${distro_arch:-x86_64}
 distro_ver=${distro_ver:-6}
 distro_name=${distro_name:-centos}
 root_dev=${root_dev:-/dev/sda1}
+
+abs_path=$(cd $(dirname $0) && pwd)
+chroot_dir=${chroot_dir:-${abs_path}/${distro_short}-${distro_ver}_${distro_arch}}
 
 # check
 [[ $UID -ne 0 ]] && {
@@ -85,6 +89,7 @@ cat <<EOS
 distro_arch: ${distro_arch}
 distro_name: ${distro_name} ${distro_snake}
 distro_ver:  ${distro_ver}
+chroot_dir:  ${chroot_dir}
 --------------------
 EOS
 
@@ -106,8 +111,6 @@ esac
 #
 #
 #
-abs_path=$(cd $(dirname $0) && pwd)
-chroot_dir=${abs_path}/${distro_short}-${distro_ver}_${distro_arch}
 repo=${abs_path}/yum-${distro_short}-${distro_ver}.repo
 yum_cmd="
 yum \
