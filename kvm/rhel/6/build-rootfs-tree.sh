@@ -180,7 +180,6 @@ ${yum_cmd} erase selinux*
 
 # /etc/fstab
 cat <<EOS > ${chroot_dir}/etc/fstab
-#UUID=${rootdev_uuid} /                       ext4    defaults        1 1
 ${root_dev}             /                       ext4    defaults        1 1
 tmpfs                   /dev/shm                tmpfs   defaults        0 0
 devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
