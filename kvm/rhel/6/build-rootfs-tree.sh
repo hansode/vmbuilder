@@ -86,31 +86,31 @@ esac
 #
 #
 #
-pwd=$(cd $(dirname $0) && pwd)
-fakeroot=${pwd}/${distro_short}-${distro_ver}_${distro_arch}
-repo=${pwd}/yum-${distro_short}-${distro_ver}.repo
+abs_path=$(cd $(dirname $0) && pwd)
+chroot_dir=${abs_path}/${distro_short}-${distro_ver}_${distro_arch}
+repo=${abs_path}/yum-${distro_short}-${distro_ver}.repo
 yum_cmd="
 yum \
  -c ${repo} \
  --disablerepo="\*" \
  --enablerepo="${distro_short}" \
- --installroot=${fakeroot} \
+ --installroot=${chroot_dir} \
  -y
 "
 
 
-[ -d ${fakeroot} ] && { echo "${fakeroot} already exists." >&2; exit 1; }
-mkdir -p ${fakeroot}
+[ -d ${chroot_dir} ] && { echo "${chroot_dir} already exists." >&2; exit 1; }
+mkdir -p ${chroot_dir}
 
 # /proc
-mkdir ${fakeroot}/proc
-# mount -t proc none ${fakeroot}/proc
-mount --bind /proc ${fakeroot}/proc
+mkdir ${chroot_dir}/proc
+# mount -t proc none ${chroot_dir}/proc
+mount --bind /proc ${chroot_dir}/proc
 
 # /dev
-mkdir ${fakeroot}/dev
+mkdir ${chroot_dir}/dev
 for i in console null tty1 tty2 tty3 tty4 zero; do
- /sbin/MAKEDEV -d ${fakeroot}/dev -x $i
+ /sbin/MAKEDEV -d ${chroot_dir}/dev -x $i
 done
 
 
@@ -150,7 +150,7 @@ ${yum_cmd} erase selinux*
 
 
 # /etc/fstab
-cat <<EOS > ${fakeroot}/etc/fstab
+cat <<EOS > ${chroot_dir}/etc/fstab
 #UUID=${rootdev_uuid} /                       ext4    defaults        1 1
 ${root_dev}             /                       ext4    defaults        1 1
 tmpfs                   /dev/shm                tmpfs   defaults        0 0
@@ -160,29 +160,29 @@ proc                    /proc                   proc    defaults        0 0
 EOS
 
 # /etc/hosts
-cat <<EOS > ${fakeroot}/etc/hosts
+cat <<EOS > ${chroot_dir}/etc/hosts
 127.0.0.1       localhost
 EOS
 
 # /etc/resolv.conf
-cat <<EOS > ${fakeroot}/etc/resolv.conf
+cat <<EOS > ${chroot_dir}/etc/resolv.conf
 nameserver 8.8.8.8
 EOS
 
 # /etc/sysconfig/network
-cat <<EOS > ${fakeroot}/etc/sysconfig/network
+cat <<EOS > ${chroot_dir}/etc/sysconfig/network
 NETWORKING=yes
 EOS
 
 # /etc/sysconfig/network-scripts/ifcfg-eth0
-cat <<EOS > ${fakeroot}/etc/sysconfig/network-scripts/ifcfg-eth0
+cat <<EOS > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
 DEVICE=eth0
 BOOTPROTO=dhcp
 ONBOOT=yes
 EOS
 
 # /etc/inittab
-cat <<EOS > ${fakeroot}/etc/inittab
+cat <<EOS > ${chroot_dir}/etc/inittab
 #
 # ADDING OTHER CONFIGURATION HERE WILL HAVE NO EFFECT ON YOUR SYSTEM.
 #
@@ -211,17 +211,17 @@ id:3:initdefault:
 EOS
 
 # /etc/modprobe.conf
-#cat <<EOS > ${fakeroot}/etc/modprobe.conf
+#cat <<EOS > ${chroot_dir}/etc/modprobe.conf
 #alias scsi_hostadapter xenblk
 #alias eth0 xennet
 #EOS
 
 # passwd
-/usr/sbin/chroot ${fakeroot} pwconv
-#/usr/sbin/chroot ${fakeroot} passwd -d root
+/usr/sbin/chroot ${chroot_dir} pwconv
+#/usr/sbin/chroot ${chroot_dir} passwd -d root
 
 # TimeZone
-/bin/cp ${fakeroot}/usr/share/zoneinfo/Japan ${fakeroot}/etc/localtime
+/bin/cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
 
 # diet
 ## ${yum_cmd} erase kbd slang audit-libs-python ed ustr setserial checkpolicy
@@ -229,17 +229,17 @@ EOS
 
 
 # rebuild initrd for domU
-ls -1 ${fakeroot}/lib/modules/ | tail -1 | while read i; do
+ls -1 ${chroot_dir}/lib/modules/ | tail -1 | while read i; do
   modver=$(basename ${i})
-  [ -f  ${fakeroot}/boot/initrd-${modver}.img ] && {
-    /bin/rm ${fakeroot}/boot/initrd-${modver}.img
-    /usr/sbin/chroot ${fakeroot} \
+  [ -f  ${chroot_dir}/boot/initrd-${modver}.img ] && {
+    /bin/rm ${chroot_dir}/boot/initrd-${modver}.img
+    /usr/sbin/chroot ${chroot_dir} \
       /sbin/mkinitrd \
         --preload=ext4 \
         /boot/initrd-${modver}.img ${modver}
 
 # /boot/grub/grub.conf
-cat <<EOS > ${fakeroot}/boot/grub/grub.conf
+cat <<EOS > ${chroot_dir}/boot/grub/grub.conf
 default=0
 timeout=3
 hiddenmenu
@@ -254,26 +254,26 @@ EOS
 done
 
 # needless services
-/usr/sbin/chroot ${fakeroot} /sbin/chkconfig --list |grep -v :on |\
+/usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --list |grep -v :on |\
  while read svc dummy; do
-   /usr/sbin/chroot ${fakeroot} /sbin/chkconfig --del ${svc}
+   /usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --del ${svc}
  done
 
 #
 for grub_distro_name in redhat unknown; do
-  grub_src_dir=${fakeroot}/usr/share/grub/${distro_arch}-${grub_distro_name}
+  grub_src_dir=${chroot_dir}/usr/share/grub/${distro_arch}-${grub_distro_name}
   [ -d ${grub_src_dir} ] || continue
-  rsync -a ${grub_src_dir}/ ${fakeroot}/boot/grub/
+  rsync -a ${grub_src_dir}/ ${chroot_dir}/boot/grub/
 done
 
 #
 # clean-up
 #
-rm -f  ${fakeroot}/boot/grub/splash.xpm.gz
-find   ${fakeroot}/var/log/ -type f | xargs rm
-rm -rf ${fakeroot}/tmp/*
+rm -f  ${chroot_dir}/boot/grub/splash.xpm.gz
+find   ${chroot_dir}/var/log/ -type f | xargs rm
+rm -rf ${chroot_dir}/tmp/*
 rm -f  ${repo}
 
-umount ${fakeroot}/proc
+umount ${chroot_dir}/proc
 
 exit 0
