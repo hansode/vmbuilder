@@ -63,7 +63,7 @@ case ${distro_name} in
     baseurl=http://ftp.riken.go.jp/pub/Linux/centos/${distro_ver}/os/${distro_arch}
     case ${distro_ver} in
     6|6.*)
-      gpgkey="${baseurl}/RPM-GPG-KEY-${distro_snake}-6 ${baseurl}/RPM-GPG-KEY-beta"
+      gpgkey="${baseurl}/RPM-GPG-KEY-${distro_snake}-6"
       ;;
     esac
     ;;
