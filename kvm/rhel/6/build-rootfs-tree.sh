@@ -6,7 +6,8 @@
 #        --distro_ver=[6 | 6.0 | 6.2 | ... ]
 #        --batch=1
 #        --chroot_dir=/path/to/rootfs
-
+#        --debug=1
+#
 export PATH=/bin:/usr/bin:/sbin:/usr/sbin
 
 #
@@ -27,6 +28,9 @@ while [ $# -gt 0 ]; do
   esac
   shift
 done
+
+debug=${debug:-}
+[ -z ${debug} ] || set -x
 
 #
 # vars
