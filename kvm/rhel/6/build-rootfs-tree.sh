@@ -253,33 +253,6 @@ EOS
 # diet
 ## ${yum_cmd} erase kbd slang audit-libs-python ed ustr setserial checkpolicy
 
-
-
-# rebuild initrd for domU
-ls -1 ${chroot_dir}/lib/modules/ | tail -1 | while read i; do
-  modver=$(basename ${i})
-  [ -f  ${chroot_dir}/boot/initrd-${modver}.img ] && {
-    /bin/rm ${chroot_dir}/boot/initrd-${modver}.img
-    /usr/sbin/chroot ${chroot_dir} \
-      /sbin/mkinitrd \
-        --preload=ext4 \
-        /boot/initrd-${modver}.img ${modver}
-
-# /boot/grub/grub.conf
-cat <<EOS > ${chroot_dir}/boot/grub/grub.conf
-default=0
-timeout=3
-hiddenmenu
-title ${distro_snake} (${modver})
-        root (hd0,0)
-        kernel /boot/vmlinuz-${modver} ro root=${root_dev}
-        initrd /boot/initrd-${modver}.img
-EOS
-#
-
-  }
-done
-
 # needless services
 /usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --list |grep -v :on |\
  while read svc dummy; do
