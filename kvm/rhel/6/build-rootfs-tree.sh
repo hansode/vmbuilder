@@ -241,4 +241,7 @@ rm -f  ${repo}
 
 umount ${chroot_dir}/proc
 
+printf "[INFO] Installed => %s\n" ${chroot_dir}
+printf "[INFO] Complete!\n"
+
 exit 0
