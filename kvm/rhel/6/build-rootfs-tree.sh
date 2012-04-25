@@ -36,6 +36,11 @@ distro_name=${distro_name:-centos}
 root_dev=${root_dev:-/dev/sda1}
 
 # check
+[[ $UID -ne 0 ]] && {
+  echo "ERROR: Run as root" >/dev/stderr
+  exit 1
+}
+
 which yum >/dev/null 2>&1 || {
   echo "[error] command not found: 'yum'" >&2
   exit 1;
