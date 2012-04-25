@@ -169,8 +169,10 @@ EOS
 
 # install packages
 ${yum_cmd} groupinstall Core
-${yum_cmd} install kernel mkinitrd openssh openssh-clients openssh-server rpm yum curl dhclient
-${yum_cmd} install passwd grub
+${yum_cmd} install \
+             kernel dracut openssh openssh-clients openssh-server rpm yum curl dhclient \
+             passwd grub \
+             vim-minimal
 ${yum_cmd} erase selinux*
 
 
