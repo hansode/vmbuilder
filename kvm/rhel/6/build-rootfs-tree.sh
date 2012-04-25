@@ -69,7 +69,7 @@ case ${distro_name} in
     baseurl=http://ftp.riken.go.jp/pub/Linux/scientific/${distro_ver}/${distro_arch}/os
     case ${distro_ver} in
     6|6.*)
-      gpgkey="${baseurl}/RPM-GPG-KEY-sl ${baseurl}/RPM-GPG-KEY-dawson"
+      gpgkey="${baseurl}/RPM-GPG-KEY-sl ${baseurl}/RPM-GPG-KEY-sl6"
       ;;
     esac
     ;;
