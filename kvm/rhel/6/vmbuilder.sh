@@ -66,7 +66,7 @@ distro_name=${distro_name:-centos}
 distro_ver=${distro_ver:-6}
 distro_arch=${distro_arch:-x86_64}
 distro=${distro_name}-${distro_ver}_${distro_arch}
-distro_dir=${distro_dir:-${distro}}
+distro_dir=${distro_dir:-`pwd`/${distro}}
 
 [ -d ${distro_dir} ] || {
   printf "[INFO] Building OS tree: %s\n" ${distro_dir}
