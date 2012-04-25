@@ -70,7 +70,7 @@ distro_dir=${distro_dir:-${distro}}
 
 [ -d ${distro_dir} ] || {
   printf "[INFO] Building OS tree: %s\n" ${distro_dir}
-  ${abs_path}/build-rootfs-tree.sh --distro_name=${distro_name} --distro_ver=${distro_ver} --distro_arch=${distro_arch} --batch=1
+  ${abs_path}/build-rootfs-tree.sh --distro_name=${distro_name} --distro_ver=${distro_ver} --distro_arch=${distro_arch} --chroot_dir=${distro_dir} --batch=1 --debug=1
 }
 
 
