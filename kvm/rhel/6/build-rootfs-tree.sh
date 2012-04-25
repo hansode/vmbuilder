@@ -1,6 +1,31 @@
 #!/bin/bash
 #
+# OPTIONS
+#        --distro_arch=x86_64
+#        --distro_name=[centos | sl]
+#        --distro_ver=[6 | 6.0 | 6.2 | ... ]
+#        --batch=1
+
 export PATH=/bin:/usr/bin:/sbin:/usr/sbin
+
+#
+set -e
+
+args=
+while [ $# -gt 0 ]; do
+  arg="$1"
+  case "${arg}" in
+    --*=*)
+      key=${arg%%=*}; key=${key##--}
+      value=${arg##--*=}
+      eval "${key}=\"${value}\""
+      ;;
+    *)
+      args="${args} ${arg}"
+      ;;
+  esac
+  shift
+done
 
 #
 # vars
@@ -15,16 +40,6 @@ which yum >/dev/null 2>&1 || {
   echo "[error] command not found: 'yum'" >&2
   exit 1;
 }
-
-# main
-for arg in $*; do
-case $arg in
-  --distro_arch=*) distro_arch=${arg##--distro_arch=} ;;
-  --distro_name=*) distro_name=${arg##--distro_name=} ;;
-  --distro_ver=*)  distro_ver=${arg##--distro_ver=} ;;
-  --batch=*) batch=${arg##--batch=} ;;
-esac
-done
 
 # validate
 case ${distro_arch} in
