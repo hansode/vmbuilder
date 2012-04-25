@@ -66,7 +66,7 @@ case ${distro_name} in
   sl|scientific|scientificlinux)
     distro_short=sl
     distro_snake="Scientific Linux"
-    baseurl=http://srv2.ftp.ne.jp/Linux/packages/scientificlinux/${distro_ver}/${distro_arch}/os
+    baseurl=http://ftp.riken.go.jp/pub/Linux/scientific/${distro_ver}/${distro_arch}/os
     case ${distro_ver} in
     6|6.*)
       gpgkey="${baseurl}/RPM-GPG-KEY-sl ${baseurl}/RPM-GPG-KEY-dawson"
