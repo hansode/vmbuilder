@@ -237,15 +237,8 @@ cat <<EOS > ${chroot_dir}/etc/inittab
 id:3:initdefault:
 EOS
 
-# /etc/modprobe.conf
-#cat <<EOS > ${chroot_dir}/etc/modprobe.conf
-#alias scsi_hostadapter xenblk
-#alias eth0 xennet
-#EOS
-
 # passwd
 /usr/sbin/chroot ${chroot_dir} pwconv
-#/usr/sbin/chroot ${chroot_dir} passwd -d root
 
 # TimeZone
 /bin/cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
