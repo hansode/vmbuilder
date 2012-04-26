@@ -84,8 +84,8 @@ distro_dir=${distro_dir:-`pwd`/${distro}}
 # + ('--swapsize', metavar='SIZE', default=1024, help='Size (in MB) of the swap partition [default: %default]')
 # + ('--raw', metavar='PATH', type='str', help="Specify a file (or block device) to as first disk image.")
 #
-rootsize=${rootsize:-2048}
-swapsize=${swapsize:-512}
+rootsize=${rootsize:-4096}
+swapsize=${swapsize:-1024}
 execscript=${execscript:-./execscript.sh}
 raw=${raw:-./${distro}.raw}
 
