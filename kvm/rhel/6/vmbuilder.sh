@@ -86,7 +86,7 @@ distro_dir=${distro_dir:-`pwd`/${distro}}
 #
 rootsize=${rootsize:-4096}
 swapsize=${swapsize:-1024}
-execscript=${execscript:-./execscript.sh}
+execscript=${execscript:-}
 raw=${raw:-./${distro}.raw}
 
 # local params
@@ -312,21 +312,15 @@ printf "[INFO] Unsetting udev 70-persistent-net.rules.\n"
 rm -f ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
 ln -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
 
-[ -f ${chroot_dir} ] || {
-  cat <<EOS > ${execscript}
-#!/bin/bash
-
-set -e
-
-echo "doing execscript.sh: \$1"
-chroot \$1 bash -c "echo root:root | chpasswd"
-EOS
-  chmod 755 ${execscript}
-}
-
-[ -x ${execscript} ] && {
-  printf "[INFO] Excecuting after script\n"
-  ${execscript} ${chroot_dir}
+[ -z ${execscript} ] || {
+  [ -f ${execscript} ] || {
+    chroot ${chroot_dir} bash -c "echo root:root | chpasswd"
+  } && {
+    [ -x ${execscript} ] && {
+      printf "[INFO] Excecuting after script\n"
+      ${execscript} ${chroot_dir}
+    } || :
+  }
 }
 
 printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
