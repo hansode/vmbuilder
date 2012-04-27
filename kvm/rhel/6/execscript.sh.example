@@ -1,0 +1,36 @@
+#!/bin/bash
+
+set -x
+set -e
+
+echo "doing execscript.sh: $1"
+
+cat <<'EOS' | chroot $1 bash -c "cat | bash"
+# change root passwd
+echo root:root | chpasswd
+
+# instlall package
+distro_pkgs="
+ vim-minimal
+ screen
+ git
+ make
+ sudo
+"
+yum install -y ${distro_pkgs}
+
+cd /tmp
+
+echo "git clone."
+[ -d gist-1108422 ] || git clone git://gist.github.com/1108422.git gist-1108422
+cd gist-1108422
+pwd
+
+echo "add work user."
+./add-work-user.sh
+
+echo "change normal user password"
+eval $(./detect-linux-distribution.sh)
+devel_user=$(echo ${DISTRIB_ID} | tr A-Z a-z)
+echo ${devel_user}:${devel_user} | chpasswd
+EOS
