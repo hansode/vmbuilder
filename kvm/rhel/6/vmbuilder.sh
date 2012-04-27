@@ -27,6 +27,27 @@
 #               --swapsize SIZE
 #                      Size (in MB) of the swap partition [default: 1024]. Discarded when --part is used.
 #
+#   Network related options:
+#       --domain DOMAIN
+#              Set DOMAIN as the domain name of the guest. Default: The domain of the machine running this script.
+#
+#       --ip ADDRESS
+#              IP address in dotted form [default: dhcp]
+#
+#       Options below are discarded if --ip is not specified
+#              --mask VALUE IP mask in dotted form [default: based on ip setting].
+#
+#              --net ADDRESS
+#                     IP net address in dotted form [default: based on ip setting].
+#
+#              --bcast VALUE
+#                     IP broadcast in dotted form [default: based on ip setting].
+#
+#              --gw ADDRESS
+#                     Gateway (router) address in dotted form [default: based on ip setting (first valid address in the network)].
+#
+#              --dns ADDRESS
+#                     DNS address in dotted form [default: based on ip setting (first valid address in the network)]
 #
 #    Post install actions:
 #        --copy FILE
@@ -88,6 +109,14 @@ rootsize=${rootsize:-4096}
 swapsize=${swapsize:-1024}
 execscript=${execscript:-}
 raw=${raw:-./${distro}.raw}
+
+#domain=${domain:-}
+ip=${ip:-}
+mask=${mask:-}
+net=${net:-}
+bcast=${bcast:-}
+gw=${gw:-}
+dns=${dns:-}
 
 # local params
 disk_filename=${raw}
@@ -306,6 +335,35 @@ sysfs                   /sys                    sysfs   defaults        0 0
 proc                    /proc                   proc    defaults        0 0
 _EOS_
 cat ${chroot_dir}/etc/fstab
+
+DEVICE=eth0
+BOOTPROTO=dhcp
+ONBOOT=yes
+
+# /etc/sysconfig/network-scripts/ifcfg-eth0
+[ -z ${ip} ] || {
+  printf "[INFO] Unsetting /etc/sysconfig/network-scripts/ifcfg-eth0.\n"
+  cat <<_EOS_ > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
+DEVICE=eth0
+BOOTPROTO=static
+ONBOOT=yes
+
+IPADDR=${ip}
+$([ -z ${net}   ] || echo "NETMASK=${net}")
+$([ -z ${bcast} ] || echo "BROADCAST=${bcast}")
+$([ -z ${gw}    ] || echo "GATEWAY=${gw}")
+_EOS_
+  cat ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
+}
+
+# /etc/resolv.conf
+[ -z ${dns} ] || {
+  printf "[INFO] Unsetting /etc/resolv.conf.\n"
+  cat <<_EOS_ > ${chroot_dir}/etc/resolv.conf
+nameserver ${dns}
+_EOS_
+  cat ${chroot_dir}/etc/resolv.conf
+}
 
 # disable mac address caching
 printf "[INFO] Unsetting udev 70-persistent-net.rules.\n"
