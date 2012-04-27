@@ -7,9 +7,9 @@ all: build
 build: $(DISTRO_NAMES)
 
 centos:
-	for distro_ver in $(DISTRO_VERS); do sudo $(VMBUILDER) --distro_name=$@ --distro_ver=$${distro_ver} ; done
+	for distro_ver in $(DISTRO_VERS); do sudo $(VMBUILDER) --distro_name=$@ --distro_ver=$${distro_ver} --execscript=./execscript.sh.example ; done
 
 sl:
-	for distro_ver in $(DISTRO_VERS); do sudo $(VMBUILDER) --distro_name=$@ --distro_ver=$${distro_ver} ; done
+	for distro_ver in $(DISTRO_VERS); do sudo $(VMBUILDER) --distro_name=$@ --distro_ver=$${distro_ver} --execscript=./execscript.sh.example ; done
 
 .PHONY: build clean centos sl
