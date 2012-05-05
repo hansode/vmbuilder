@@ -318,7 +318,7 @@ splashimage=(hd${grub_id},0)/boot/grub/splash.xpm.gz
 hiddenmenu
 title ${distro} ($(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1 | sed 's,^vmlinuz-,,'))
         root (hd${grub_id},0)
-        kernel /boot/$(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1) ro root=UUID=${rootdev_uuid} rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD quiet SYSFONT=latarcyrheb-sun16 rhgb crashkernel=auto  KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM
+        kernel /boot/$(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1) ro root=UUID=${rootdev_uuid} rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto  KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM
         initrd /boot/$(cd ${chroot_dir}/boot && ls initramfs-*| tail -1)
 _EOS_
 cat ${chroot_dir}/boot/grub/grub.conf
