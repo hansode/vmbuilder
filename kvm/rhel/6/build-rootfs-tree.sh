@@ -216,7 +216,7 @@ EOS
 /bin/cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
 
 # diet
-${yum_cmd} erase kbd ed ustr checkpolicy
+#${yum_cmd} erase kbd ed ustr checkpolicy
 
 # needless services
 /usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --list |grep -v :on |\
