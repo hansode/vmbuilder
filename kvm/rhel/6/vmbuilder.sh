@@ -383,6 +383,8 @@ ln -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
 
 printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
 umount ${chroot_dir}/${new_filename}
+printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
+rm -rf ${chroot_dir}/${tmpdir}
 
 printf "[DEBUG] Unmounting %s\n" ${mntpnt}
 umount ${mntpnt}
