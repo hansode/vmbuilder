@@ -79,7 +79,7 @@ done
 
 #
 debug=${debug:-}
-[ -z ${debug} ] || set -x
+[ -z "${debug}" ] || set -x
 abs_path=$(cd $(dirname $0) && pwd)
 
 #
@@ -89,7 +89,7 @@ distro_arch=${distro_arch:-x86_64}
 distro=${distro_name}-${distro_ver}_${distro_arch}
 distro_dir=${distro_dir:-`pwd`/${distro}}
 
-[ -d ${distro_dir} ] || {
+[ -d "${distro_dir}" ] || {
   printf "[INFO] Building OS tree: %s\n" ${distro_dir}
   ${abs_path}/build-rootfs-tree.sh --distro_name=${distro_name} --distro_ver=${distro_ver} --distro_arch=${distro_arch} --chroot_dir=${distro_dir} --batch=1 --debug=1
 }
@@ -216,7 +216,7 @@ done
 #            self.vm.add_clean_cb(self.umount)
 
 mntpnt=/tmp/tmp$(date +%s)
-[ -d ${mntpnt} ] && { exit 1; } || mkdir -p ${mntpnt}
+[ -d "${mntpnt}" ] && { exit 1; } || mkdir -p ${mntpnt}
 
 for part_filename in ${part_filenames}; do
   case ${part_filename} in
@@ -239,7 +239,7 @@ done
 #distro=centos-6_x86_64
 #distro_dir=./${distro}
 
-[ -d ${distro_dir} ] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
+[ -d "${distro_dir}" ] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
 
 printf "[DEBUG] Installing OS to %s\n" ${mntpnt}
 rsync -aHA ${distro_dir}/ ${mntpnt}
@@ -341,7 +341,7 @@ BOOTPROTO=dhcp
 ONBOOT=yes
 
 # /etc/sysconfig/network-scripts/ifcfg-eth0
-[ -z ${ip} ] || {
+[ -z "${ip}" ] || {
   printf "[INFO] Unsetting /etc/sysconfig/network-scripts/ifcfg-eth0.\n"
   cat <<_EOS_ > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
 DEVICE=eth0
@@ -349,15 +349,15 @@ BOOTPROTO=static
 ONBOOT=yes
 
 IPADDR=${ip}
-$([ -z ${net}   ] || echo "NETMASK=${net}")
-$([ -z ${bcast} ] || echo "BROADCAST=${bcast}")
-$([ -z ${gw}    ] || echo "GATEWAY=${gw}")
+$([ -z "${net}"   ] || echo "NETMASK=${net}")
+$([ -z "${bcast}" ] || echo "BROADCAST=${bcast}")
+$([ -z "${gw}"    ] || echo "GATEWAY=${gw}")
 _EOS_
   cat ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
 }
 
 # /etc/resolv.conf
-[ -z ${dns} ] || {
+[ -z "${dns}" ] || {
   printf "[INFO] Unsetting /etc/resolv.conf.\n"
   cat <<_EOS_ > ${chroot_dir}/etc/resolv.conf
 nameserver ${dns}
@@ -370,11 +370,11 @@ printf "[INFO] Unsetting udev 70-persistent-net.rules.\n"
 rm -f ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
 ln -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
 
-[ -z ${execscript} ] || {
-  [ -f ${execscript} ] || {
+[ -z "${execscript}" ] || {
+  [ -f "${execscript}" ] || {
     chroot ${chroot_dir} bash -c "echo root:root | chpasswd"
   } && {
-    [ -x ${execscript} ] && {
+    [ -x "${execscript}" ] && {
       printf "[INFO] Excecuting after script\n"
       ${execscript} ${chroot_dir}
     } || :
