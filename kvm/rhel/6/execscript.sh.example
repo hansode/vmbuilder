@@ -39,4 +39,6 @@ egrep -q ^umask ${devel_home}/.bashrc || {
   echo umask 022 >> ${devel_home}/.bashrc
 }
 
+cd /tmp
+rm -rf gist-1108422
 EOS
