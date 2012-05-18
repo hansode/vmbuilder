@@ -40,9 +40,6 @@ distro_ver=${distro_ver:-6}
 distro_name=${distro_name:-centos}
 root_dev=${root_dev:-/dev/sda1}
 
-abs_path=$(cd $(dirname $0) && pwd)
-chroot_dir=${chroot_dir:-${abs_path}/${distro_short}-${distro_ver}_${distro_arch}}
-
 # check
 [[ $UID -ne 0 ]] && {
   echo "ERROR: Run as root" >/dev/stderr
@@ -86,6 +83,8 @@ case ${distro_name} in
     exit 1;
 esac
 
+abs_path=$(cd $(dirname $0) && pwd)
+chroot_dir=${chroot_dir:-${abs_path}/${distro_short}-${distro_ver}_${distro_arch}}
 
 # dump vars
 cat <<EOS
