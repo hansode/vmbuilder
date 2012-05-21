@@ -147,6 +147,7 @@ parted --script -- ${disk_filename} mkpart  primary 'linux-swap(new)' ${rootsize
 #        for line in parts:
 #            mapdevs.append(line.split(' ')[2])
 printf "[INFO] Creating loop devices corresponding to the created partitions\n"
+which kpartx || exit 1
 mapdevs=$(
  kpartx -va ${disk_filename} \
   | egrep -v "^(gpt|dos):" \
