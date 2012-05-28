@@ -377,7 +377,7 @@ ln -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
   } && {
     [ -x "${execscript}" ] && {
       printf "[INFO] Excecuting after script\n"
-      ${execscript} ${chroot_dir}
+      setarch ${distro_arch} ${execscript} ${chroot_dir}
     } || :
   }
 }
