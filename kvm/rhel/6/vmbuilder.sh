@@ -124,14 +124,16 @@ size=$((${rootsize=2048} + ${swapsize=512}))
 
 # * /usr/share/pyshared/VMBuilder/disk.py
 # rhel)
-qemu_img_path=qemu-img
+# qemu_img_path=qemu-img
 # ubuntu|debian)
 # qemu_img_path=kvm-img
 
 
 # def create(self):
 printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${disk_filename} ${size}
-${qemu_img_path} create -f raw ${disk_filename} ${size}M
+#${qemu_img_path} create -f raw ${disk_filename} ${size}M
+#dd if=/dev/zero of=${disk_filename} bs=1M count=${size}
+truncate -s ${size}M ${disk_filename}
 
 # def partition(self)
 printf "[INFO] Adding partition table to disk image: %s\n" ${disk_filename}
