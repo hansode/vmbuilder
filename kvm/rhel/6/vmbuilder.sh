@@ -85,7 +85,13 @@ abs_path=$(cd $(dirname $0) && pwd)
 #
 distro_name=${distro_name:-centos}
 distro_ver=${distro_ver:-6}
-distro_arch=${distro_arch:-x86_64}
+
+distro_arch=${distro_arch:-$(arch)}
+case ${distro_arch} in
+i*86)   basearch=i386; distro_arch=i686;;
+x86_64) basearch=${distro_arch};;
+esac
+
 distro=${distro_name}-${distro_ver}_${distro_arch}
 distro_dir=${distro_dir:-`pwd`/${distro}}
 

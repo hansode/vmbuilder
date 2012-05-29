@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # OPTIONS
-#        --distro_arch=x86_64
+#        --distro_arch=[x86_64 | i686]
 #        --distro_name=[centos | sl]
 #        --distro_ver=[6 | 6.0 | 6.2 | ... ]
 #        --batch=1
@@ -35,7 +35,12 @@ debug=${debug:-}
 #
 # vars
 #
-distro_arch=${distro_arch:-x86_64}
+distro_arch=${distro_arch:-$(arch)}
+case ${distro_arch} in
+i*86)   basearch=i386; distro_arch=i686;;
+x86_64) basearch=${distro_arch};;
+esac
+
 distro_ver=${distro_ver:-6}
 distro_name=${distro_name:-centos}
 root_dev=${root_dev:-/dev/sda1}
@@ -52,16 +57,11 @@ which yum >/dev/null 2>&1 || {
 }
 
 # validate
-case ${distro_arch} in
-  i386|x86_64) ;;
-  *) distro_arch=i386 ;;
-esac
-
 case ${distro_name} in
   centos)
     distro_short=centos
     distro_snake=CentOS
-    baseurl=http://ftp.riken.go.jp/pub/Linux/centos/${distro_ver}/os/${distro_arch}
+    baseurl=http://ftp.riken.go.jp/pub/Linux/centos/${distro_ver}/os/${basearch}
     case ${distro_ver} in
     6|6.*)
       gpgkey="${baseurl}/RPM-GPG-KEY-${distro_snake}-6"
@@ -71,7 +71,7 @@ case ${distro_name} in
   sl|scientific|scientificlinux)
     distro_short=sl
     distro_snake="Scientific Linux"
-    baseurl=http://ftp.riken.go.jp/pub/Linux/scientific/${distro_ver}/${distro_arch}/os
+    baseurl=http://ftp.riken.go.jp/pub/Linux/scientific/${distro_ver}/${basearch}/os
     case ${distro_ver} in
     6|6.*)
       gpgkey="${baseurl}/RPM-GPG-KEY-sl ${baseurl}/RPM-GPG-KEY-sl6"
@@ -157,7 +157,7 @@ installonly_limit=2
 # PUT YOUR REPOS HERE OR IN separate files named file.repo
 # in /etc/yum.repos.d
 [${distro_short}]
-name=${distro_snake} ${distro_ver} - ${distro_arch}
+name=${distro_snake} ${distro_ver} - ${basearch}
 failovermethod=priority
 baseurl=${baseurl}
 enabled=1
@@ -225,7 +225,7 @@ EOS
 
 #
 for grub_distro_name in redhat unknown; do
-  grub_src_dir=${chroot_dir}/usr/share/grub/${distro_arch}-${grub_distro_name}
+  grub_src_dir=${chroot_dir}/usr/share/grub/${basearch}-${grub_distro_name}
   [ -d ${grub_src_dir} ] || continue
   rsync -a ${grub_src_dir}/ ${chroot_dir}/boot/grub/
 done
