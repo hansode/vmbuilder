@@ -109,7 +109,14 @@ case ${yorn} in
   n|N|no|NO) exit 1;;
 esac
 
-
+function do_cleanup() {
+  printf "[DEBUG] Caught signal\n"
+  umount ${chroot_dir}/proc
+  [ -d ${chroot_dir} ] && rm -rf ${chroot_dir}
+  [ -f ${repo} ] && rm -f ${repo}
+  printf "[DEBUG] Cleaned up\n"
+}
+trap do_cleanup 1 2 3 15
 
 #
 #
