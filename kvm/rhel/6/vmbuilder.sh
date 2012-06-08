@@ -126,7 +126,7 @@ dns=${dns:-}
 
 # local params
 disk_filename=${raw}
-size=$((${rootsize=2048} + ${swapsize=512}))
+size=$((${rootsize} + ${swapsize}))
 
 # * /usr/share/pyshared/VMBuilder/disk.py
 # rhel)
