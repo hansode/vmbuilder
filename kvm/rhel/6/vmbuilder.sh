@@ -108,10 +108,12 @@ distro_dir=${distro_dir:-`pwd`/${distro}}
 # -------------------
 #
 # + ('--rootsize', metavar='SIZE', default=4096, help='Size (in MB) of the root filesystem [default: %default]')
+# + ('--optsize', metavar='SIZE', default=0, help='Size (in MB) of the /opt filesystem. If not set, no /opt filesystem will be added.')
 # + ('--swapsize', metavar='SIZE', default=1024, help='Size (in MB) of the swap partition [default: %default]')
 # + ('--raw', metavar='PATH', type='str', help="Specify a file (or block device) to as first disk image.")
 #
 rootsize=${rootsize:-4096}
+optsize=${optsize:-0}
 swapsize=${swapsize:-1024}
 execscript=${execscript:-}
 raw=${raw:-./${distro}.raw}
@@ -126,7 +128,7 @@ dns=${dns:-}
 
 # local params
 disk_filename=${raw}
-size=$((${rootsize} + ${swapsize}))
+size=$((${rootsize} + ${optsize} + ${swapsize}))
 
 # * /usr/share/pyshared/VMBuilder/disk.py
 # rhel)
@@ -145,10 +147,21 @@ truncate -s ${size}M ${disk_filename}
 printf "[INFO] Adding partition table to disk image: %s\n" ${disk_filename}
 parted --script    ${disk_filename} mklabel msdos
 
+offset=0
+# root
 printf "[INFO] Adding type %s partition to disk image: %s\n" ext2 ${disk_filename}
-parted --script -- ${disk_filename} mkpart  primary ext2 0 $((${rootsize} - 1))
+parted --script -- ${disk_filename} mkpart  primary ext2 ${offset} $((${rootsize} - 1))
+offset=$((${offset} + ${rootsize}))
+# swap
 printf "[INFO] Adding type %s partition to disk image: %s\n" swap ${disk_filename}
-parted --script -- ${disk_filename} mkpart  primary 'linux-swap(new)' ${rootsize} $((${size} - 1))
+parted --script -- ${disk_filename} mkpart  primary 'linux-swap(new)' ${offset} $((${offset} + ${swapsize} - 1))
+offset=$((${offset} + ${swapsize}))
+# opt
+[ ${optsize} -gt 0 ] && {
+  printf "[INFO] Adding type %s partition to disk image: %s\n" ext2 ${disk_filename}
+  parted --script -- ${disk_filename} mkpart  primary ext2 ${offset} $((${offset} + ${optsize} - 1))
+}
+unset offset
 
 # def map_partitions(self):
 #        mapdevs = []
@@ -192,7 +205,7 @@ getid_path=
 uuids=
 for part_filename in ${part_filenames}; do
   case ${part_filename} in
-  *p1)
+  *p1|*p3)
     mkfs.ext4 -F ${part_filename}
     ;;
   *p2)
@@ -317,6 +330,7 @@ _EOS_
 #
 rootdev_uuid=$(echo ${uuids} | awk '{print $1}')
 swapdev_uuid=$(echo ${uuids} | awk '{print $2}')
+optdev_uuid=$(echo ${uuids} | awk '{print $3}')
 
 # /boot/grub/grub.conf
 printf "[INFO] Generating /boot/grub/grub.conf.\n"
@@ -338,6 +352,10 @@ printf "[INFO] Overwriting /etc/fstab.\n"
 cat <<_EOS_ > ${chroot_dir}/etc/fstab
 UUID=${rootdev_uuid} /                       ext4    defaults        1 1
 UUID=${swapdev_uuid} swap                    swap    defaults        0 0
+$([ ${optsize} -gt 0 ] && { cat <<_OPTDEV_
+UUID=${optdev_uuid} /opt                    ext4    defaults        1 1
+_OPTDEV_
+})
 tmpfs                   /dev/shm                tmpfs   defaults        0 0
 devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
 sysfs                   /sys                    sysfs   defaults        0 0
