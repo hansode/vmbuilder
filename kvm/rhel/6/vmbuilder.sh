@@ -66,7 +66,7 @@ while [ $# -gt 0 ]; do
   arg="$1"
   case "${arg}" in
     --*=*)
-      key=${arg%%=*}; key=${key##--}
+      key=${arg%%=*}; key=$(echo ${key##--} | tr - _)
       value=${arg##--*=}
       eval "${key}=\"${value}\""
       ;;
@@ -97,7 +97,7 @@ distro_dir=${distro_dir:-`pwd`/${distro}}
 
 [ -d "${distro_dir}" ] || {
   printf "[INFO] Building OS tree: %s\n" ${distro_dir}
-  ${abs_path}/build-rootfs-tree.sh --distro_name=${distro_name} --distro_ver=${distro_ver} --distro_arch=${distro_arch} --chroot_dir=${distro_dir} --batch=1 --debug=1
+  ${abs_path}/build-rootfs-tree.sh --distro-name=${distro_name} --distro-ver=${distro_ver} --distro-arch=${distro_arch} --chroot-dir=${distro_dir} --batch=1 --debug=1
 }
 
 

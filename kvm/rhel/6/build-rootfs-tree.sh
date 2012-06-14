@@ -1,11 +1,11 @@
 #!/bin/bash
 #
 # OPTIONS
-#        --distro_arch=[x86_64 | i686]
-#        --distro_name=[centos | sl]
-#        --distro_ver=[6 | 6.0 | 6.2 | ... ]
+#        --distro-arch=[x86_64 | i686]
+#        --distro-name=[centos | sl]
+#        --distro-ver=[6 | 6.0 | 6.2 | ... ]
 #        --batch=1
-#        --chroot_dir=/path/to/rootfs
+#        --chroot-dir=/path/to/rootfs
 #        --debug=1
 #
 export PATH=/bin:/usr/bin:/sbin:/usr/sbin
@@ -18,7 +18,7 @@ while [ $# -gt 0 ]; do
   arg="$1"
   case "${arg}" in
     --*=*)
-      key=${arg%%=*}; key=${key##--}
+      key=${arg%%=*}; key=$(echo ${key##--} | tr - _)
       value=${arg##--*=}
       eval "${key}=\"${value}\""
       ;;
