@@ -58,6 +58,29 @@
 #               the virtual machine.
 #
 #
+# <based ontune2fs>
+#
+#       -c max-mount-counts
+#              Adjust the number of mounts after which the filesystem will be checked by e2fsck(8).  If max-mount-counts is 0 or  -1,  the  number  of  times  the
+#              filesystem is mounted will be disregarded by e2fsck(8) and the kernel.
+#
+#              Staggering  the  mount-counts  at  which filesystems are forcibly checked will avoid all filesystems being checked at one time when using journaled
+#              filesystems.
+#
+#              You should strongly consider the consequences of disabling mount-count-dependent checking entirely.  Bad disk drives, cables,  memory,  and  kernel
+#              bugs  could  all  corrupt  a  filesystem  without  marking  the filesystem dirty or in error.  If you are using journaling on your filesystem, your
+#              filesystem will never be marked dirty, so it will not normally be checked.  A filesystem error detected by the kernel will still force an  fsck  on
+#              the next reboot, but it may already be too late to prevent data loss at that point.
+#
+#              See also the -i option for time-dependent checking.
+#
+#       -i  interval-between-checks[d|m|w]
+#              Adjust the maximal time between two filesystem checks.  No suffix or d will interpret the number interval-between-checks as days, m as months,  and
+#              w as weeks.  A value of zero will disable the time-dependent checking.
+#
+#              It  is  strongly  recommended  that  either  -c (mount-count-dependent) or -i (time-dependent) checking be enabled to force periodic full e2fsck(8)
+#              checking of the filesystem.  Failure to do so may lead to filesystem corruption (due to bad disks, cables, memory, or kernel bugs) going unnoticed,
+#              ultimately resulting in data loss or corruption.
 #
 set -e
 
@@ -99,6 +122,12 @@ distro_dir=${distro_dir:-`pwd`/${distro}}
   printf "[INFO] Building OS tree: %s\n" ${distro_dir}
   ${abs_path}/build-rootfs-tree.sh --distro-name=${distro_name} --distro-ver=${distro_ver} --distro-arch=${distro_arch} --chroot-dir=${distro_dir} --batch=1 --debug=1
 }
+
+# * tune2fs
+# > This filesystem will be automatically checked every 37 mounts or
+# > 180 days, whichever comes first.  Use tune2fs -c or -i to override.
+max_mount_count=${max_mount_count:-37}
+interval_between_check=${interval_between_check:-180}
 
 
 # * /usr/share/pyshared/VMBuilder/contrib/cli.py
@@ -207,6 +236,14 @@ for part_filename in ${part_filenames}; do
   case ${part_filename} in
   *p1|*p3)
     mkfs.ext4 -F ${part_filename}
+
+    # > This filesystem will be automatically checked every 37 mounts or
+    # > 180 days, whichever comes first.  Use tune2fs -c or -i to override.
+    [ ! "${max_mount_count}" -eq 37 -o ! "${interval_between_check}" -eq 180 ] && {
+      printf "[INFO] Setting maximal mount count: %s\n" ${max_mount_count}
+      printf "[INFO] Setting interval between check(s): %s\n" ${interval_between_check}
+      tune2fs -c ${max_mount_count} -i ${interval_between_check} ${part_filename}
+    }
     ;;
   *p2)
     mkswap ${part_filename}
