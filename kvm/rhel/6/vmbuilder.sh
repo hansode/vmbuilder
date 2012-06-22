@@ -446,15 +446,15 @@ printf "[INFO] Unsetting udev 70-persistent-net.rules.\n"
 rm -f ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
 ln -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
 
-[ -z "${execscript}" ] || {
-  [ -f "${execscript}" ] || {
-    chroot ${chroot_dir} bash -c "echo root:root | chpasswd"
-  } && {
+[ -z "${execscript}" ] && {
+  chroot ${chroot_dir} bash -c "echo root:root | chpasswd"
+} || {
+  [ -f "${execscript}" ] && {
     [ -x "${execscript}" ] && {
       printf "[INFO] Excecuting after script\n"
       setarch ${distro_arch} ${execscript} ${chroot_dir}
     } || :
-  }
+  } || :
 }
 
 printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
