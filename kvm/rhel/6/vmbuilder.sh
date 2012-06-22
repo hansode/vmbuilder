@@ -154,6 +154,7 @@ net=${net:-}
 bcast=${bcast:-}
 gw=${gw:-}
 dns=${dns:-}
+hostname=${hostname:-}
 
 # local params
 disk_filename=${raw}
@@ -427,6 +428,17 @@ _EOS_
 nameserver ${dns}
 _EOS_
   cat ${chroot_dir}/etc/resolv.conf
+}
+
+# hostname
+[ -z "${hostname}" ] || {
+  printf "[INFO] Setting hostname: %s\n" ${hostname}
+  egrep ^HOSTNAME= ${chroot_dir}/etc/sysconfig/network -q && {
+    sed -i "s,^HOSTNAME=.*,HOSTNAME=${hostname}," ${chroot_dir}/etc/sysconfig/network
+  } || {
+    echo HOSTNAME=${hostname} >> ${chroot_dir}/etc/sysconfig/network
+  }
+  echo 127.0.0.1 ${hostname} >> ${chroot_dir}/etc/hosts
 }
 
 # disable mac address caching
