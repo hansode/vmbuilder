@@ -471,7 +471,7 @@ tries=0
 max_tries=3
 while [ ${tries} -lt ${max_tries} ]; do
   kpartx -vd ${disk_filename} && break || :
-  tries=$(({tries} + 1))
+  tries=$((${tries} + 1))
   sleep 1
   [ ${tries} -ge ${max_tries} ] && printf "[INFO] Could not unmount '%s' after '%d' attempts. Final attempt" ${disk_filename} ${tries}
 done
