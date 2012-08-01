@@ -118,9 +118,16 @@ esac
 distro=${distro_name}-${distro_ver}_${distro_arch}
 distro_dir=${distro_dir:-`pwd`/${distro}}
 
+keepcache=${keepcache:-0}
+# keepcache should be [ 0 | 1 ]
+case ${keepcache} in
+[01]) ;;
+*)    keepcache=0 ;;
+esac
+
 [ -d "${distro_dir}" ] || {
   printf "[INFO] Building OS tree: %s\n" ${distro_dir}
-  ${abs_path}/build-rootfs-tree.sh --distro-name=${distro_name} --distro-ver=${distro_ver} --distro-arch=${distro_arch} --chroot-dir=${distro_dir} --batch=1 --debug=1
+  ${abs_path}/build-rootfs-tree.sh --distro-name=${distro_name} --distro-ver=${distro_ver} --distro-arch=${distro_arch} --chroot-dir=${distro_dir} --keepcache=${keepcache} --batch=1 --debug=1
 }
 
 # * tune2fs
@@ -304,6 +311,9 @@ done
 printf "[DEBUG] Installing OS to %s\n" ${mntpnt}
 rsync -aHA ${distro_dir}/ ${mntpnt}
 sync
+
+printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
+sed -i s,^keepcache=.*,keepcache=${keepcache}, ${mntpnt}/etc/yum.conf
 
 #        if self.needs_bootloader:
 #            self.call_hooks('install_bootloader', self.chroot_dir, self.disks)

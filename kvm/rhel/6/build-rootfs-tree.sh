@@ -86,7 +86,13 @@ esac
 
 abs_path=$(cd $(dirname $0) && pwd)
 chroot_dir=${chroot_dir:-${abs_path}/${distro_short}-${distro_ver}_${distro_arch}}
+
 keepcache=${keepcache:-0}
+# keepcache should be [ 0 | 1 ]
+case ${keepcache} in
+[01]) ;;
+*)    keepcache=0 ;;
+esac
 
 # dump vars
 cat <<EOS
