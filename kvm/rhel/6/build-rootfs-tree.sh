@@ -111,7 +111,7 @@ esac
 
 function do_cleanup() {
   printf "[DEBUG] Caught signal\n"
-  umount ${chroot_dir}/proc
+  umount -l ${chroot_dir}/proc
   [ -d ${chroot_dir} ] && rm -rf ${chroot_dir}
   [ -f ${repo} ] && rm -f ${repo}
   printf "[DEBUG] Cleaned up\n"
@@ -245,7 +245,7 @@ find   ${chroot_dir}/var/log/ -type f | xargs rm
 rm -rf ${chroot_dir}/tmp/*
 rm -f  ${repo}
 
-umount ${chroot_dir}/proc
+umount -l ${chroot_dir}/proc
 
 printf "[INFO] Installed => %s\n" ${chroot_dir}
 printf "[INFO] Complete!\n"
