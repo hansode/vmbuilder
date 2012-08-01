@@ -6,6 +6,7 @@
 #        --distro-ver=[6 | 6.0 | 6.2 | ... ]
 #        --batch=1
 #        --chroot-dir=/path/to/rootfs
+#        --keepcache=1
 #        --debug=1
 #
 export PATH=/bin:/usr/bin:/sbin:/usr/sbin
@@ -85,6 +86,7 @@ esac
 
 abs_path=$(cd $(dirname $0) && pwd)
 chroot_dir=${chroot_dir:-${abs_path}/${distro_short}-${distro_ver}_${distro_arch}}
+keepcache=${keepcache:-0}
 
 # dump vars
 cat <<EOS
@@ -93,6 +95,7 @@ distro_arch: ${distro_arch}
 distro_name: ${distro_name} ${distro_snake}
 distro_ver:  ${distro_ver}
 chroot_dir:  ${chroot_dir}
+keepcache:   ${keepcache}
 --------------------
 EOS
 
@@ -151,7 +154,7 @@ done
 cat <<EOS > ${repo}
 [main]
 cachedir=/var/cache/yum
-keepcache=0
+keepcache=${keepcache}
 debuglevel=2
 logfile=/var/log/yum.log
 exactarch=1
