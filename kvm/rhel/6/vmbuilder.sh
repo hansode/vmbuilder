@@ -190,9 +190,11 @@ printf "[INFO] Adding type %s partition to disk image: %s\n" ext2 ${disk_filenam
 parted --script -- ${disk_filename} mkpart  primary ext2 ${offset} $((${rootsize} - 1))
 offset=$((${offset} + ${rootsize}))
 # swap
-printf "[INFO] Adding type %s partition to disk image: %s\n" swap ${disk_filename}
-parted --script -- ${disk_filename} mkpart  primary 'linux-swap(new)' ${offset} $((${offset} + ${swapsize} - 1))
-offset=$((${offset} + ${swapsize}))
+[ ${swapsize} -gt 0 ] && {
+  printf "[INFO] Adding type %s partition to disk image: %s\n" swap ${disk_filename}
+  parted --script -- ${disk_filename} mkpart  primary 'linux-swap(new)' ${offset} $((${offset} + ${swapsize} - 1))
+  offset=$((${offset} + ${swapsize}))
+}
 # opt
 [ ${optsize} -gt 0 ] && {
   printf "[INFO] Adding type %s partition to disk image: %s\n" ext2 ${disk_filename}
@@ -409,7 +411,10 @@ chroot ${chroot_dir} ln -s /boot/grub/grub.conf /boot/grub/menu.lst
 printf "[INFO] Overwriting /etc/fstab.\n"
 cat <<_EOS_ > ${chroot_dir}/etc/fstab
 UUID=${rootdev_uuid} /                       ext4    defaults        1 1
+$([ ${optsize} -gt 0 ] && { cat <<_SWAPDEV_
 UUID=${swapdev_uuid} swap                    swap    defaults        0 0
+_SWAPDEV_
+})
 $([ ${optsize} -gt 0 ] && { cat <<_OPTDEV_
 UUID=${optdev_uuid} /opt                    ext4    defaults        1 1
 _OPTDEV_
