@@ -301,7 +301,7 @@ for part_filename in ${part_filenames}; do
   case ${part_filename} in
   *p1)
     printf "[DEBUG] Mounting %s\n" ${mntpnt}
-    mount -o loop ${part_filename} ${mntpnt}
+    mount ${part_filename} ${mntpnt}
     ;;
   esac
 done
