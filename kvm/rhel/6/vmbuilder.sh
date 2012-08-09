@@ -107,7 +107,7 @@ abs_path=$(cd $(dirname $0) && pwd)
 
 #
 distro_name=${distro_name:-centos}
-distro_ver=${distro_ver:-6}
+distro_ver=${distro_ver:-6.3}
 
 distro_arch=${distro_arch:-$(arch)}
 case ${distro_arch} in

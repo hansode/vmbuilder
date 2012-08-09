@@ -42,7 +42,7 @@ i*86)   basearch=i386; distro_arch=i686;;
 x86_64) basearch=${distro_arch};;
 esac
 
-distro_ver=${distro_ver:-6}
+distro_ver=${distro_ver:-6.3}
 distro_name=${distro_name:-centos}
 root_dev=${root_dev:-/dev/sda1}
 
