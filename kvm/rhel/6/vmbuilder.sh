@@ -287,16 +287,6 @@ done
 mntpnt=/tmp/tmp$(date +%s)
 [ -d "${mntpnt}" ] && { exit 1; } || mkdir -p ${mntpnt}
 
-# setup to unmount and clean up
-trap '
-set +e
-for tmpmnt in ${chroot_dir}/${new_filename} ${mntpnt}; do
-  while grep -q ${tmpmnt} /proc/mounts; do
-    umount -l ${tmpmnt}
-  done
-done
-' 0 2 3 15
-
 for part_filename in ${part_filenames}; do
   case ${part_filename} in
   *p1)
