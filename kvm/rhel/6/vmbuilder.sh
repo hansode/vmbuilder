@@ -261,6 +261,8 @@ function build_vers() {
   disk_filename=${raw}
 }
 
+## rootfs tree
+
 function mkrootfs() {
   local distro_dir=$1
   [[ -d "${distro_dir}" ]] || {
@@ -276,6 +278,8 @@ function mkrootfs() {
   }
 }
 
+## disk
+
 function mkdisk() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] && { echo "already exists: ${disk_filename}" >&2; return 1; }
@@ -289,6 +293,8 @@ function rmdisk() {
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   ${rm} -f ${disk_filename}
 }
+
+## ptab
 
 function mkptab() {
   local disk_filename=$1
@@ -358,6 +364,8 @@ function devmap2path() {
   done
 }
 
+## vmimage
+
 function mkfs2vm() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
@@ -402,23 +410,26 @@ function mountvm() {
 function installos() {
   local disk_filename=$1
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
-
   local mntpnt=/tmp/tmp$(date +%s)
 
   mountvm ${disk_filename} ${mntpnt}
 
-  printf "[DEBUG] Installing OS to %s\n" ${mntpnt}
-  ${rsync} -aHA ${distro_dir}/ ${mntpnt}
-  ${sync}
-  printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
-  ${sed} -i s,^keepcache=.*,keepcache=${keepcache}, ${mntpnt}/etc/yum.conf
-
+  installdistro2vm     ${mntpnt}
   installgrub2vm       ${mntpnt}
   configure_networking ${mntpnt}
   configure_mounting   ${mntpnt}
   run_execscript       ${mntpnt}
 
   umountvm             ${mntpnt}
+}
+
+function installdistro2vm() {
+  local chroot_dir=${mntpnt}
+  printf "[DEBUG] Installing OS to %s\n" ${mntpnt}
+  ${rsync} -aHA ${distro_dir}/ ${mntpnt}
+  ${sync}
+  printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
+  ${sed} -i s,^keepcache=.*,keepcache=${keepcache}, ${mntpnt}/etc/yum.conf
 }
 
 function installgrub2vm() {
