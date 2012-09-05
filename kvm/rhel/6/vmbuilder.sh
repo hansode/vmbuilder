@@ -465,8 +465,6 @@ function installgrub2vm() {
     done
   )
   rootdev_uuid=$(echo ${uuids} | awk '{print $1}')
-  #swapdev_uuid=$(echo ${uuids} | awk '{print $2}')
-  #optdev_uuid=$(echo ${uuids} | awk '{print $3}')
 
   printf "[INFO] Generating /boot/grub/grub.conf.\n"
   ${cat} <<-_EOS_ > ${chroot_dir}/boot/grub/grub.conf
@@ -592,7 +590,6 @@ printf "[DEBUG] Unmounting %s\n" ${mntpnt}
 ${umount} ${mntpnt}
 
 printf "[INFO] Deleting loop devices\n"
-
 unmapptab_r ${disk_filename}
 
 ${rmdir} ${mntpnt}
