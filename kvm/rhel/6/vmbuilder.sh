@@ -105,6 +105,111 @@ function extract_args() {
   CMD_ARGS=${CMD_ARGS## }
 }
 
+function build_vers() {
+  debug=${debug:-}
+  [[ -z "${debug}" ]] || set -x
+  dry_run=${dry_run:-}
+
+  distro_name=${distro_name:-centos}
+  distro_ver=${distro_ver:-6.3}
+
+  distro_arch=${distro_arch:-$(arch)}
+  case "${distro_arch}" in
+  i*86)   basearch=i386; distro_arch=i686;;
+  x86_64) basearch=${distro_arch};;
+  esac
+
+  distro=${distro_name}-${distro_ver}_${distro_arch}
+  distro_dir=${distro_dir:-`pwd`/${distro}}
+
+  keepcache=${keepcache:-0}
+  # keepcache should be [ 0 | 1 ]
+  case "${keepcache}" in
+  [01]) ;;
+  *)    keepcache=0 ;;
+  esac
+
+  # requires:
+  build_rootfs_tree_sh=${build_rootfs_tree_sh:-"${abs_path}/build-rootfs-tree.sh"}
+  truncate=${truncate:-"truncate"}
+  parted=${parted:-"parted"}
+  kpartx=${kpartx:-"kpartx"}
+  udevadm=${udevadm:-"/sbin/udevadm"}
+  blkid=${blkid:-"blkid"}
+  mkfs=${mkfs:-"mkfs.ext4"}
+  tune2fs=${tune2fs:-"tune2fs"}
+  mkswap=${mkswap:-"mkswap"}
+  mount=${mount:-"mount"}
+  umount=${umount:-"umount"}
+  mkdir=${mkdir:-"mkdir"}
+  rmdir=${rmdir:-"rmdir"}
+  rsync=${rsync:-"rsync"}
+  sync=${sync:-"sync"}
+  touch=${touch:-"touch"}
+  ln=${ln:-"ln"}
+  rm=${rm:-"rm"}
+  chroot=${chroot:-"chroot"}
+
+  [[ -n ${dry_run} ]] && {
+    build_rootfs_tree_sh="echo ${abs_path}/build-rootfs-tree.sh"
+    truncate="echo ${truncate}"
+    parted="echo ${parted}"
+    kpartx="echo ${kpartx}"
+    udevadm="echo ${udevadm}"
+    blkid="echo ${blkid}"
+    mkfs="echo ${mkfs}"
+    tune2fs="echo ${tune2fs}"
+    mkswap="echo ${mkswap}"
+    mount="echo ${mount}"
+    umount="echo ${umount}"
+    mkdir="echo ${mkdir}"
+    rmdir="echo ${rmdir}"
+    rsync="echo ${rsync}"
+    sync="echo ${sync}"
+    touch="echo ${touch}"
+    ln="echo ${ln}"
+    rm="echo ${rm}"
+    chroot="echo ${chroot}"
+  } || :
+
+  # * tune2fs
+  # > This filesystem will be automatically checked every 37 mounts or
+  # > 180 days, whichever comes first.  Use tune2fs -c or -i to override.
+  max_mount_count=${max_mount_count:-37}
+  interval_between_check=${interval_between_check:-180}
+
+  # * /usr/share/pyshared/VMBuilder/contrib/cli.py
+
+  #
+  # OptionGroup('Disk')
+  # -------------------
+  #
+  # + ('--rootsize', metavar='SIZE', default=4096, help='Size (in MB) of the root filesystem [default: %default]')
+  # + ('--optsize', metavar='SIZE', default=0, help='Size (in MB) of the /opt filesystem. If not set, no /opt filesystem will be added.')
+  # + ('--swapsize', metavar='SIZE', default=1024, help='Size (in MB) of the swap partition [default: %default]')
+  # + ('--raw', metavar='PATH', type='str', help="Specify a file (or block device) to as first disk image.")
+  #
+  rootsize=${rootsize:-4096}
+  optsize=${optsize:-0}
+  swapsize=${swapsize:-1024}
+  execscript=${execscript:-}
+  raw=${raw:-./${distro}.raw}
+
+  #domain=${domain:-}
+  ip=${ip:-}
+  mask=${mask:-}
+  net=${net:-}
+  bcast=${bcast:-}
+  gw=${gw:-}
+  dns=${dns:-}
+  hostname=${hostname:-}
+
+  # local params
+  disk_filename=${raw}
+  size=$((${rootsize} + ${optsize} + ${swapsize}))
+  mntpnt=/tmp/tmp$(date +%s)
+}
+
 ### prepare
 
 extract_args $*
@@ -115,71 +220,12 @@ abs_path=$(cd $(dirname $0) && pwd)
 
 ## main
 
-#
-debug=${debug:-}
-[ -z "${debug}" ] || set -x
-
-#
-distro_name=${distro_name:-centos}
-distro_ver=${distro_ver:-6.3}
-
-distro_arch=${distro_arch:-$(arch)}
-case ${distro_arch} in
-i*86)   basearch=i386; distro_arch=i686;;
-x86_64) basearch=${distro_arch};;
-esac
-
-distro=${distro_name}-${distro_ver}_${distro_arch}
-distro_dir=${distro_dir:-`pwd`/${distro}}
-
-keepcache=${keepcache:-0}
-# keepcache should be [ 0 | 1 ]
-case ${keepcache} in
-[01]) ;;
-*)    keepcache=0 ;;
-esac
+build_vers
 
 [ -d "${distro_dir}" ] || {
   printf "[INFO] Building OS tree: %s\n" ${distro_dir}
   ${abs_path}/build-rootfs-tree.sh --distro-name=${distro_name} --distro-ver=${distro_ver} --distro-arch=${distro_arch} --chroot-dir=${distro_dir} --keepcache=${keepcache} --batch=1 --debug=1
 }
-
-# * tune2fs
-# > This filesystem will be automatically checked every 37 mounts or
-# > 180 days, whichever comes first.  Use tune2fs -c or -i to override.
-max_mount_count=${max_mount_count:-37}
-interval_between_check=${interval_between_check:-180}
-
-
-# * /usr/share/pyshared/VMBuilder/contrib/cli.py
-
-#
-# OptionGroup('Disk')
-# -------------------
-#
-# + ('--rootsize', metavar='SIZE', default=4096, help='Size (in MB) of the root filesystem [default: %default]')
-# + ('--optsize', metavar='SIZE', default=0, help='Size (in MB) of the /opt filesystem. If not set, no /opt filesystem will be added.')
-# + ('--swapsize', metavar='SIZE', default=1024, help='Size (in MB) of the swap partition [default: %default]')
-# + ('--raw', metavar='PATH', type='str', help="Specify a file (or block device) to as first disk image.")
-#
-rootsize=${rootsize:-4096}
-optsize=${optsize:-0}
-swapsize=${swapsize:-1024}
-execscript=${execscript:-}
-raw=${raw:-./${distro}.raw}
-
-#domain=${domain:-}
-ip=${ip:-}
-mask=${mask:-}
-net=${net:-}
-bcast=${bcast:-}
-gw=${gw:-}
-dns=${dns:-}
-hostname=${hostname:-}
-
-# local params
-disk_filename=${raw}
-size=$((${rootsize} + ${optsize} + ${swapsize}))
 
 # * /usr/share/pyshared/VMBuilder/disk.py
 # rhel)
@@ -298,7 +344,6 @@ done
 #            run_cmd('mount', '-o', 'loop', self.filename, self.mntpath)
 #            self.vm.add_clean_cb(self.umount)
 
-mntpnt=/tmp/tmp$(date +%s)
 [ -d "${mntpnt}" ] && { exit 1; } || mkdir -p ${mntpnt}
 
 for part_filename in ${part_filenames}; do
