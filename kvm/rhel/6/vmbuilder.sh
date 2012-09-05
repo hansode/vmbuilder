@@ -363,6 +363,32 @@ function devmap2path() {
   done
 }
 
+function mkfs2vm() {
+  local disk_filename=$1
+  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
+    case ${part_filename} in
+    *p1|*p3)
+      ${mkfs} -F ${part_filename}
+
+      # > This filesystem will be automatically checked every 37 mounts or
+      # > 180 days, whichever comes first.  Use tune2fs -c or -i to override.
+      [ ! "${max_mount_count}" -eq 37 -o ! "${interval_between_check}" -eq 180 ] && {
+        printf "[INFO] Setting maximal mount count: %s\n" ${max_mount_count}
+        printf "[INFO] Setting interval between check(s): %s\n" ${interval_between_check}
+        ${tune2fs} -c ${max_mount_count} -i ${interval_between_check} ${part_filename}
+      }
+      ;;
+    *p2)
+      ${mkswap} ${part_filename}
+      ;;
+    *)
+      ;;
+    esac
+    ${udevadm} settle
+  done
+}
+
 ### prepare
 
 extract_args $*
@@ -403,27 +429,7 @@ mapptab ${disk_filename}
 #            elif os.path.exists("/sbin/blkid"):
 #                self.uuid = run_cmd('blkid', '-c', '/dev/null', '-sUUID', '-ovalue', self.filename).rstrip()
 
-lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
-  case ${part_filename} in
-  *p1|*p3)
-    ${mkfs} -F ${part_filename}
-
-    # > This filesystem will be automatically checked every 37 mounts or
-    # > 180 days, whichever comes first.  Use tune2fs -c or -i to override.
-    [ ! "${max_mount_count}" -eq 37 -o ! "${interval_between_check}" -eq 180 ] && {
-      printf "[INFO] Setting maximal mount count: %s\n" ${max_mount_count}
-      printf "[INFO] Setting interval between check(s): %s\n" ${interval_between_check}
-      ${tune2fs} -c ${max_mount_count} -i ${interval_between_check} ${part_filename}
-    }
-    ;;
-  *p2)
-    ${mkswap} ${part_filename}
-    ;;
-  *)
-    ;;
-  esac
-  ${udevadm} settle
-done
+mkfs2vm ${disk_filename}
 
 uuids=
 lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
