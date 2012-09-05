@@ -578,18 +578,27 @@ readonly abs_path=$(cd $(dirname $0) && pwd)
 ## main
 
 build_vers
+cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
-mkrootfs ${distro_dir}
+case "${cmd}" in
+debug)
+  dump_vers
+  ;;
+*)
+  mkrootfs ${distro_dir}
 
-[[ -f ${disk_filename} ]] && rmdisk ${disk_filename}
-mkdisk  ${disk_filename}
-mkptab  ${disk_filename}
-mapptab ${disk_filename}
-mkfs2vm ${disk_filename}
+  [[ -f ${disk_filename} ]] && rmdisk ${disk_filename}
+  mkdisk  ${disk_filename}
+  mkptab  ${disk_filename}
+  mapptab ${disk_filename}
+  mkfs2vm ${disk_filename}
 
-installos ${disk_filename}
+  installos ${disk_filename}
 
-unmapptab_r ${disk_filename}
+  unmapptab_r ${disk_filename}
 
-printf "[INFO] Generated => %s\n" ${disk_filename}
-printf "[INFO] Complete!\n"
+  printf "[INFO] Generated => %s\n" ${disk_filename}
+  printf "[INFO] Complete!\n"
+  ;;
+esac
+
