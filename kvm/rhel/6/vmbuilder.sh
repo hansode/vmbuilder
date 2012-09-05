@@ -429,26 +429,16 @@ function installos2vm() {
   local distro_dir=$1 mntpnt=$2
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
   [[ -d "${mntpnt}"     ]] || { echo "no such directory: ${mntpnt}" >&2; return 1; }
-#    def install_os(self):
-#        self.nics = [self.NIC()]
-#        self.call_hooks('preflight_check')
-#        self.call_hooks('configure_networking', self.nics)
-#        self.call_hooks('configure_mounting', self.disks, self.filesystems)
-#
-#        self.chroot_dir = tmpdir()
-#        self.call_hooks('mount_partitions', self.chroot_dir)
-#        run_cmd('rsync', '-aHA', '%s/' % self.distro.chroot_dir, self.chroot_dir)
   printf "[DEBUG] Installing OS to %s\n" ${mntpnt}
   ${rsync} -aHA ${distro_dir}/ ${mntpnt}
   ${sync}
-
   printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
   ${sed} -i s,^keepcache=.*,keepcache=${keepcache}, ${mntpnt}/etc/yum.conf
 }
 installos2vm ${distro_dir} ${mntpnt}
 
 function installgrub2vm() {
-  chroot_dir=${mntpnt}
+  local chroot_dir=${mntpnt}
   tmpdir=/tmp/vmbuilder-grub
   ${mkdir} -p ${chroot_dir}/${tmpdir}
 
@@ -478,7 +468,6 @@ function installgrub2vm() {
   #swapdev_uuid=$(echo ${uuids} | awk '{print $2}')
   #optdev_uuid=$(echo ${uuids} | awk '{print $3}')
 
-  # /boot/grub/grub.conf
   printf "[INFO] Generating /boot/grub/grub.conf.\n"
   ${cat} <<-_EOS_ > ${chroot_dir}/boot/grub/grub.conf
 	default=0
@@ -496,10 +485,7 @@ function installgrub2vm() {
 installgrub2vm
 
 function configure_networking() {
-  #DEVICE=eth0
-  #BOOTPROTO=dhcp
-  #ONBOOT=yes
-
+  local chroot_dir=${mntpnt}
   # /etc/sysconfig/network-scripts/ifcfg-eth0
   [[ -z "${ip}" ]] || {
     printf "[INFO] Unsetting /etc/sysconfig/network-scripts/ifcfg-eth0.\n"
@@ -546,6 +532,7 @@ function configure_networking() {
 configure_networking
 
 function configure_mounting() {
+  local chroot_dir=${mntpnt}
   uuids=$(
     lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
       ${blkid} -c /dev/null -sUUID -ovalue ${part_filename}
@@ -577,21 +564,29 @@ function configure_mounting() {
 }
 configure_mounting
 
-[[ -z "${execscript}" ]] && {
-  ${chroot} ${chroot_dir} bash -c "echo root:root | chpasswd"
-} || {
-  [[ -f "${execscript}" ]] && {
-    [[ -x "${execscript}" ]] && {
-      printf "[INFO] Excecuting after script\n"
-      ${setarch} ${distro_arch} ${execscript} ${chroot_dir}
+function run_execscript() {
+  local chroot_dir=${mntpnt}
+  [[ -z "${execscript}" ]] && {
+    ${chroot} ${chroot_dir} bash -c "echo root:root | chpasswd"
+  } || {
+    [[ -f "${execscript}" ]] && {
+      [[ -x "${execscript}" ]] && {
+        printf "[INFO] Excecuting after script\n"
+        ${setarch} ${distro_arch} ${execscript} ${chroot_dir}
+      } || :
     } || :
-  } || :
+  }
 }
+run_execscript
 
-printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
-${umount} ${chroot_dir}/${new_filename}
-printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
-${rm} -rf ${chroot_dir}/${tmpdir}
+function umountvm() {
+  local chroot_dir=${mntpnt}
+  printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
+  ${umount} ${chroot_dir}/${new_filename}
+  printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
+  ${rm} -rf ${chroot_dir}/${tmpdir}
+}
+umountvm ${mntpnt}
 
 printf "[DEBUG] Unmounting %s\n" ${mntpnt}
 ${umount} ${mntpnt}
