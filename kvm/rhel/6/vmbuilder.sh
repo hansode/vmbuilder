@@ -282,6 +282,32 @@ function mkrootfs() {
   }
 }
 
+function mkptab() {
+  local disk_filename=$1
+  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+
+  printf "[INFO] Adding partition table to disk image: %s\n" ${disk_filename}
+  ${parted} --script ${disk_filename} mklabel msdos
+
+  local offset=0
+
+  # root
+  printf "[INFO] Adding type %s partition to disk image: %s\n" ext2 ${disk_filename}
+  ${parted} --script -- ${disk_filename} mkpart  primary ext2 ${offset} $((${rootsize} - 1))
+  offset=$((${offset} + ${rootsize}))
+  # swap
+  [[ ${swapsize} -gt 0 ]] && {
+    printf "[INFO] Adding type %s partition to disk image: %s\n" swap ${disk_filename}
+    ${parted} --script -- ${disk_filename} mkpart  primary 'linux-swap(new)' ${offset} $((${offset} + ${swapsize} - 1))
+    offset=$((${offset} + ${swapsize}))
+  } || :
+  # opt
+  [[ ${optsize} -gt 0 ]] && {
+    printf "[INFO] Adding type %s partition to disk image: %s\n" ext2 ${disk_filename}
+    ${parted} --script -- ${disk_filename} mkpart  primary ext2 ${offset} $((${offset} + ${optsize} - 1))
+  } || :
+}
+
 ### prepare
 
 extract_args $*
@@ -295,33 +321,7 @@ readonly abs_path=$(cd $(dirname $0) && pwd)
 build_vers
 mkrootfs ${distro_dir}
 
-# * /usr/share/pyshared/VMBuilder/disk.py
-
-# def create(self):
-printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${disk_filename} ${size}
-${truncate} -s ${size}M ${disk_filename}
-
-# def partition(self)
-printf "[INFO] Adding partition table to disk image: %s\n" ${disk_filename}
-${parted} --script    ${disk_filename} mklabel msdos
-
-offset=0
-# root
-printf "[INFO] Adding type %s partition to disk image: %s\n" ext2 ${disk_filename}
-${parted} --script -- ${disk_filename} mkpart  primary ext2 ${offset} $((${rootsize} - 1))
-offset=$((${offset} + ${rootsize}))
-# swap
-[[ ${swapsize} -gt 0 ]] && {
-  printf "[INFO] Adding type %s partition to disk image: %s\n" swap ${disk_filename}
-  ${parted} --script -- ${disk_filename} mkpart  primary 'linux-swap(new)' ${offset} $((${offset} + ${swapsize} - 1))
-  offset=$((${offset} + ${swapsize}))
-}
-# opt
-[[ ${optsize} -gt 0 ]] && {
-  printf "[INFO] Adding type %s partition to disk image: %s\n" ext2 ${disk_filename}
-  ${parted} --script -- ${disk_filename} mkpart  primary ext2 ${offset} $((${offset} + ${optsize} - 1))
-}
-unset offset
+mkptab ${disk_filename}
 
 # def map_partitions(self):
 #        mapdevs = []
