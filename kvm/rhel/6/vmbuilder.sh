@@ -105,6 +105,61 @@ function extract_args() {
   CMD_ARGS=${CMD_ARGS## }
 }
 
+function dump_vers() {
+  cat <<-EOS
+	debug="${debug}"
+	dry_run="${dry_run}"
+	#
+	distro_name="${distro_name}"
+	distro_ver="${distro_ver}"
+	distro_arch="${distro_arch}"
+	basearch="${basearch}"
+	distro="${distro}"
+	distro_dir="${distro_dir}"
+	#
+	build_rootfs_tree_sh="${build_rootfs_tree_sh}"
+	keepcache="${keepcache}"
+	max_mount_count="${max_mount_count}"
+	interval_between_check="${interval_between_check}"
+	#
+	rootsize="${rootsize}"
+	optsize="${optsize}"
+	swapsize="${swapsize}"
+	execscript="${execscript}"
+	raw="${raw}"
+	ip="${ip}"
+	mask="${mask}"
+	bcast="${bcast}"
+	gw="${gw}"
+	dns="${dns}"
+	hostname="${hostname}"
+	#
+	disk_filename="${disk_filename}"
+	size="${size}"
+	mntpnt="${mntpnt}"
+	# requires:
+	build_rootfs_tree_sh="${build_rootfs_tree_sh}"
+	truncate="${truncate}"
+	parted="${parted}"
+	kpartx="${kpartx}"
+	udevadm="${udevadm}"
+	blkid="${blkid}"
+	mkfs="${mkfs}"
+	tune2fs="${tune2fs}"
+	mkswap="${mkswap}"
+	mount="${mount}"
+	umount"=${umount}"
+	mkdir="${mkdir}"
+	rmdir="${rmdir}"
+	rsync="${rsync}"
+	sync="${sync}"
+	touch="${touch}"
+	ln="${ln}"
+	rm="${rm}"
+	chroot="${chroot}"
+	EOS
+}
+
 function build_vers() {
   debug=${debug:-}
   [[ -z "${debug}" ]] || set -x
