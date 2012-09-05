@@ -386,15 +386,10 @@ mkptab ${disk_filename}
 printf "[INFO] Creating loop devices corresponding to the created partitions\n"
 
 mapptab ${disk_filename}
-mapdevs=$(lsdevmap ${disk_filename})
 
 #        for (part, mapdev) in zip(self.partitions, mapdevs):
 #            part.set_filename('/dev/mapper/%s' % mapdev)
-part_filenames=$(
-  for mapdev in ${mapdevs}; do
-    echo /dev/mapper/${mapdev}
-  done
-)
+part_filenames=$(lsdevmap ${disk_filename} | devmap2path)
 
 #    def mkfs(self):
 #        if not self.filename:
