@@ -407,19 +407,24 @@ function mountvm() {
 }
 
 function installos2vm() {
-  local mntpnt=$1
+  local disk_filename=$1
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
-  [[ -d "${mntpnt}"     ]] || { echo "no such directory: ${mntpnt}" >&2; return 1; }
+  #[[ -d "${mntpnt}"     ]] || { echo "no such directory: ${mntpnt}" >&2; return 1; }
+
+  mountvm ${disk_filename} ${mntpnt}
+
   printf "[DEBUG] Installing OS to %s\n" ${mntpnt}
   ${rsync} -aHA ${distro_dir}/ ${mntpnt}
   ${sync}
   printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
   ${sed} -i s,^keepcache=.*,keepcache=${keepcache}, ${mntpnt}/etc/yum.conf
 
-  installgrub2vm ${mntpnt}
+  installgrub2vm       ${mntpnt}
   configure_networking ${mntpnt}
-  configure_mounting ${mntpnt}
-  run_execscript ${mntpnt}
+  configure_mounting   ${mntpnt}
+  run_execscript       ${mntpnt}
+
+  umountvm             ${mntpnt}
 }
 
 function installgrub2vm() {
@@ -590,9 +595,7 @@ mkptab  ${disk_filename}
 mapptab ${disk_filename}
 mkfs2vm ${disk_filename}
 
-mountvm ${disk_filename} ${mntpnt}
-installos2vm ${mntpnt}
-umountvm ${mntpnt}
+installos2vm ${disk_filename}
 
 unmapptab_r ${disk_filename}
 
