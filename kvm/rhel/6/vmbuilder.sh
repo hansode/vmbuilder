@@ -267,6 +267,21 @@ function build_vers() {
   mntpnt=/tmp/tmp$(date +%s)
 }
 
+function mkrootfs() {
+  local distro_dir=$1
+  [[ -d "${distro_dir}" ]] || {
+    printf "[INFO] Building OS tree: %s\n" ${distro_dir}
+    ${build_rootfs_tree_sh} \
+     --distro-name=${distro_name} \
+     --distro-ver=${distro_ver}   \
+     --distro-arch=${distro_arch} \
+     --chroot-dir=${distro_dir}   \
+     --keepcache=${keepcache}     \
+     --batch=1                    \
+     --debug=1
+  }
+}
+
 ### prepare
 
 extract_args $*
@@ -278,18 +293,7 @@ readonly abs_path=$(cd $(dirname $0) && pwd)
 ## main
 
 build_vers
-
-[[ -d "${distro_dir}" ]] || {
-  printf "[INFO] Building OS tree: %s\n" ${distro_dir}
-  ${build_rootfs_tree_sh} \
-   --distro-name=${distro_name} \
-   --distro-ver=${distro_ver}   \
-   --distro-arch=${distro_arch} \
-   --chroot-dir=${distro_dir}   \
-   --keepcache=${keepcache}     \
-   --batch=1                    \
-   --debug=1
-}
+mkrootfs ${distro_dir}
 
 # * /usr/share/pyshared/VMBuilder/disk.py
 
