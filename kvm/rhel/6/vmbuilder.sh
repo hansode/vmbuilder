@@ -137,7 +137,6 @@ function dump_vers() {
 	#
 	disk_filename="${disk_filename}"
 	size="${size}"
-	mntpnt="${mntpnt}"
 	# requires:
 	build_rootfs_tree_sh="${build_rootfs_tree_sh}"
 	cat="${cat}"
@@ -266,7 +265,6 @@ function build_vers() {
   # local params
   disk_filename=${raw}
   size=$((${rootsize} + ${optsize} + ${swapsize}))
-  mntpnt=/tmp/tmp$(date +%s)
 }
 
 function mkrootfs() {
@@ -409,7 +407,8 @@ function mountvm() {
 function installos2vm() {
   local disk_filename=$1
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
-  #[[ -d "${mntpnt}"     ]] || { echo "no such directory: ${mntpnt}" >&2; return 1; }
+
+  local mntpnt=/tmp/tmp$(date +%s)
 
   mountvm ${disk_filename} ${mntpnt}
 
