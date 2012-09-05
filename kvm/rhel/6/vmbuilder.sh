@@ -107,22 +107,17 @@ function extract_args() {
 
 function dump_vers() {
   cat <<-EOS
+	# options
 	debug="${debug}"
 	dry_run="${dry_run}"
-	force="${force}"
-	#
 	distro_name="${distro_name}"
 	distro_ver="${distro_ver}"
 	distro_arch="${distro_arch}"
-	basearch="${basearch}"
 	distro="${distro}"
 	distro_dir="${distro_dir}"
-	#
-	build_rootfs_tree_sh="${build_rootfs_tree_sh}"
 	keepcache="${keepcache}"
 	max_mount_count="${max_mount_count}"
 	interval_between_check="${interval_between_check}"
-	#
 	rootsize="${rootsize}"
 	optsize="${optsize}"
 	swapsize="${swapsize}"
@@ -134,9 +129,10 @@ function dump_vers() {
 	gw="${gw}"
 	dns="${dns}"
 	hostname="${hostname}"
-	#
+	# internal variables
+	basearch="${basearch}"
 	disk_filename="${disk_filename}"
-	# requires:
+	# required commands
 	build_rootfs_tree_sh="${build_rootfs_tree_sh}"
 	cat="${cat}"
 	truncate="${truncate}"
@@ -167,7 +163,6 @@ function build_vers() {
   debug=${debug:-}
   [[ -z "${debug}" ]] || set -x
   dry_run=${dry_run:-}
-  force=${force:-}
 
   distro_name=${distro_name:-centos}
   distro_ver=${distro_ver:-6.3}
