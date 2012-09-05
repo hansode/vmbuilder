@@ -533,12 +533,10 @@ function configure_mounting() {
 	UUID=${swapdev_uuid} swap                    swap    defaults        0 0
 	_SWAPDEV_
 	})
-
 	$([[ ${optsize} -gt 0 ]] && { ${cat} <<-_OPTDEV_
 	UUID=${optdev_uuid} /opt                    ext4    defaults        1 1
 	_OPTDEV_
 	})
-
 	tmpfs                   /dev/shm                tmpfs   defaults        0 0
 	devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
 	sysfs                   /sys                    sysfs   defaults        0 0
