@@ -323,6 +323,46 @@ function mkptab() {
   } || :
 }
 
+function mapptab() {
+  local disk_filename=$1
+  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  ${kpartx} -a ${disk_filename} && ${udevadm} settle
+  # add map loop0p1 (253:3): 0 1998013 linear /dev/loop0 34
+}
+
+function unmapptab() {
+  local disk_filename=$1
+  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  ${kpartx} -d ${disk_filename}
+  # del devmap : loop0p1
+}
+
+function unmapptab_r() {
+  local disk_filename=$1
+  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  local tries=0 local max_tries=3
+  while [[ ${tries} -lt ${max_tries} ]]; do
+    unmapptab ${disk_filename}  && break || :
+    tries=$((${tries} + 1))
+    sleep 1
+  done
+  unmapptab ${disk_filename}
+}
+
+function lsdevmap() {
+  local disk_filename=$1
+  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  ${kpartx} -l ${disk_filename} \
+   | egrep -v "^(gpt|dos):" \
+   | awk '{print $1}'
+}
+
+function devmap2path() {
+  cat | while read devmap; do
+    echo /dev/mapper/${devmap}
+  done
+}
+
 ### prepare
 
 extract_args $*
@@ -344,14 +384,10 @@ mkptab ${disk_filename}
 #        for line in parts:
 #            mapdevs.append(line.split(' ')[2])
 printf "[INFO] Creating loop devices corresponding to the created partitions\n"
-mapdevs=$(
- ${kpartx} -va ${disk_filename} \
-  | egrep -v "^(gpt|dos):" \
-  | egrep -w add \
-  | while read line; do
-      echo ${line} | awk '{print $3}'
-    done
-)
+
+mapptab ${disk_filename}
+mapdevs=$(lsdevmap ${disk_filename})
+
 #        for (part, mapdev) in zip(self.partitions, mapdevs):
 #            part.set_filename('/dev/mapper/%s' % mapdev)
 part_filenames=$(
