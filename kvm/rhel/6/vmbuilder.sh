@@ -581,14 +581,15 @@ readonly abs_path=$(cd $(dirname $0) && pwd)
 ## main
 
 build_vers
+
 mkrootfs ${distro_dir}
+
 [[ -f ${disk_filename} ]] && rmdisk ${disk_filename}
-mkdisk ${disk_filename}
-mkptab ${disk_filename}
-
+mkdisk  ${disk_filename}
+mkptab  ${disk_filename}
 mapptab ${disk_filename}
-
 mkfs2vm ${disk_filename}
+
 mountvm ${disk_filename} ${mntpnt}
 installos2vm ${mntpnt}
 umountvm ${mntpnt}
