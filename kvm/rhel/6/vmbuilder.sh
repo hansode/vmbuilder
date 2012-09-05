@@ -241,7 +241,6 @@ function build_vers() {
   max_mount_count=${max_mount_count:-37}
   interval_between_check=${interval_between_check:-180}
 
-  # * /usr/share/pyshared/VMBuilder/contrib/cli.py
   rootsize=${rootsize:-4096}
   optsize=${optsize:-0}
   swapsize=${swapsize:-1024}
@@ -265,6 +264,7 @@ function build_vers() {
 
 function mkrootfs() {
   local distro_dir=$1
+
   [[ -d "${distro_dir}" ]] || {
     printf "[INFO] Building OS tree: %s\n" ${distro_dir}
     ${build_rootfs_tree_sh} \
@@ -283,6 +283,7 @@ function mkrootfs() {
 function mkdisk() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] && { echo "already exists: ${disk_filename}" >&2; return 1; }
+
   local size=$((${rootsize} + ${optsize} + ${swapsize}))
   printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${disk_filename} ${size}
   ${truncate} -s ${size}M ${disk_filename}
@@ -291,6 +292,7 @@ function mkdisk() {
 function rmdisk() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+
   ${rm} -f ${disk_filename}
 }
 
@@ -325,6 +327,7 @@ function mkptab() {
 function mapptab() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+
   printf "[INFO] Creating loop devices corresponding to the created partitions\n"
   ${kpartx} -vsa ${disk_filename} && ${udevadm} settle
   # add map loop0p1 (253:3): 0 1998013 linear /dev/loop0 34
@@ -333,6 +336,7 @@ function mapptab() {
 function unmapptab() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+
   ${kpartx} -vsd ${disk_filename}
   # del devmap : loop0p1
 }
@@ -340,6 +344,7 @@ function unmapptab() {
 function unmapptab_r() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+
   printf "[INFO] Deleting loop devices\n"
   local tries=0 local max_tries=3
   while [[ ${tries} -lt ${max_tries} ]]; do
@@ -353,6 +358,7 @@ function unmapptab_r() {
 function lsdevmap() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+
   ${kpartx} -l ${disk_filename} \
    | egrep -v "^(gpt|dos):" \
    | awk '{print $1}'
@@ -369,6 +375,7 @@ function devmap2path() {
 function mkfs2vm() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+
   lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
     case ${part_filename} in
     *p1|*p3)
@@ -396,6 +403,7 @@ function mountvm() {
   local disk_filename=$1 mntpnt=$2
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   [[ -d "${mntpnt}" ]] && { echo "already exists: ${mntpnt}" >&2; return 1; }
+
   ${mkdir} -p ${mntpnt}
   lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
     case ${part_filename} in
@@ -407,9 +415,24 @@ function mountvm() {
   done
 }
 
+function umountvm() {
+  local chroot_dir=${mntpnt}
+
+  printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
+  ${umount} ${chroot_dir}/${new_filename}
+
+  printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
+  ${rm} -rf ${chroot_dir}/${tmpdir}
+
+  printf "[DEBUG] Unmounting %s\n" ${mntpnt}
+  ${umount} ${mntpnt}
+  ${rmdir}  ${mntpnt}
+}
+
 function installos() {
   local disk_filename=$1
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
+
   local mntpnt=/tmp/tmp$(date +%s)
 
   mountvm ${disk_filename} ${mntpnt}
@@ -425,15 +448,18 @@ function installos() {
 
 function installdistro2vm() {
   local chroot_dir=${mntpnt}
+
   printf "[DEBUG] Installing OS to %s\n" ${mntpnt}
   ${rsync} -aHA ${distro_dir}/ ${mntpnt}
   ${sync}
+
   printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
   ${sed} -i s,^keepcache=.*,keepcache=${keepcache}, ${mntpnt}/etc/yum.conf
 }
 
 function installgrub2vm() {
   local chroot_dir=${mntpnt}
+
   tmpdir=/tmp/vmbuilder-grub
   ${mkdir} -p ${chroot_dir}/${tmpdir}
 
@@ -478,6 +504,7 @@ function installgrub2vm() {
 
 function configure_networking() {
   local chroot_dir=${mntpnt}
+
   # /etc/sysconfig/network-scripts/ifcfg-eth0
   [[ -z "${ip}" ]] || {
     printf "[INFO] Unsetting /etc/sysconfig/network-scripts/ifcfg-eth0.\n"
@@ -524,6 +551,7 @@ function configure_networking() {
 
 function configure_mounting() {
   local chroot_dir=${mntpnt}
+
   uuids=$(
     lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
       ${blkid} -c /dev/null -sUUID -ovalue ${part_filename}
@@ -554,6 +582,7 @@ function configure_mounting() {
 
 function run_execscript() {
   local chroot_dir=${mntpnt}
+
   [[ -z "${execscript}" ]] && {
     ${chroot} ${chroot_dir} bash -c "echo root:root | chpasswd"
   } || {
@@ -564,18 +593,6 @@ function run_execscript() {
       } || :
     } || :
   }
-}
-
-function umountvm() {
-  local chroot_dir=${mntpnt}
-  printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
-  ${umount} ${chroot_dir}/${new_filename}
-  printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
-  ${rm} -rf ${chroot_dir}/${tmpdir}
-
-  printf "[DEBUG] Unmounting %s\n" ${mntpnt}
-  ${umount} ${mntpnt}
-  ${rmdir} ${mntpnt}
 }
 
 ### prepare
@@ -612,4 +629,3 @@ debug)
   printf "[INFO] Complete!\n"
   ;;
 esac
-
