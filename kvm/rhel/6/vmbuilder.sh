@@ -389,6 +389,21 @@ function mkfs2vm() {
   done
 }
 
+function mountvm() {
+  local disk_filename=$1 mntpnt=$2
+  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -d "${mntpnt}" ]] && { echo "already exists: ${mntpnt}" >&2; return 1; }
+  ${mkdir} -p ${mntpnt}
+  lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
+    case ${part_filename} in
+    *p1)
+      printf "[DEBUG] Mounting %s\n" ${mntpnt}
+      ${mount} ${part_filename} ${mntpnt}
+      ;;
+    esac
+  done
+}
+
 ### prepare
 
 extract_args $*
@@ -446,16 +461,7 @@ done
 #            run_cmd('mount', '-o', 'loop', self.filename, self.mntpath)
 #            self.vm.add_clean_cb(self.umount)
 
-[[ -d "${mntpnt}" ]] && { exit 1; } || ${mkdir} -p ${mntpnt}
-
-lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
-  case ${part_filename} in
-  *p1)
-    printf "[DEBUG] Mounting %s\n" ${mntpnt}
-    ${mount} ${part_filename} ${mntpnt}
-    ;;
-  esac
-done
+mountvm ${disk_filename} ${mntpnt}
 
 #    def install_os(self):
 #        self.nics = [self.NIC()]
