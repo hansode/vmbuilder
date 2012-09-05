@@ -425,6 +425,10 @@ mapptab ${disk_filename}
 mkfs2vm ${disk_filename}
 mountvm ${disk_filename} ${mntpnt}
 
+function installos2vm() {
+  local distro_dir=$1 mntpnt=$2
+  [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
+  [[ -d "${mntpnt}"     ]] || { echo "no such directory: ${mntpnt}" >&2; return 1; }
 #    def install_os(self):
 #        self.nics = [self.NIC()]
 #        self.call_hooks('preflight_check')
@@ -434,163 +438,144 @@ mountvm ${disk_filename} ${mntpnt}
 #        self.chroot_dir = tmpdir()
 #        self.call_hooks('mount_partitions', self.chroot_dir)
 #        run_cmd('rsync', '-aHA', '%s/' % self.distro.chroot_dir, self.chroot_dir)
-[[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
+  printf "[DEBUG] Installing OS to %s\n" ${mntpnt}
+  ${rsync} -aHA ${distro_dir}/ ${mntpnt}
+  ${sync}
 
-printf "[DEBUG] Installing OS to %s\n" ${mntpnt}
-${rsync} -aHA ${distro_dir}/ ${mntpnt}
-${sync}
-
-printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
-${sed} -i s,^keepcache=.*,keepcache=${keepcache}, ${mntpnt}/etc/yum.conf
-
-#        if self.needs_bootloader:
-#            self.call_hooks('install_bootloader', self.chroot_dir, self.disks)
-#        self.call_hooks('install_kernel', self.chroot_dir)
-#        self.call_hooks('unmount_partitions')
-#        os.rmdir(self.chroot_dir)
-
-
-
-# * /usr/share/pyshared/VMBuilder/plugins/ubuntu/distro.py
-#    def install_bootloader(self, chroot_dir, disks):
-chroot_dir=${mntpnt}
-
-#        root_dev = VMBuilder.disk.bootpart(disks).get_grub_id()
-
-#
-#        tmpdir = '/tmp/vmbuilder-grub'
-#        os.makedirs('%s%s' % (chroot_dir, tmpdir))
-tmpdir=/tmp/vmbuilder-grub
-${mkdir} -p ${chroot_dir}/${tmpdir}
-
-#        self.context.add_clean_cb(self.install_bootloader_cleanup)
-#        devmapfile = os.path.join(tmpdir, 'device.map')
-#        devmap = open('%s%s' % (chroot_dir, devmapfile), 'w')
-devmapfile=${tmpdir}/device.map
-${touch} ${chroot_dir}/${devmapfile}
-
-#        for (disk, id) in zip(disks, range(len(disks))):
-grub_id=0
-
-#            new_filename = os.path.join(tmpdir, os.path.basename(disk.filename))
-#            open('%s%s' % (chroot_dir, new_filename), 'w').close()
-#            run_cmd('mount', '--bind', disk.filename, '%s%s' % (chroot_dir, new_filename))
-new_filename=${tmpdir}/$(basename ${disk_filename})
-${touch} ${chroot_dir}/${new_filename}
-${mount} --bind ${disk_filename} ${chroot_dir}/${new_filename}
-
-#            st = os.stat(disk.filename)
-#            if stat.S_ISBLK(st.st_mode):
-#                for (part, part_id) in zip(disk.partitions, range(len(disk.partitions))):
-#                    part_mountpnt = '%s%s%d' % (chroot_dir, new_filename, part_id+1)
-#                    open(part_mountpnt, 'w').close()
-#                    run_cmd('mount', '--bind', part.filename, part_mountpnt)
-#            devmap.write("(hd%d) %s\n" % (id, new_filename))
-printf "(hd%d) %s\n" ${grub_id} ${new_filename} >> ${chroot_dir}/${devmapfile}
-
-#        devmap.close()
-#        run_cmd('cat', '%s%s' % (chroot_dir, devmapfile))
-${cat} ${chroot_dir}/${devmapfile}
-
-#        self.suite.install_grub(chroot_dir)
-#        self.run_in_target('grub', '--device-map=%s' % devmapfile, '--batch',  stdin='''root %s
-#setup (hd0)
-#EOT''' % root_dev)
-
-${cat} <<_EOS_ | ${chroot} ${chroot_dir} ${grub} --device-map=${devmapfile} --batch
-root (hd${grub_id},0)
-setup (hd0)
-quit
-_EOS_
-
-#
-uuids=
-lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
-  uuid=$(${blkid} -c /dev/null -sUUID -ovalue ${part_filename})
-  uuids="${uuids} ${uuid}"
-done
-rootdev_uuid=$(echo ${uuids} | awk '{print $1}')
-swapdev_uuid=$(echo ${uuids} | awk '{print $2}')
-optdev_uuid=$(echo ${uuids} | awk '{print $3}')
-
-# /boot/grub/grub.conf
-printf "[INFO] Generating /boot/grub/grub.conf.\n"
-${cat} <<_EOS_ > ${chroot_dir}/boot/grub/grub.conf
-default=0
-timeout=5
-splashimage=(hd${grub_id},0)/boot/grub/splash.xpm.gz
-hiddenmenu
-title ${distro} ($(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1 | sed 's,^vmlinuz-,,'))
-        root (hd${grub_id},0)
-        kernel /boot/$(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1) ro root=UUID=${rootdev_uuid} rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto  KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM
-        initrd /boot/$(cd ${chroot_dir}/boot && ls initramfs-*| tail -1)
-_EOS_
-${cat} ${chroot_dir}/boot/grub/grub.conf
-${chroot} ${chroot_dir} ${ln} -s /boot/grub/grub.conf /boot/grub/menu.lst
-
-# /etc/fstab
-printf "[INFO] Overwriting /etc/fstab.\n"
-${cat} <<_EOS_ > ${chroot_dir}/etc/fstab
-UUID=${rootdev_uuid} /                       ext4    defaults        1 1
-$([[ ${optsize} -gt 0 ]] && { ${cat} <<_SWAPDEV_
-UUID=${swapdev_uuid} swap                    swap    defaults        0 0
-_SWAPDEV_
-})
-$([[ ${optsize} -gt 0 ]] && { ${cat} <<_OPTDEV_
-UUID=${optdev_uuid} /opt                    ext4    defaults        1 1
-_OPTDEV_
-})
-tmpfs                   /dev/shm                tmpfs   defaults        0 0
-devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
-sysfs                   /sys                    sysfs   defaults        0 0
-proc                    /proc                   proc    defaults        0 0
-_EOS_
-${cat} ${chroot_dir}/etc/fstab
-
-DEVICE=eth0
-BOOTPROTO=dhcp
-ONBOOT=yes
-
-# /etc/sysconfig/network-scripts/ifcfg-eth0
-[[ -z "${ip}" ]] || {
-  printf "[INFO] Unsetting /etc/sysconfig/network-scripts/ifcfg-eth0.\n"
-  ${cat} <<_EOS_ > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
-DEVICE=eth0
-BOOTPROTO=static
-ONBOOT=yes
-
-IPADDR=${ip}
-$([[ -z "${net}"   ]] || echo "NETMASK=${net}")
-$([[ -z "${bcast}" ]] || echo "BROADCAST=${bcast}")
-$([[ -z "${gw}"    ]] || echo "GATEWAY=${gw}")
-_EOS_
-  ${cat} ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
+  printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
+  ${sed} -i s,^keepcache=.*,keepcache=${keepcache}, ${mntpnt}/etc/yum.conf
 }
+installos2vm ${distro_dir} ${mntpnt}
 
-# /etc/resolv.conf
-[[ -z "${dns}" ]] || {
-  printf "[INFO] Unsetting /etc/resolv.conf.\n"
-  ${cat} <<_EOS_ > ${chroot_dir}/etc/resolv.conf
-nameserver ${dns}
-_EOS_
-  ${cat} ${chroot_dir}/etc/resolv.conf
+function installgrub2vm() {
+  chroot_dir=${mntpnt}
+  tmpdir=/tmp/vmbuilder-grub
+  ${mkdir} -p ${chroot_dir}/${tmpdir}
+
+  devmapfile=${tmpdir}/device.map
+  ${touch} ${chroot_dir}/${devmapfile}
+  grub_id=0
+
+  new_filename=${tmpdir}/$(basename ${disk_filename})
+  ${touch} ${chroot_dir}/${new_filename}
+  ${mount} --bind ${disk_filename} ${chroot_dir}/${new_filename}
+  printf "(hd%d) %s\n" ${grub_id} ${new_filename} >> ${chroot_dir}/${devmapfile}
+  ${cat} ${chroot_dir}/${devmapfile}
+
+  # install grub
+  ${cat} <<-_EOS_ | ${chroot} ${chroot_dir} ${grub} --device-map=${devmapfile} --batch
+	root (hd${grub_id},0)
+	setup (hd0)
+	quit
+	_EOS_
+
+  uuids=$(
+    lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
+      ${blkid} -c /dev/null -sUUID -ovalue ${part_filename}
+    done
+  )
+  rootdev_uuid=$(echo ${uuids} | awk '{print $1}')
+  #swapdev_uuid=$(echo ${uuids} | awk '{print $2}')
+  #optdev_uuid=$(echo ${uuids} | awk '{print $3}')
+
+  # /boot/grub/grub.conf
+  printf "[INFO] Generating /boot/grub/grub.conf.\n"
+  ${cat} <<-_EOS_ > ${chroot_dir}/boot/grub/grub.conf
+	default=0
+	timeout=5
+	splashimage=(hd${grub_id},0)/boot/grub/splash.xpm.gz
+	hiddenmenu
+	title ${distro} ($(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1 | sed 's,^vmlinuz-,,'))
+	        root (hd${grub_id},0)
+	        kernel /boot/$(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1) ro root=UUID=${rootdev_uuid} rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto  KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM
+	        initrd /boot/$(cd ${chroot_dir}/boot && ls initramfs-*| tail -1)
+	_EOS_
+  ${cat} ${chroot_dir}/boot/grub/grub.conf
+  ${chroot} ${chroot_dir} ${ln} -s /boot/grub/grub.conf /boot/grub/menu.lst
 }
+installgrub2vm
 
-# hostname
-[[ -z "${hostname}" ]] || {
-  printf "[INFO] Setting hostname: %s\n" ${hostname}
-  egrep ^HOSTNAME= ${chroot_dir}/etc/sysconfig/network -q && {
-    ${sed} -i "s,^HOSTNAME=.*,HOSTNAME=${hostname}," ${chroot_dir}/etc/sysconfig/network
-  } || {
-    echo HOSTNAME=${hostname} >> ${chroot_dir}/etc/sysconfig/network
+function configure_networking() {
+  #DEVICE=eth0
+  #BOOTPROTO=dhcp
+  #ONBOOT=yes
+
+  # /etc/sysconfig/network-scripts/ifcfg-eth0
+  [[ -z "${ip}" ]] || {
+    printf "[INFO] Unsetting /etc/sysconfig/network-scripts/ifcfg-eth0.\n"
+    ${cat} <<-_EOS_ > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
+	DEVICE=eth0
+	BOOTPROTO=static
+	ONBOOT=yes
+	IPADDR=${ip}
+	$([[ -z "${net}"   ]] || echo "NETMASK=${net}")
+	$([[ -z "${bcast}" ]] || echo "BROADCAST=${bcast}")
+	$([[ -z "${gw}"    ]] || echo "GATEWAY=${gw}")
+	_EOS_
   }
-  echo 127.0.0.1 ${hostname} >> ${chroot_dir}/etc/hosts
-}
+  ${cat} ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
 
-# disable mac address caching
-printf "[INFO] Unsetting udev 70-persistent-net.rules.\n"
-${rm} -f ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
-${ln} -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
+  # /etc/resolv.conf
+  [[ -z "${dns}" ]] || {
+    printf "[INFO] Unsetting /etc/resolv.conf.\n"
+    ${cat} <<-_EOS_ > ${chroot_dir}/etc/resolv.conf
+	nameserver ${dns}
+	_EOS_
+  }
+  ${cat} ${chroot_dir}/etc/resolv.conf
+
+  # hostname
+  [[ -z "${hostname}" ]] || {
+    printf "[INFO] Setting hostname: %s\n" ${hostname}
+    egrep ^HOSTNAME= ${chroot_dir}/etc/sysconfig/network -q && {
+      ${sed} -i "s,^HOSTNAME=.*,HOSTNAME=${hostname}," ${chroot_dir}/etc/sysconfig/network
+    } || {
+      echo HOSTNAME=${hostname} >> ${chroot_dir}/etc/sysconfig/network
+    }
+    ${cat} ${chroot_dir}/etc/sysconfig/network
+
+    echo 127.0.0.1 ${hostname} >> ${chroot_dir}/etc/hosts
+    ${cat} ${chroot_dir}/etc/hosts
+  }
+
+  # disable mac address caching
+  printf "[INFO] Unsetting udev 70-persistent-net.rules.\n"
+  ${rm} -f ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
+  ${ln} -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
+}
+configure_networking
+
+function configure_mounting() {
+  uuids=$(
+    lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
+      ${blkid} -c /dev/null -sUUID -ovalue ${part_filename}
+    done
+  )
+  rootdev_uuid=$(echo ${uuids} | awk '{print $1}')
+  swapdev_uuid=$(echo ${uuids} | awk '{print $2}')
+  optdev_uuid=$(echo ${uuids} | awk '{print $3}')
+
+  printf "[INFO] Overwriting /etc/fstab.\n"
+  ${cat} <<-_EOS_ > ${chroot_dir}/etc/fstab
+	UUID=${rootdev_uuid} /                       ext4    defaults        1 1
+	$([[ ${optsize} -gt 0 ]] && { ${cat} <<-_SWAPDEV_
+	UUID=${swapdev_uuid} swap                    swap    defaults        0 0
+	_SWAPDEV_
+	})
+
+	$([[ ${optsize} -gt 0 ]] && { ${cat} <<-_OPTDEV_
+	UUID=${optdev_uuid} /opt                    ext4    defaults        1 1
+	_OPTDEV_
+	})
+
+	tmpfs                   /dev/shm                tmpfs   defaults        0 0
+	devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
+	sysfs                   /sys                    sysfs   defaults        0 0
+	proc                    /proc                   proc    defaults        0 0
+	_EOS_
+  ${cat} ${chroot_dir}/etc/fstab
+}
+configure_mounting
 
 [[ -z "${execscript}" ]] && {
   ${chroot} ${chroot_dir} bash -c "echo root:root | chpasswd"
