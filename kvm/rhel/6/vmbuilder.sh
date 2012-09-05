@@ -324,13 +324,13 @@ printf "[INFO] Adding type %s partition to disk image: %s\n" ext2 ${disk_filenam
 ${parted} --script -- ${disk_filename} mkpart  primary ext2 ${offset} $((${rootsize} - 1))
 offset=$((${offset} + ${rootsize}))
 # swap
-[ ${swapsize} -gt 0 ] && {
+[[ ${swapsize} -gt 0 ]] && {
   printf "[INFO] Adding type %s partition to disk image: %s\n" swap ${disk_filename}
   ${parted} --script -- ${disk_filename} mkpart  primary 'linux-swap(new)' ${offset} $((${offset} + ${swapsize} - 1))
   offset=$((${offset} + ${swapsize}))
 }
 # opt
-[ ${optsize} -gt 0 ] && {
+[[ ${optsize} -gt 0 ]] && {
   printf "[INFO] Adding type %s partition to disk image: %s\n" ext2 ${disk_filename}
   ${parted} --script -- ${disk_filename} mkpart  primary ext2 ${offset} $((${offset} + ${optsize} - 1))
 }
@@ -406,7 +406,7 @@ done
 #            run_cmd('mount', '-o', 'loop', self.filename, self.mntpath)
 #            self.vm.add_clean_cb(self.umount)
 
-[ -d "${mntpnt}" ] && { exit 1; } || ${mkdir} -p ${mntpnt}
+[[ -d "${mntpnt}" ]] && { exit 1; } || ${mkdir} -p ${mntpnt}
 
 for part_filename in ${part_filenames}; do
   case ${part_filename} in
@@ -429,7 +429,7 @@ done
 #distro=centos-6_x86_64
 #distro_dir=./${distro}
 
-[ -d "${distro_dir}" ] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
+[[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
 
 printf "[DEBUG] Installing OS to %s\n" ${mntpnt}
 ${rsync} -aHA ${distro_dir}/ ${mntpnt}
@@ -522,11 +522,11 @@ ${chroot} ${chroot_dir} ${ln} -s /boot/grub/grub.conf /boot/grub/menu.lst
 printf "[INFO] Overwriting /etc/fstab.\n"
 ${cat} <<_EOS_ > ${chroot_dir}/etc/fstab
 UUID=${rootdev_uuid} /                       ext4    defaults        1 1
-$([ ${optsize} -gt 0 ] && { ${cat} <<_SWAPDEV_
+$([[ ${optsize} -gt 0 ]] && { ${cat} <<_SWAPDEV_
 UUID=${swapdev_uuid} swap                    swap    defaults        0 0
 _SWAPDEV_
 })
-$([ ${optsize} -gt 0 ] && { ${cat} <<_OPTDEV_
+$([[ ${optsize} -gt 0 ]] && { ${cat} <<_OPTDEV_
 UUID=${optdev_uuid} /opt                    ext4    defaults        1 1
 _OPTDEV_
 })
@@ -542,7 +542,7 @@ BOOTPROTO=dhcp
 ONBOOT=yes
 
 # /etc/sysconfig/network-scripts/ifcfg-eth0
-[ -z "${ip}" ] || {
+[[ -z "${ip}" ]] || {
   printf "[INFO] Unsetting /etc/sysconfig/network-scripts/ifcfg-eth0.\n"
   ${cat} <<_EOS_ > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
 DEVICE=eth0
@@ -550,15 +550,15 @@ BOOTPROTO=static
 ONBOOT=yes
 
 IPADDR=${ip}
-$([ -z "${net}"   ] || echo "NETMASK=${net}")
-$([ -z "${bcast}" ] || echo "BROADCAST=${bcast}")
-$([ -z "${gw}"    ] || echo "GATEWAY=${gw}")
+$([[ -z "${net}"   ]] || echo "NETMASK=${net}")
+$([[ -z "${bcast}" ]] || echo "BROADCAST=${bcast}")
+$([[ -z "${gw}"    ]] || echo "GATEWAY=${gw}")
 _EOS_
   ${cat} ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
 }
 
 # /etc/resolv.conf
-[ -z "${dns}" ] || {
+[[ -z "${dns}" ]] || {
   printf "[INFO] Unsetting /etc/resolv.conf.\n"
   ${cat} <<_EOS_ > ${chroot_dir}/etc/resolv.conf
 nameserver ${dns}
@@ -567,7 +567,7 @@ _EOS_
 }
 
 # hostname
-[ -z "${hostname}" ] || {
+[[ -z "${hostname}" ]] || {
   printf "[INFO] Setting hostname: %s\n" ${hostname}
   egrep ^HOSTNAME= ${chroot_dir}/etc/sysconfig/network -q && {
     ${sed} -i "s,^HOSTNAME=.*,HOSTNAME=${hostname}," ${chroot_dir}/etc/sysconfig/network
@@ -582,11 +582,11 @@ printf "[INFO] Unsetting udev 70-persistent-net.rules.\n"
 ${rm} -f ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
 ${ln} -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
 
-[ -z "${execscript}" ] && {
+[[ -z "${execscript}" ]] && {
   ${chroot} ${chroot_dir} bash -c "echo root:root | chpasswd"
 } || {
-  [ -f "${execscript}" ] && {
-    [ -x "${execscript}" ] && {
+  [[ -f "${execscript}" ]] && {
+    [[ -x "${execscript}" ]] && {
       printf "[INFO] Excecuting after script\n"
       ${setarch} ${distro_arch} ${execscript} ${chroot_dir}
     } || :
@@ -605,11 +605,11 @@ printf "[INFO] Deleting loop devices\n"
 
 tries=0
 max_tries=3
-while [ ${tries} -lt ${max_tries} ]; do
+while [[ ${tries} -lt ${max_tries} ]]; do
   ${kpartx} -vd ${disk_filename} && break || :
   tries=$((${tries} + 1))
   sleep 1
-  [ ${tries} -ge ${max_tries} ] && printf "[INFO] Could not unmount '%s' after '%d' attempts. Final attempt" ${disk_filename} ${tries}
+  [[ ${tries} -ge ${max_tries} ]] && printf "[INFO] Could not unmount '%s' after '%d' attempts. Final attempt" ${disk_filename} ${tries}
 done
 ${kpartx} -vd ${disk_filename} || :
 
