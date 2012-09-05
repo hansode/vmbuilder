@@ -389,7 +389,6 @@ mapptab ${disk_filename}
 
 #        for (part, mapdev) in zip(self.partitions, mapdevs):
 #            part.set_filename('/dev/mapper/%s' % mapdev)
-part_filenames=$(lsdevmap ${disk_filename} | devmap2path)
 
 #    def mkfs(self):
 #        if not self.filename:
@@ -405,7 +404,7 @@ part_filenames=$(lsdevmap ${disk_filename} | devmap2path)
 #                self.uuid = run_cmd('blkid', '-c', '/dev/null', '-sUUID', '-ovalue', self.filename).rstrip()
 
 uuids=
-for part_filename in ${part_filenames}; do
+lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
   case ${part_filename} in
   *p1|*p3)
     ${mkfs} -F ${part_filename}
@@ -442,7 +441,7 @@ done
 
 [[ -d "${mntpnt}" ]] && { exit 1; } || ${mkdir} -p ${mntpnt}
 
-for part_filename in ${part_filenames}; do
+lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
   case ${part_filename} in
   *p1)
     printf "[DEBUG] Mounting %s\n" ${mntpnt}
