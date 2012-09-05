@@ -282,6 +282,19 @@ function mkrootfs() {
   }
 }
 
+function mkdisk() {
+  local disk_filename=$1
+  [[ -a ${disk_filename} ]] && { echo "already exists: ${disk_filename}" >&2; return 1; }
+  printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${disk_filename} ${size}
+  ${truncate} -s ${size}M ${disk_filename}
+}
+
+function rmdisk() {
+  local disk_filename=$1
+  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  ${rm} -f ${disk_filename}
+}
+
 function mkptab() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
@@ -320,7 +333,8 @@ readonly abs_path=$(cd $(dirname $0) && pwd)
 
 build_vers
 mkrootfs ${distro_dir}
-
+[[ -f ${disk_filename} ]] && rmdisk ${disk_filename}
+mkdisk ${disk_filename}
 mkptab ${disk_filename}
 
 # def map_partitions(self):
