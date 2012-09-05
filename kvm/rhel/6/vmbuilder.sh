@@ -403,7 +403,6 @@ mapptab ${disk_filename}
 #            elif os.path.exists("/sbin/blkid"):
 #                self.uuid = run_cmd('blkid', '-c', '/dev/null', '-sUUID', '-ovalue', self.filename).rstrip()
 
-uuids=
 lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
   case ${part_filename} in
   *p1|*p3)
@@ -424,11 +423,13 @@ lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
     ;;
   esac
   ${udevadm} settle
-  uuid=$(${blkid} -c /dev/null -sUUID -ovalue ${part_filename})
-
-  uuids="${uuids} ${uuid}"
 done
 
+uuids=
+lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
+  uuid=$(${blkid} -c /dev/null -sUUID -ovalue ${part_filename})
+  uuids="${uuids} ${uuid}"
+done
 
 #    def mount(self, rootmnt):
 #        if (self.type != TYPE_SWAP) and not self.dummy:
