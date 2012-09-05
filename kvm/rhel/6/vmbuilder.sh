@@ -246,16 +246,6 @@ function build_vers() {
   interval_between_check=${interval_between_check:-180}
 
   # * /usr/share/pyshared/VMBuilder/contrib/cli.py
-
-  #
-  # OptionGroup('Disk')
-  # -------------------
-  #
-  # + ('--rootsize', metavar='SIZE', default=4096, help='Size (in MB) of the root filesystem [default: %default]')
-  # + ('--optsize', metavar='SIZE', default=0, help='Size (in MB) of the /opt filesystem. If not set, no /opt filesystem will be added.')
-  # + ('--swapsize', metavar='SIZE', default=1024, help='Size (in MB) of the swap partition [default: %default]')
-  # + ('--raw', metavar='PATH', type='str', help="Specify a file (or block device) to as first disk image.")
-  #
   rootsize=${rootsize:-4096}
   optsize=${optsize:-0}
   swapsize=${swapsize:-1024}
@@ -302,16 +292,9 @@ build_vers
 }
 
 # * /usr/share/pyshared/VMBuilder/disk.py
-# rhel)
-# qemu_img_path=qemu-img
-# ubuntu|debian)
-# qemu_img_path=kvm-img
-
 
 # def create(self):
 printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${disk_filename} ${size}
-#${qemu_img_path} create -f raw ${disk_filename} ${size}M
-#dd if=/dev/zero of=${disk_filename} bs=1M count=${size}
 ${truncate} -s ${size}M ${disk_filename}
 
 # def partition(self)
@@ -426,9 +409,6 @@ done
 #        self.chroot_dir = tmpdir()
 #        self.call_hooks('mount_partitions', self.chroot_dir)
 #        run_cmd('rsync', '-aHA', '%s/' % self.distro.chroot_dir, self.chroot_dir)
-#distro=centos-6_x86_64
-#distro_dir=./${distro}
-
 [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
 
 printf "[DEBUG] Installing OS to %s\n" ${mntpnt}
