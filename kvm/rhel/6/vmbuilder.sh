@@ -420,41 +420,9 @@ mkrootfs ${distro_dir}
 mkdisk ${disk_filename}
 mkptab ${disk_filename}
 
-# def map_partitions(self):
-#        mapdevs = []
-#        for line in parts:
-#            mapdevs.append(line.split(' ')[2])
 printf "[INFO] Creating loop devices corresponding to the created partitions\n"
-
 mapptab ${disk_filename}
-
-#        for (part, mapdev) in zip(self.partitions, mapdevs):
-#            part.set_filename('/dev/mapper/%s' % mapdev)
-
-#    def mkfs(self):
-#        if not self.filename:
-#            raise VMBuilderException('We can\'t mkfs if filename is not set. Did you forget to call .create()?')
-#        if not self.dummy:
-#            cmd = self.mkfs_fstype() + [self.filename]
-#            run_cmd(*cmd)
-#            # Let udev have a chance to extract the UUID for us
-#            run_cmd('udevadm', 'settle')
-#            if os.path.exists("/sbin/vol_id"):
-#                self.uuid = run_cmd('vol_id', '--uuid', self.filename).rstrip()
-#            elif os.path.exists("/sbin/blkid"):
-#                self.uuid = run_cmd('blkid', '-c', '/dev/null', '-sUUID', '-ovalue', self.filename).rstrip()
-
 mkfs2vm ${disk_filename}
-
-#    def mount(self, rootmnt):
-#        if (self.type != TYPE_SWAP) and not self.dummy:
-#            logging.debug('Mounting %s', self.mntpnt)
-#            self.mntpath = '%s%s' % (rootmnt, self.mntpnt)
-#            if not os.path.exists(self.mntpath):
-#                os.makedirs(self.mntpath)
-#            run_cmd('mount', '-o', 'loop', self.filename, self.mntpath)
-#            self.vm.add_clean_cb(self.umount)
-
 mountvm ${disk_filename} ${mntpnt}
 
 #    def install_os(self):
