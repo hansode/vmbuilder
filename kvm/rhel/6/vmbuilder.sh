@@ -446,12 +446,6 @@ mapptab ${disk_filename}
 
 mkfs2vm ${disk_filename}
 
-uuids=
-lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
-  uuid=$(${blkid} -c /dev/null -sUUID -ovalue ${part_filename})
-  uuids="${uuids} ${uuid}"
-done
-
 #    def mount(self, rootmnt):
 #        if (self.type != TYPE_SWAP) and not self.dummy:
 #            logging.debug('Mounting %s', self.mntpnt)
@@ -542,6 +536,11 @@ quit
 _EOS_
 
 #
+uuids=
+lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
+  uuid=$(${blkid} -c /dev/null -sUUID -ovalue ${part_filename})
+  uuids="${uuids} ${uuid}"
+done
 rootdev_uuid=$(echo ${uuids} | awk '{print $1}')
 swapdev_uuid=$(echo ${uuids} | awk '{print $2}')
 optdev_uuid=$(echo ${uuids} | awk '{print $3}')
