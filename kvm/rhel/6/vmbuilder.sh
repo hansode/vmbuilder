@@ -403,7 +403,7 @@ function mountvm() {
   done
 }
 
-function installos2vm() {
+function installos() {
   local disk_filename=$1
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
 
@@ -591,7 +591,7 @@ mkptab  ${disk_filename}
 mapptab ${disk_filename}
 mkfs2vm ${disk_filename}
 
-installos2vm ${disk_filename}
+installos ${disk_filename}
 
 unmapptab_r ${disk_filename}
 
