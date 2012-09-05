@@ -326,14 +326,14 @@ function mkptab() {
 function mapptab() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  ${kpartx} -a ${disk_filename} && ${udevadm} settle
+  ${kpartx} -vsa ${disk_filename} && ${udevadm} settle
   # add map loop0p1 (253:3): 0 1998013 linear /dev/loop0 34
 }
 
 function unmapptab() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  ${kpartx} -d ${disk_filename}
+  ${kpartx} -vsd ${disk_filename}
   # del devmap : loop0p1
 }
 
