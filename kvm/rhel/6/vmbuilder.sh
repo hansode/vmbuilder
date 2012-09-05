@@ -269,9 +269,9 @@ function build_vers() {
 
 extract_args $*
 
-### variables
+### read-only variables
 
-abs_path=$(cd $(dirname $0) && pwd)
+readonly abs_path=$(cd $(dirname $0) && pwd)
 
 ## main
 
