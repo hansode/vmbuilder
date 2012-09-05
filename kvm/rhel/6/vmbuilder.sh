@@ -379,7 +379,7 @@ function mkfs2vm() {
   lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
     case ${part_filename} in
     *p1|*p3)
-      ${mkfs} -F ${part_filename}
+      ${mkfs} -F -E lazy_itable_init=1 ${part_filename}
 
       # > This filesystem will be automatically checked every 37 mounts or
       # > 180 days, whichever comes first.  Use tune2fs -c or -i to override.
