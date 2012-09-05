@@ -179,7 +179,7 @@ function build_vers() {
   esac
 
   distro=${distro_name}-${distro_ver}_${distro_arch}
-  distro_dir=${distro_dir:-`pwd`/${distro}}
+  distro_dir=${distro_dir:-${abs_path}/${distro}}
 
   keepcache=${keepcache:-0}
   # keepcache should be [ 0 | 1 ]
