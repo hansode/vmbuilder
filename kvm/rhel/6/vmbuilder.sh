@@ -58,7 +58,7 @@
 #               the virtual machine.
 #
 #
-# <based ontune2fs>
+# <based on tune2fs>
 #
 #       -c max-mount-counts
 #              Adjust the number of mounts after which the filesystem will be checked by e2fsck(8).  If max-mount-counts is 0 or  -1,  the  number  of  times  the
@@ -107,9 +107,10 @@ function extract_args() {
 
 function dump_vers() {
   cat <<-EOS
-	# options
+	# debug
 	debug="${debug}"
 	dry_run="${dry_run}"
+	# options
 	distro_name="${distro_name}"
 	distro_ver="${distro_ver}"
 	distro_arch="${distro_arch}"
