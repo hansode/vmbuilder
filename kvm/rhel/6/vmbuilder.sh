@@ -326,6 +326,7 @@ function mkptab() {
 function mapptab() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  printf "[INFO] Creating loop devices corresponding to the created partitions\n"
   ${kpartx} -vsa ${disk_filename} && ${udevadm} settle
   # add map loop0p1 (253:3): 0 1998013 linear /dev/loop0 34
 }
@@ -340,6 +341,7 @@ function unmapptab() {
 function unmapptab_r() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  printf "[INFO] Deleting loop devices\n"
   local tries=0 local max_tries=3
   while [[ ${tries} -lt ${max_tries} ]]; do
     unmapptab ${disk_filename}  && break || :
@@ -405,7 +407,7 @@ function mountvm() {
 }
 
 function installos2vm() {
-  local distro_dir=$1 mntpnt=$2
+  local mntpnt=$1
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
   [[ -d "${mntpnt}"     ]] || { echo "no such directory: ${mntpnt}" >&2; return 1; }
   printf "[DEBUG] Installing OS to %s\n" ${mntpnt}
@@ -556,6 +558,18 @@ function run_execscript() {
   }
 }
 
+function umountvm() {
+  local chroot_dir=${mntpnt}
+  printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
+  ${umount} ${chroot_dir}/${new_filename}
+  printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
+  ${rm} -rf ${chroot_dir}/${tmpdir}
+
+  printf "[DEBUG] Unmounting %s\n" ${mntpnt}
+  ${umount} ${mntpnt}
+  ${rmdir} ${mntpnt}
+}
+
 ### prepare
 
 extract_args $*
@@ -572,29 +586,14 @@ mkrootfs ${distro_dir}
 mkdisk ${disk_filename}
 mkptab ${disk_filename}
 
-printf "[INFO] Creating loop devices corresponding to the created partitions\n"
 mapptab ${disk_filename}
+
 mkfs2vm ${disk_filename}
 mountvm ${disk_filename} ${mntpnt}
-
-installos2vm ${distro_dir} ${mntpnt}
-
-function umountvm() {
-  local chroot_dir=${mntpnt}
-  printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
-  ${umount} ${chroot_dir}/${new_filename}
-  printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
-  ${rm} -rf ${chroot_dir}/${tmpdir}
-}
+installos2vm ${mntpnt}
 umountvm ${mntpnt}
 
-printf "[DEBUG] Unmounting %s\n" ${mntpnt}
-${umount} ${mntpnt}
-
-printf "[INFO] Deleting loop devices\n"
 unmapptab_r ${disk_filename}
-
-${rmdir} ${mntpnt}
 
 printf "[INFO] Generated => %s\n" ${disk_filename}
 printf "[INFO] Complete!\n"
