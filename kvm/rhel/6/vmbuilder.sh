@@ -109,6 +109,7 @@ function dump_vers() {
   cat <<-EOS
 	debug="${debug}"
 	dry_run="${dry_run}"
+	force="${force}"
 	#
 	distro_name="${distro_name}"
 	distro_ver="${distro_ver}"
@@ -168,6 +169,7 @@ function build_vers() {
   debug=${debug:-}
   [[ -z "${debug}" ]] || set -x
   dry_run=${dry_run:-}
+  force=${force:-}
 
   distro_name=${distro_name:-centos}
   distro_ver=${distro_ver:-6.3}
