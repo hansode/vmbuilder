@@ -529,7 +529,7 @@ function configure_mounting() {
   printf "[INFO] Overwriting /etc/fstab.\n"
   ${cat} <<-_EOS_ > ${chroot_dir}/etc/fstab
 	UUID=${rootdev_uuid} /                       ext4    defaults        1 1
-	$([[ ${optsize} -gt 0 ]] && { ${cat} <<-_SWAPDEV_
+	$([[ ${swapsize} -gt 0 ]] && { ${cat} <<-_SWAPDEV_
 	UUID=${swapdev_uuid} swap                    swap    defaults        0 0
 	_SWAPDEV_
 	})
