@@ -136,7 +136,6 @@ function dump_vers() {
 	hostname="${hostname}"
 	#
 	disk_filename="${disk_filename}"
-	size="${size}"
 	# requires:
 	build_rootfs_tree_sh="${build_rootfs_tree_sh}"
 	cat="${cat}"
@@ -264,7 +263,6 @@ function build_vers() {
 
   # local params
   disk_filename=${raw}
-  size=$((${rootsize} + ${optsize} + ${swapsize}))
 }
 
 function mkrootfs() {
@@ -285,6 +283,7 @@ function mkrootfs() {
 function mkdisk() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] && { echo "already exists: ${disk_filename}" >&2; return 1; }
+  local size=$((${rootsize} + ${optsize} + ${swapsize}))
   printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${disk_filename} ${size}
   ${truncate} -s ${size}M ${disk_filename}
 }
