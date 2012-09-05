@@ -139,6 +139,7 @@ function dump_vers() {
 	mntpnt="${mntpnt}"
 	# requires:
 	build_rootfs_tree_sh="${build_rootfs_tree_sh}"
+	cat="${cat}"
 	truncate="${truncate}"
 	parted="${parted}"
 	kpartx="${kpartx}"
@@ -153,10 +154,13 @@ function dump_vers() {
 	rmdir="${rmdir}"
 	rsync="${rsync}"
 	sync="${sync}"
+	sed="${sed}"
 	touch="${touch}"
 	ln="${ln}"
 	rm="${rm}"
 	chroot="${chroot}"
+	grub="${grub}"
+	setarch="${setarch}"
 	EOS
 }
 
@@ -186,10 +190,11 @@ function build_vers() {
 
   # requires:
   build_rootfs_tree_sh=${build_rootfs_tree_sh:-"${abs_path}/build-rootfs-tree.sh"}
+  cat=${cat:-"cat"}
   truncate=${truncate:-"truncate"}
   parted=${parted:-"parted"}
   kpartx=${kpartx:-"kpartx"}
-  udevadm=${udevadm:-"/sbin/udevadm"}
+  udevadm=${udevadm:-"udevadm"}
   blkid=${blkid:-"blkid"}
   mkfs=${mkfs:-"mkfs.ext4"}
   tune2fs=${tune2fs:-"tune2fs"}
@@ -200,13 +205,17 @@ function build_vers() {
   rmdir=${rmdir:-"rmdir"}
   rsync=${rsync:-"rsync"}
   sync=${sync:-"sync"}
+  sed=${sed:-"sed"}
   touch=${touch:-"touch"}
   ln=${ln:-"ln"}
   rm=${rm:-"rm"}
   chroot=${chroot:-"chroot"}
+  grub=${grub:-"grub"}
+  setarch=${setarch:-"setarch"}
 
   [[ -n ${dry_run} ]] && {
     build_rootfs_tree_sh="echo ${abs_path}/build-rootfs-tree.sh"
+    cat="echo ${cat}"
     truncate="echo ${truncate}"
     parted="echo ${parted}"
     kpartx="echo ${kpartx}"
@@ -221,10 +230,13 @@ function build_vers() {
     rmdir="echo ${rmdir}"
     rsync="echo ${rsync}"
     sync="echo ${sync}"
+    sed="echo ${sed}"
     touch="echo ${touch}"
     ln="echo ${ln}"
     rm="echo ${rm}"
     chroot="echo ${chroot}"
+    grub="echo ${grub}"
+    setarch="echo ${setarch}"
   } || :
 
   # * tune2fs
@@ -277,9 +289,16 @@ readonly abs_path=$(cd $(dirname $0) && pwd)
 
 build_vers
 
-[ -d "${distro_dir}" ] || {
+[[ -d "${distro_dir}" ]] || {
   printf "[INFO] Building OS tree: %s\n" ${distro_dir}
-  ${abs_path}/build-rootfs-tree.sh --distro-name=${distro_name} --distro-ver=${distro_ver} --distro-arch=${distro_arch} --chroot-dir=${distro_dir} --keepcache=${keepcache} --batch=1 --debug=1
+  ${build_rootfs_tree_sh} \
+   --distro-name=${distro_name} \
+   --distro-ver=${distro_ver}   \
+   --distro-arch=${distro_arch} \
+   --chroot-dir=${distro_dir}   \
+   --keepcache=${keepcache}     \
+   --batch=1                    \
+   --debug=1
 }
 
 # * /usr/share/pyshared/VMBuilder/disk.py
@@ -293,27 +312,27 @@ build_vers
 printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${disk_filename} ${size}
 #${qemu_img_path} create -f raw ${disk_filename} ${size}M
 #dd if=/dev/zero of=${disk_filename} bs=1M count=${size}
-truncate -s ${size}M ${disk_filename}
+${truncate} -s ${size}M ${disk_filename}
 
 # def partition(self)
 printf "[INFO] Adding partition table to disk image: %s\n" ${disk_filename}
-parted --script    ${disk_filename} mklabel msdos
+${parted} --script    ${disk_filename} mklabel msdos
 
 offset=0
 # root
 printf "[INFO] Adding type %s partition to disk image: %s\n" ext2 ${disk_filename}
-parted --script -- ${disk_filename} mkpart  primary ext2 ${offset} $((${rootsize} - 1))
+${parted} --script -- ${disk_filename} mkpart  primary ext2 ${offset} $((${rootsize} - 1))
 offset=$((${offset} + ${rootsize}))
 # swap
 [ ${swapsize} -gt 0 ] && {
   printf "[INFO] Adding type %s partition to disk image: %s\n" swap ${disk_filename}
-  parted --script -- ${disk_filename} mkpart  primary 'linux-swap(new)' ${offset} $((${offset} + ${swapsize} - 1))
+  ${parted} --script -- ${disk_filename} mkpart  primary 'linux-swap(new)' ${offset} $((${offset} + ${swapsize} - 1))
   offset=$((${offset} + ${swapsize}))
 }
 # opt
 [ ${optsize} -gt 0 ] && {
   printf "[INFO] Adding type %s partition to disk image: %s\n" ext2 ${disk_filename}
-  parted --script -- ${disk_filename} mkpart  primary ext2 ${offset} $((${offset} + ${optsize} - 1))
+  ${parted} --script -- ${disk_filename} mkpart  primary ext2 ${offset} $((${offset} + ${optsize} - 1))
 }
 unset offset
 
@@ -322,9 +341,8 @@ unset offset
 #        for line in parts:
 #            mapdevs.append(line.split(' ')[2])
 printf "[INFO] Creating loop devices corresponding to the created partitions\n"
-which kpartx >/dev/null || exit 1
 mapdevs=$(
- kpartx -va ${disk_filename} \
+ ${kpartx} -va ${disk_filename} \
   | egrep -v "^(gpt|dos):" \
   | egrep -w add \
   | while read line; do
@@ -352,39 +370,28 @@ part_filenames=$(
 #            elif os.path.exists("/sbin/blkid"):
 #                self.uuid = run_cmd('blkid', '-c', '/dev/null', '-sUUID', '-ovalue', self.filename).rstrip()
 
-getid_path=
-[ -x /sbin/vol_id ] && getid_path=/sbin/vol_id || :
-[ -x /sbin/blkid  ] && getid_path=/sbin/blkid  || :
-
 uuids=
 for part_filename in ${part_filenames}; do
   case ${part_filename} in
   *p1|*p3)
-    mkfs.ext4 -F ${part_filename}
+    ${mkfs} -F ${part_filename}
 
     # > This filesystem will be automatically checked every 37 mounts or
     # > 180 days, whichever comes first.  Use tune2fs -c or -i to override.
     [ ! "${max_mount_count}" -eq 37 -o ! "${interval_between_check}" -eq 180 ] && {
       printf "[INFO] Setting maximal mount count: %s\n" ${max_mount_count}
       printf "[INFO] Setting interval between check(s): %s\n" ${interval_between_check}
-      tune2fs -c ${max_mount_count} -i ${interval_between_check} ${part_filename}
+      ${tune2fs} -c ${max_mount_count} -i ${interval_between_check} ${part_filename}
     }
     ;;
   *p2)
-    mkswap ${part_filename}
+    ${mkswap} ${part_filename}
     ;;
   *)
     ;;
   esac
-  udevadm settle
-  case ${getid_path} in
-  /sbin/vol_id)
-    uuid=$(${getid_path} --uuid ${part_filename})
-    ;;
-  /sbin/blkid)
-    uuid=$(${getid_path} -c /dev/null -sUUID -ovalue ${part_filename})
-    ;;
-  esac
+  ${udevadm} settle
+  uuid=$(${blkid} -c /dev/null -sUUID -ovalue ${part_filename})
 
   uuids="${uuids} ${uuid}"
 done
@@ -399,13 +406,13 @@ done
 #            run_cmd('mount', '-o', 'loop', self.filename, self.mntpath)
 #            self.vm.add_clean_cb(self.umount)
 
-[ -d "${mntpnt}" ] && { exit 1; } || mkdir -p ${mntpnt}
+[ -d "${mntpnt}" ] && { exit 1; } || ${mkdir} -p ${mntpnt}
 
 for part_filename in ${part_filenames}; do
   case ${part_filename} in
   *p1)
     printf "[DEBUG] Mounting %s\n" ${mntpnt}
-    mount ${part_filename} ${mntpnt}
+    ${mount} ${part_filename} ${mntpnt}
     ;;
   esac
 done
@@ -425,11 +432,11 @@ done
 [ -d "${distro_dir}" ] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
 
 printf "[DEBUG] Installing OS to %s\n" ${mntpnt}
-rsync -aHA ${distro_dir}/ ${mntpnt}
-sync
+${rsync} -aHA ${distro_dir}/ ${mntpnt}
+${sync}
 
 printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
-sed -i s,^keepcache=.*,keepcache=${keepcache}, ${mntpnt}/etc/yum.conf
+${sed} -i s,^keepcache=.*,keepcache=${keepcache}, ${mntpnt}/etc/yum.conf
 
 #        if self.needs_bootloader:
 #            self.call_hooks('install_bootloader', self.chroot_dir, self.disks)
@@ -449,13 +456,13 @@ chroot_dir=${mntpnt}
 #        tmpdir = '/tmp/vmbuilder-grub'
 #        os.makedirs('%s%s' % (chroot_dir, tmpdir))
 tmpdir=/tmp/vmbuilder-grub
-mkdir -p ${chroot_dir}/${tmpdir}
+${mkdir} -p ${chroot_dir}/${tmpdir}
 
 #        self.context.add_clean_cb(self.install_bootloader_cleanup)
 #        devmapfile = os.path.join(tmpdir, 'device.map')
 #        devmap = open('%s%s' % (chroot_dir, devmapfile), 'w')
 devmapfile=${tmpdir}/device.map
-touch ${chroot_dir}/${devmapfile}
+${touch} ${chroot_dir}/${devmapfile}
 
 #        for (disk, id) in zip(disks, range(len(disks))):
 grub_id=0
@@ -464,8 +471,8 @@ grub_id=0
 #            open('%s%s' % (chroot_dir, new_filename), 'w').close()
 #            run_cmd('mount', '--bind', disk.filename, '%s%s' % (chroot_dir, new_filename))
 new_filename=${tmpdir}/$(basename ${disk_filename})
-touch ${chroot_dir}/${new_filename}
-mount --bind ${disk_filename} ${chroot_dir}/${new_filename}
+${touch} ${chroot_dir}/${new_filename}
+${mount} --bind ${disk_filename} ${chroot_dir}/${new_filename}
 
 #            st = os.stat(disk.filename)
 #            if stat.S_ISBLK(st.st_mode):
@@ -478,14 +485,14 @@ printf "(hd%d) %s\n" ${grub_id} ${new_filename} >> ${chroot_dir}/${devmapfile}
 
 #        devmap.close()
 #        run_cmd('cat', '%s%s' % (chroot_dir, devmapfile))
-cat ${chroot_dir}/${devmapfile}
+${cat} ${chroot_dir}/${devmapfile}
 
 #        self.suite.install_grub(chroot_dir)
 #        self.run_in_target('grub', '--device-map=%s' % devmapfile, '--batch',  stdin='''root %s
 #setup (hd0)
 #EOT''' % root_dev)
 
-cat <<_EOS_ | chroot ${chroot_dir} grub --device-map=${devmapfile} --batch
+${cat} <<_EOS_ | ${chroot} ${chroot_dir} ${grub} --device-map=${devmapfile} --batch
 root (hd${grub_id},0)
 setup (hd0)
 quit
@@ -498,7 +505,7 @@ optdev_uuid=$(echo ${uuids} | awk '{print $3}')
 
 # /boot/grub/grub.conf
 printf "[INFO] Generating /boot/grub/grub.conf.\n"
-cat <<_EOS_ > ${chroot_dir}/boot/grub/grub.conf
+${cat} <<_EOS_ > ${chroot_dir}/boot/grub/grub.conf
 default=0
 timeout=5
 splashimage=(hd${grub_id},0)/boot/grub/splash.xpm.gz
@@ -508,18 +515,18 @@ title ${distro} ($(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1 | sed 's,^vml
         kernel /boot/$(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1) ro root=UUID=${rootdev_uuid} rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto  KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM
         initrd /boot/$(cd ${chroot_dir}/boot && ls initramfs-*| tail -1)
 _EOS_
-cat ${chroot_dir}/boot/grub/grub.conf
-chroot ${chroot_dir} ln -s /boot/grub/grub.conf /boot/grub/menu.lst
+${cat} ${chroot_dir}/boot/grub/grub.conf
+${chroot} ${chroot_dir} ${ln} -s /boot/grub/grub.conf /boot/grub/menu.lst
 
 # /etc/fstab
 printf "[INFO] Overwriting /etc/fstab.\n"
-cat <<_EOS_ > ${chroot_dir}/etc/fstab
+${cat} <<_EOS_ > ${chroot_dir}/etc/fstab
 UUID=${rootdev_uuid} /                       ext4    defaults        1 1
-$([ ${optsize} -gt 0 ] && { cat <<_SWAPDEV_
+$([ ${optsize} -gt 0 ] && { ${cat} <<_SWAPDEV_
 UUID=${swapdev_uuid} swap                    swap    defaults        0 0
 _SWAPDEV_
 })
-$([ ${optsize} -gt 0 ] && { cat <<_OPTDEV_
+$([ ${optsize} -gt 0 ] && { ${cat} <<_OPTDEV_
 UUID=${optdev_uuid} /opt                    ext4    defaults        1 1
 _OPTDEV_
 })
@@ -528,7 +535,7 @@ devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
 sysfs                   /sys                    sysfs   defaults        0 0
 proc                    /proc                   proc    defaults        0 0
 _EOS_
-cat ${chroot_dir}/etc/fstab
+${cat} ${chroot_dir}/etc/fstab
 
 DEVICE=eth0
 BOOTPROTO=dhcp
@@ -537,7 +544,7 @@ ONBOOT=yes
 # /etc/sysconfig/network-scripts/ifcfg-eth0
 [ -z "${ip}" ] || {
   printf "[INFO] Unsetting /etc/sysconfig/network-scripts/ifcfg-eth0.\n"
-  cat <<_EOS_ > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
+  ${cat} <<_EOS_ > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
 DEVICE=eth0
 BOOTPROTO=static
 ONBOOT=yes
@@ -547,23 +554,23 @@ $([ -z "${net}"   ] || echo "NETMASK=${net}")
 $([ -z "${bcast}" ] || echo "BROADCAST=${bcast}")
 $([ -z "${gw}"    ] || echo "GATEWAY=${gw}")
 _EOS_
-  cat ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
+  ${cat} ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
 }
 
 # /etc/resolv.conf
 [ -z "${dns}" ] || {
   printf "[INFO] Unsetting /etc/resolv.conf.\n"
-  cat <<_EOS_ > ${chroot_dir}/etc/resolv.conf
+  ${cat} <<_EOS_ > ${chroot_dir}/etc/resolv.conf
 nameserver ${dns}
 _EOS_
-  cat ${chroot_dir}/etc/resolv.conf
+  ${cat} ${chroot_dir}/etc/resolv.conf
 }
 
 # hostname
 [ -z "${hostname}" ] || {
   printf "[INFO] Setting hostname: %s\n" ${hostname}
   egrep ^HOSTNAME= ${chroot_dir}/etc/sysconfig/network -q && {
-    sed -i "s,^HOSTNAME=.*,HOSTNAME=${hostname}," ${chroot_dir}/etc/sysconfig/network
+    ${sed} -i "s,^HOSTNAME=.*,HOSTNAME=${hostname}," ${chroot_dir}/etc/sysconfig/network
   } || {
     echo HOSTNAME=${hostname} >> ${chroot_dir}/etc/sysconfig/network
   }
@@ -572,41 +579,41 @@ _EOS_
 
 # disable mac address caching
 printf "[INFO] Unsetting udev 70-persistent-net.rules.\n"
-rm -f ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
-ln -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
+${rm} -f ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
+${ln} -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
 
 [ -z "${execscript}" ] && {
-  chroot ${chroot_dir} bash -c "echo root:root | chpasswd"
+  ${chroot} ${chroot_dir} bash -c "echo root:root | chpasswd"
 } || {
   [ -f "${execscript}" ] && {
     [ -x "${execscript}" ] && {
       printf "[INFO] Excecuting after script\n"
-      setarch ${distro_arch} ${execscript} ${chroot_dir}
+      ${setarch} ${distro_arch} ${execscript} ${chroot_dir}
     } || :
   } || :
 }
 
 printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
-umount ${chroot_dir}/${new_filename}
+${umount} ${chroot_dir}/${new_filename}
 printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
-rm -rf ${chroot_dir}/${tmpdir}
+${rm} -rf ${chroot_dir}/${tmpdir}
 
 printf "[DEBUG] Unmounting %s\n" ${mntpnt}
-umount ${mntpnt}
+${umount} ${mntpnt}
 
 printf "[INFO] Deleting loop devices\n"
 
 tries=0
 max_tries=3
 while [ ${tries} -lt ${max_tries} ]; do
-  kpartx -vd ${disk_filename} && break || :
+  ${kpartx} -vd ${disk_filename} && break || :
   tries=$((${tries} + 1))
   sleep 1
   [ ${tries} -ge ${max_tries} ] && printf "[INFO] Could not unmount '%s' after '%d' attempts. Final attempt" ${disk_filename} ${tries}
 done
-kpartx -vd ${disk_filename} || :
+${kpartx} -vd ${disk_filename} || :
 
-rmdir ${mntpnt}
+${rmdir} ${mntpnt}
 
 printf "[INFO] Generated => %s\n" ${disk_filename}
 printf "[INFO] Complete!\n"
