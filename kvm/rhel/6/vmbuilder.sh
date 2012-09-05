@@ -595,6 +595,35 @@ function run_execscript() {
   }
 }
 
+## task
+
+function task_prepare() {
+  mkrootfs ${distro_dir}
+}
+
+function task_setup() {
+  [[ -f ${disk_filename} ]] && rmdisk ${disk_filename}
+  mkdisk  ${disk_filename}
+  mkptab  ${disk_filename}
+  mapptab ${disk_filename}
+  mkfs2vm ${disk_filename}
+}
+
+function task_install() {
+  installos ${disk_filename}
+}
+
+function task_postinstall() {
+  unmapptab_r ${disk_filename}
+  printf "[INFO] Generated => %s\n" ${disk_filename}
+  printf "[INFO] Complete!\n"
+}
+
+function task_clean() {
+  [[ -f ${disk_filename} ]] && rmdisk ${disk_filename}
+  [[ -d ${distro_dir} ]] && rm -rf ${distro_dir}
+}
+
 ### prepare
 
 extract_args $*
@@ -612,20 +641,25 @@ case "${cmd}" in
 debug)
   dump_vers
   ;;
+prepare)
+  task_prepare
+  ;;
+setup)
+  task_setup
+  ;;
+install)
+  task_install
+  ;;
+postinstall)
+  task_postinstall
+  ;;
+clean)
+  task_clean
+  ;;
 *)
-  mkrootfs ${distro_dir}
-
-  [[ -f ${disk_filename} ]] && rmdisk ${disk_filename}
-  mkdisk  ${disk_filename}
-  mkptab  ${disk_filename}
-  mapptab ${disk_filename}
-  mkfs2vm ${disk_filename}
-
-  installos ${disk_filename}
-
-  unmapptab_r ${disk_filename}
-
-  printf "[INFO] Generated => %s\n" ${disk_filename}
-  printf "[INFO] Complete!\n"
+  task_prepare
+  task_setup
+  task_install
+  task_postinstall
   ;;
 esac
