@@ -404,27 +404,6 @@ function mountvm() {
   done
 }
 
-### prepare
-
-extract_args $*
-
-### read-only variables
-
-readonly abs_path=$(cd $(dirname $0) && pwd)
-
-## main
-
-build_vers
-mkrootfs ${distro_dir}
-[[ -f ${disk_filename} ]] && rmdisk ${disk_filename}
-mkdisk ${disk_filename}
-mkptab ${disk_filename}
-
-printf "[INFO] Creating loop devices corresponding to the created partitions\n"
-mapptab ${disk_filename}
-mkfs2vm ${disk_filename}
-mountvm ${disk_filename} ${mntpnt}
-
 function installos2vm() {
   local distro_dir=$1 mntpnt=$2
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
@@ -434,8 +413,12 @@ function installos2vm() {
   ${sync}
   printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
   ${sed} -i s,^keepcache=.*,keepcache=${keepcache}, ${mntpnt}/etc/yum.conf
+
+  installgrub2vm ${mntpnt}
+  configure_networking ${mntpnt}
+  configure_mounting ${mntpnt}
+  run_execscript ${mntpnt}
 }
-installos2vm ${distro_dir} ${mntpnt}
 
 function installgrub2vm() {
   local chroot_dir=${mntpnt}
@@ -480,7 +463,6 @@ function installgrub2vm() {
   ${cat} ${chroot_dir}/boot/grub/grub.conf
   ${chroot} ${chroot_dir} ${ln} -s /boot/grub/grub.conf /boot/grub/menu.lst
 }
-installgrub2vm
 
 function configure_networking() {
   local chroot_dir=${mntpnt}
@@ -527,7 +509,6 @@ function configure_networking() {
   ${rm} -f ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
   ${ln} -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
 }
-configure_networking
 
 function configure_mounting() {
   local chroot_dir=${mntpnt}
@@ -560,7 +541,6 @@ function configure_mounting() {
 	_EOS_
   ${cat} ${chroot_dir}/etc/fstab
 }
-configure_mounting
 
 function run_execscript() {
   local chroot_dir=${mntpnt}
@@ -575,7 +555,29 @@ function run_execscript() {
     } || :
   }
 }
-run_execscript
+
+### prepare
+
+extract_args $*
+
+### read-only variables
+
+readonly abs_path=$(cd $(dirname $0) && pwd)
+
+## main
+
+build_vers
+mkrootfs ${distro_dir}
+[[ -f ${disk_filename} ]] && rmdisk ${disk_filename}
+mkdisk ${disk_filename}
+mkptab ${disk_filename}
+
+printf "[INFO] Creating loop devices corresponding to the created partitions\n"
+mapptab ${disk_filename}
+mkfs2vm ${disk_filename}
+mountvm ${disk_filename} ${mntpnt}
+
+installos2vm ${distro_dir} ${mntpnt}
 
 function umountvm() {
   local chroot_dir=${mntpnt}
