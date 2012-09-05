@@ -265,7 +265,9 @@ function build_vers() {
 function mkrootfs() {
   local distro_dir=$1
 
-  [[ -d "${distro_dir}" ]] || {
+  [[ -d "${distro_dir}" ]] && {
+    printf "[INFO] already exists: %s\n" ${distro_dir}
+  } || {
     printf "[INFO] Building OS tree: %s\n" ${distro_dir}
     ${build_rootfs_tree_sh} \
      --distro-name=${distro_name} \
