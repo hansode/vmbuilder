@@ -613,11 +613,11 @@ function run_execscript() {
 
 function task_prepare() {
   mkrootfs ${distro_dir}
+  [[ -f ${disk_filename} ]] && rmdisk ${disk_filename}
+  mkdisk  ${disk_filename}
 }
 
 function task_setup() {
-  [[ -f ${disk_filename} ]] && rmdisk ${disk_filename}
-  mkdisk  ${disk_filename}
   mkptab  ${disk_filename}
   mapptab ${disk_filename}
   mkfs2vm ${disk_filename}
