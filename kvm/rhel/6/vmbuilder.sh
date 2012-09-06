@@ -665,10 +665,10 @@ check_user
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
 case "${cmd}" in
-debug)
+debug|dump)
   dump_vers
   ;;
-prepare)
+prep|prepare)
   task_prepare
   ;;
 setup)
@@ -677,7 +677,7 @@ setup)
 install)
   task_install
   ;;
-postinstall)
+post|postinstall)
   task_postinstall
   ;;
 clean)
