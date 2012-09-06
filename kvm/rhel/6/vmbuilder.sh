@@ -437,14 +437,14 @@ function umountvm() {
 }
 
 function installos() {
-  local disk_filename=$1
+  local distro_dir=$1 disk_filename=$2
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
 
   local chroot_dir=/tmp/tmp$(date +%s)
 
   mountvm ${disk_filename} ${chroot_dir}
 
-  installdistro2vm     ${chroot_dir}
+  installdistro2vm     ${distro_dir} ${chroot_dir}
   installgrub2vm       ${chroot_dir}
   configure_networking ${chroot_dir}
   configure_mounting   ${chroot_dir}
@@ -454,7 +454,7 @@ function installos() {
 }
 
 function installdistro2vm() {
-  local chroot_dir=$1
+  local distro_dir=$1 chroot_dir=$2
 
   printf "[DEBUG] Installing OS to %s\n" ${chroot_dir}
   ${rsync} -aHA ${distro_dir}/ ${chroot_dir}
@@ -622,7 +622,7 @@ function task_setup() {
 }
 
 function task_install() {
-  installos ${disk_filename}
+  installos ${distro_dir} ${disk_filename}
 }
 
 function task_postinstall() {
