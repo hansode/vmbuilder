@@ -429,7 +429,7 @@ function mountvm() {
 }
 
 function umountvm() {
-  local chroot_dir=${mntpnt}
+  local chroot_dir=$1
 
   printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
   ${umount} ${chroot_dir}/${new_filename}
@@ -460,7 +460,7 @@ function installos() {
 }
 
 function installdistro2vm() {
-  local chroot_dir=${mntpnt}
+  local chroot_dir=$1
 
   printf "[DEBUG] Installing OS to %s\n" ${mntpnt}
   ${rsync} -aHA ${distro_dir}/ ${mntpnt}
@@ -471,7 +471,7 @@ function installdistro2vm() {
 }
 
 function installgrub2vm() {
-  local chroot_dir=${mntpnt}
+  local chroot_dir=$1
 
   tmpdir=/tmp/vmbuilder-grub
   ${mkdir} -p ${chroot_dir}/${tmpdir}
@@ -516,7 +516,7 @@ function installgrub2vm() {
 }
 
 function configure_networking() {
-  local chroot_dir=${mntpnt}
+  local chroot_dir=$1
 
   # /etc/sysconfig/network-scripts/ifcfg-eth0
   [[ -z "${ip}" ]] || {
@@ -563,7 +563,7 @@ function configure_networking() {
 }
 
 function configure_mounting() {
-  local chroot_dir=${mntpnt}
+  local chroot_dir=$1
 
   uuids=$(
     lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
@@ -594,7 +594,7 @@ function configure_mounting() {
 }
 
 function run_execscript() {
-  local chroot_dir=${mntpnt}
+  local chroot_dir=$1
 
   [[ -n "${execscript}" ]] || {
     ${chroot} ${chroot_dir} bash -c "echo root:root | chpasswd"
