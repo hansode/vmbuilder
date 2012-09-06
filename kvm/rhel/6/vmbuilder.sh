@@ -136,8 +136,6 @@ function dump_vers() {
 	gw="${gw}"
 	dns="${dns}"
 	hostname="${hostname}"
-	# internal variables
-	disk_filename="${disk_filename}"
 	# required commands
 	build_rootfs_tree_sh="${build_rootfs_tree_sh}"
 	cat="${cat}"
@@ -266,9 +264,6 @@ function build_vers() {
   gw=${gw:-}
   dns=${dns:-}
   hostname=${hostname:-}
-
-  # local params
-  disk_filename=${raw}
 }
 
 ## rootfs tree
@@ -445,9 +440,9 @@ function installos() {
   mountvm ${disk_filename} ${chroot_dir}
 
   installdistro2vm     ${distro_dir} ${chroot_dir}
-  installgrub2vm       ${chroot_dir}
+  installgrub2vm       ${chroot_dir} ${disk_filename}
   configure_networking ${chroot_dir}
-  configure_mounting   ${chroot_dir}
+  configure_mounting   ${chroot_dir} ${disk_filename}
   run_execscript       ${chroot_dir}
 
   umountvm             ${chroot_dir}
@@ -465,7 +460,7 @@ function installdistro2vm() {
 }
 
 function installgrub2vm() {
-  local chroot_dir=$1
+  local chroot_dir=$1 disk_filename=$2
 
   local tmpdir=/tmp/vmbuilder-grub
   ${mkdir} -p ${chroot_dir}/${tmpdir}
@@ -563,7 +558,7 @@ function configure_networking() {
 }
 
 function configure_mounting() {
-  local chroot_dir=$1
+  local chroot_dir=$1 disk_filename=$2
 
   uuids=$(
     lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
@@ -611,28 +606,28 @@ function run_execscript() {
 
 function task_prepare() {
   mkrootfs ${distro_dir}
-  [[ -f ${disk_filename} ]] && rmdisk ${disk_filename}
-  mkdisk  ${disk_filename}
+  [[ -f ${raw} ]] && rmdisk ${raw}
+  mkdisk  ${raw}
 }
 
 function task_setup() {
-  mkptab  ${disk_filename}
-  mapptab ${disk_filename}
-  mkfs2vm ${disk_filename}
+  mkptab  ${raw}
+  mapptab ${raw}
+  mkfs2vm ${raw}
 }
 
 function task_install() {
-  installos ${distro_dir} ${disk_filename}
+  installos ${distro_dir} ${raw}
 }
 
 function task_postinstall() {
-  unmapptab_r ${disk_filename}
-  printf "[INFO] Generated => %s\n" ${disk_filename}
+  unmapptab_r ${raw}
+  printf "[INFO] Generated => %s\n" ${raw}
   printf "[INFO] Complete!\n"
 }
 
 function task_clean() {
-  [[ -f ${disk_filename} ]] && rmdisk ${disk_filename}
+  [[ -f ${raw} ]] && rmdisk ${raw}
   [[ -d ${distro_dir} ]] && rm -rf ${distro_dir}
 }
 
