@@ -10,6 +10,7 @@
 #  mount, umount, mkdir, rmdir
 #  rsync, sync, touch, ln, rm
 #  chroot, grub, setarch
+#  losetup, dmsetup
 #
 # memo:
 #
@@ -162,6 +163,8 @@ function dump_vers() {
 	chroot="${chroot}"
 	grub="${grub}"
 	setarch="${setarch}"
+	losetup="${losetup}"
+	dmsetup="${dmsetup}"
 	EOS
 }
 
@@ -213,6 +216,8 @@ function build_vers() {
   chroot=${chroot:-"chroot"}
   grub=${grub:-"grub"}
   setarch=${setarch:-"setarch"}
+  losetup=${losetup:-"losetup"}
+  dmsetup=${dmsetup:-"dmsetup"}
 
   [[ -n ${dry_run} ]] && {
     build_rootfs_tree_sh="echo ${abs_path}/build-rootfs-tree.sh"
@@ -238,6 +243,8 @@ function build_vers() {
     chroot="echo ${chroot}"
     grub="echo ${grub}"
     setarch="echo ${setarch}"
+    losetup="echo ${losetup}"
+    dmsetup="echo ${dmsetup}"
   } || :
 
   # * tune2fs
@@ -631,6 +638,18 @@ function task_clean() {
   [[ -d ${distro_dir} ]] && rm -rf ${distro_dir}
 }
 
+function task_status() {
+  ${losetup} -a
+  ${dmsetup} ls
+}
+
+function check_user() {
+  [[ $UID -ne 0 ]] && {
+    echo "[ERROR] Run as root." >&2
+    return 1
+  } || :
+}
+
 ### prepare
 
 extract_args $*
@@ -642,6 +661,7 @@ readonly abs_path=$(cd $(dirname $0) && pwd)
 ## main
 
 build_vers
+check_user
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
 case "${cmd}" in
@@ -662,6 +682,9 @@ postinstall)
   ;;
 clean)
   task_clean
+  ;;
+status)
+  task_status
   ;;
 *)
   task_prepare
