@@ -431,9 +431,6 @@ function mountvm() {
 function umountvm() {
   local chroot_dir=$1
 
-  printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
-  ${rm} -rf ${chroot_dir}/${tmpdir}
-
   printf "[DEBUG] Unmounting %s\n" ${mntpnt}
   ${umount} ${mntpnt}
   ${rmdir}  ${mntpnt}
@@ -470,10 +467,10 @@ function installdistro2vm() {
 function installgrub2vm() {
   local chroot_dir=$1
 
-  tmpdir=/tmp/vmbuilder-grub
+  local tmpdir=/tmp/vmbuilder-grub
   ${mkdir} -p ${chroot_dir}/${tmpdir}
 
-  devmapfile=${tmpdir}/device.map
+  local devmapfile=${tmpdir}/device.map
   ${touch} ${chroot_dir}/${devmapfile}
 
   local grub_id=0
@@ -513,6 +510,9 @@ function installgrub2vm() {
 
   printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
   ${umount} ${chroot_dir}/${new_filename}
+
+  printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
+  ${rm} -rf ${chroot_dir}/${tmpdir}
 }
 
 function configure_networking() {
