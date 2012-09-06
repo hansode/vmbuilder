@@ -25,6 +25,17 @@
 # OPTIONS
 #
 #    Guest partitioning options
+#        --part=PATH
+#               Allows to specify a partition table in PATH each line of partfile should specify (root first):
+#                       mountpoint size (device) (filename)
+#               one  per  line, separated by space, where size is in megabytes. The third and fourth options allow you to specify a device for the filesystem, and a name for the filesystem image, both of which
+#               are optional. You can have up to 4 virtual disks, a new disk starts on a line containing only '---'. ie:
+#                       root 2000 a1 rootfs
+#                       /boot 512 a2 boot
+#                       swap 1000 a3 swapfs
+#                       ---
+#                       /var 8000 b1 var
+#                       /var/log 2000 b2 varlog
 #
 #        The following three options are not used if --part is specified:
 #
@@ -38,7 +49,6 @@
 #                      Size (in MB) of the swap partition [default: 1024]. Discarded when --part is used.
 #
 #   Network related options:
-#
 #       --ip=ADDRESS
 #              IP address in dotted form [default: dhcp]
 #
@@ -58,7 +68,6 @@
 #                     DNS address in dotted form [default: based on ip setting (first valid address in the network)]
 #
 #    Post install actions:
-#
 #        --execscript=SCRIPT
 #               Run SCRIPT after distro installation finishes. Script will be called with the guest's chroot as first argument, so you can use chroot $1 <cmd> to  run  code  in
 #               the virtual machine.
