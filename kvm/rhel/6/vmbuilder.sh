@@ -19,11 +19,7 @@
 #        vmbuilder - builds virtual machines from the command line
 #
 # SYNOPSIS
-#        vmbuilder <hypervisor> <distro> [OPTIONS]...
-#
-#        <hypervisor>  Hypervisor image format. Valid options: xen kvm vmw6 vmserver
-#
-#        <distro>      Distribution. Valid options: ubuntu
+#        vmbuilder [OPTIONS]...
 #
 # OPTIONS
 #
@@ -31,49 +27,45 @@
 #
 #        The following three options are not used if --part is specified:
 #
-#               --rootsize SIZE
+#               --rootsize=SIZE
 #                      Size (in MB) of the root filesystem [default: 4096].  Discarded when --part is used.
 #
-#               --optsize SIZE
+#               --optsize=SIZE
 #                      Size (in MB) of the /opt filesystem. If not set, no /opt filesystem will be added. Discarded when --part is used.
 #
-#               --swapsize SIZE
+#               --swapsize=SIZE
 #                      Size (in MB) of the swap partition [default: 1024]. Discarded when --part is used.
 #
 #   Network related options:
-#       --domain DOMAIN
-#              Set DOMAIN as the domain name of the guest. Default: The domain of the machine running this script.
 #
-#       --ip ADDRESS
+#       --ip=ADDRESS
 #              IP address in dotted form [default: dhcp]
 #
 #       Options below are discarded if --ip is not specified
-#              --mask VALUE IP mask in dotted form [default: based on ip setting].
+#              --mask=VALUE IP mask in dotted form [default: based on ip setting].
 #
-#              --net ADDRESS
+#              --net=ADDRESS
 #                     IP net address in dotted form [default: based on ip setting].
 #
-#              --bcast VALUE
+#              --bcast=VALUE
 #                     IP broadcast in dotted form [default: based on ip setting].
 #
-#              --gw ADDRESS
+#              --gw=ADDRESS
 #                     Gateway (router) address in dotted form [default: based on ip setting (first valid address in the network)].
 #
-#              --dns ADDRESS
+#              --dns=ADDRESS
 #                     DNS address in dotted form [default: based on ip setting (first valid address in the network)]
 #
 #    Post install actions:
-#        --copy FILE
-#               Read 'source dest' lines from FILE, copying source files from host to dest in the guest's file system.
 #
-#        --execscript SCRIPT, --exec SCRIPT
+#        --execscript=SCRIPT
 #               Run SCRIPT after distro installation finishes. Script will be called with the guest's chroot as first argument, so you can use chroot $1 <cmd> to  run  code  in
 #               the virtual machine.
 #
 #
 # <based on tune2fs>
 #
-#       -c max-mount-counts
+#       --max-mount-count=COUNT
 #              Adjust the number of mounts after which the filesystem will be checked by e2fsck(8).  If max-mount-counts is 0 or  -1,  the  number  of  times  the
 #              filesystem is mounted will be disregarded by e2fsck(8) and the kernel.
 #
@@ -87,7 +79,7 @@
 #
 #              See also the -i option for time-dependent checking.
 #
-#       -i  interval-between-checks[d|m|w]
+#       --interval-between-check=COUNT
 #              Adjust the maximal time between two filesystem checks.  No suffix or d will interpret the number interval-between-checks as days, m as months,  and
 #              w as weeks.  A value of zero will disable the time-dependent checking.
 #
