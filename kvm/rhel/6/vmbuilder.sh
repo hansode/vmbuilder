@@ -431,9 +431,6 @@ function mountvm() {
 function umountvm() {
   local chroot_dir=$1
 
-  printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
-  ${umount} ${chroot_dir}/${new_filename}
-
   printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
   ${rm} -rf ${chroot_dir}/${tmpdir}
 
@@ -480,7 +477,7 @@ function installgrub2vm() {
   ${touch} ${chroot_dir}/${devmapfile}
 
   local grub_id=0
-  new_filename=${tmpdir}/$(basename ${disk_filename})
+  local new_filename=${tmpdir}/$(basename ${disk_filename})
   ${touch} ${chroot_dir}/${new_filename}
   ${mount} --bind ${disk_filename} ${chroot_dir}/${new_filename}
   printf "(hd%d) %s\n" ${grub_id} ${new_filename} >> ${chroot_dir}/${devmapfile}
@@ -513,6 +510,9 @@ function installgrub2vm() {
 	_EOS_
   ${cat} ${chroot_dir}/boot/grub/grub.conf
   ${chroot} ${chroot_dir} ${ln} -fs /boot/grub/grub.conf /boot/grub/menu.lst
+
+  printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
+  ${umount} ${chroot_dir}/${new_filename}
 }
 
 function configure_networking() {
