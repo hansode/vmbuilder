@@ -1,5 +1,18 @@
 #!/bin/bash
 #
+# requires:
+#  bash
+#  tr, dirname, pwd
+#  sed, head
+#  build_rootfs_tree.sh
+#  cat, truncate, parted, kpartx, udevadm, blkid
+#  mkfs, tune2fs, mkswap
+#  mount, umount, mkdir, rmdir
+#  rsync, sync, touch, ln, rm
+#  chroot, grub, setarch
+#
+# memo:
+#
 # <based on vmbuilder>
 #
 # NAME
