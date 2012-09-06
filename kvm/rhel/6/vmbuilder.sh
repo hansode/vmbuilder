@@ -478,8 +478,8 @@ function installgrub2vm() {
 
   devmapfile=${tmpdir}/device.map
   ${touch} ${chroot_dir}/${devmapfile}
-  grub_id=0
 
+  local grub_id=0
   new_filename=${tmpdir}/$(basename ${disk_filename})
   ${touch} ${chroot_dir}/${new_filename}
   ${mount} --bind ${disk_filename} ${chroot_dir}/${new_filename}
