@@ -647,7 +647,7 @@ function task_status() {
 
 function check_user() {
   [[ $UID -ne 0 ]] && {
-    echo "[ERROR] Run as root." >&2
+    echo "[ERROR] Must run as root." >&2
     return 1
   } || :
 }
