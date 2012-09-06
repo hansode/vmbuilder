@@ -413,16 +413,16 @@ function mkfs2vm() {
 }
 
 function mountvm() {
-  local disk_filename=$1 mntpnt=$2
+  local disk_filename=$1 chroot_dir=$2
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  [[ -d "${mntpnt}" ]] && { echo "already exists: ${mntpnt}" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] && { echo "already exists: ${chroot_dir}" >&2; return 1; }
 
-  ${mkdir} -p ${mntpnt}
+  ${mkdir} -p ${chroot_dir}
   lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
     case ${part_filename} in
     *p1)
-      printf "[DEBUG] Mounting %s\n" ${mntpnt}
-      ${mount} ${part_filename} ${mntpnt}
+      printf "[DEBUG] Mounting %s\n" ${chroot_dir}
+      ${mount} ${part_filename} ${chroot_dir}
       ;;
     esac
   done
@@ -431,37 +431,37 @@ function mountvm() {
 function umountvm() {
   local chroot_dir=$1
 
-  printf "[DEBUG] Unmounting %s\n" ${mntpnt}
-  ${umount} ${mntpnt}
-  ${rmdir}  ${mntpnt}
+  printf "[DEBUG] Unmounting %s\n" ${chroot_dir}
+  ${umount} ${chroot_dir}
+  ${rmdir}  ${chroot_dir}
 }
 
 function installos() {
   local disk_filename=$1
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
 
-  local mntpnt=/tmp/tmp$(date +%s)
+  local chroot_dir=/tmp/tmp$(date +%s)
 
-  mountvm ${disk_filename} ${mntpnt}
+  mountvm ${disk_filename} ${chroot_dir}
 
-  installdistro2vm     ${mntpnt}
-  installgrub2vm       ${mntpnt}
-  configure_networking ${mntpnt}
-  configure_mounting   ${mntpnt}
-  run_execscript       ${mntpnt}
+  installdistro2vm     ${chroot_dir}
+  installgrub2vm       ${chroot_dir}
+  configure_networking ${chroot_dir}
+  configure_mounting   ${chroot_dir}
+  run_execscript       ${chroot_dir}
 
-  umountvm             ${mntpnt}
+  umountvm             ${chroot_dir}
 }
 
 function installdistro2vm() {
   local chroot_dir=$1
 
-  printf "[DEBUG] Installing OS to %s\n" ${mntpnt}
-  ${rsync} -aHA ${distro_dir}/ ${mntpnt}
+  printf "[DEBUG] Installing OS to %s\n" ${chroot_dir}
+  ${rsync} -aHA ${distro_dir}/ ${chroot_dir}
   ${sync}
 
   printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
-  ${sed} -i s,^keepcache=.*,keepcache=${keepcache}, ${mntpnt}/etc/yum.conf
+  ${sed} -i s,^keepcache=.*,keepcache=${keepcache}, ${chroot_dir}/etc/yum.conf
 }
 
 function installgrub2vm() {
