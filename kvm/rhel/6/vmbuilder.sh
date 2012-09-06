@@ -137,7 +137,6 @@ function dump_vers() {
 	dns="${dns}"
 	hostname="${hostname}"
 	# internal variables
-	basearch="${basearch}"
 	disk_filename="${disk_filename}"
 	# required commands
 	build_rootfs_tree_sh="${build_rootfs_tree_sh}"
@@ -178,8 +177,8 @@ function build_vers() {
 
   distro_arch=${distro_arch:-$(arch)}
   case "${distro_arch}" in
-  i*86)   basearch=i386; distro_arch=i686;;
-  x86_64) basearch=${distro_arch};;
+  i*86)   distro_arch=i686;;
+  x86_64) ;;
   esac
 
   distro=${distro_name}-${distro_ver}_${distro_arch}
