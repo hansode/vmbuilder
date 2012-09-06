@@ -513,7 +513,7 @@ function installgrub2vm() {
 	        initrd /boot/$(cd ${chroot_dir}/boot && ls initramfs-*| tail -1)
 	_EOS_
   ${cat} ${chroot_dir}/boot/grub/grub.conf
-  ${chroot} ${chroot_dir} ${ln} -s /boot/grub/grub.conf /boot/grub/menu.lst
+  ${chroot} ${chroot_dir} ${ln} -fs /boot/grub/grub.conf /boot/grub/menu.lst
 }
 
 function configure_networking() {
@@ -597,16 +597,15 @@ function configure_mounting() {
 function run_execscript() {
   local chroot_dir=${mntpnt}
 
-  [[ -z "${execscript}" ]] && {
+  [[ -n "${execscript}" ]] || {
     ${chroot} ${chroot_dir} bash -c "echo root:root | chpasswd"
-  } || {
-    [[ -f "${execscript}" ]] && {
-      [[ -x "${execscript}" ]] && {
-        printf "[INFO] Excecuting after script\n"
-        ${setarch} ${distro_arch} ${execscript} ${chroot_dir}
-      } || :
-    } || :
+    return 0
   }
+
+  [[ -f "${execscript}" ]] || return 0
+  [[ -x "${execscript}" ]] || return 0
+  printf "[INFO] Excecuting after script\n"
+  ${setarch} ${distro_arch} ${execscript} ${chroot_dir}
 }
 
 ## task
