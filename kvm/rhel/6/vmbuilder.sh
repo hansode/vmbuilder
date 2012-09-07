@@ -324,8 +324,14 @@ function mkpart() {
   swap) fstype="linux-swap(new)" ;;
   esac
 
+  local partition_start=${offset}
+  [[ ${offset} == 0 ]] && {
+    printf "[INFO] Partition at beginning of disk - reserving first cylinder\n"
+    partition_start="63s"
+  }
+
   printf "[INFO] Adding type %s partition to disk image: %s\n" ${fstype} ${disk_filename}
-  ${parted} --script -- ${disk_filename} mkpart primary ${fstype} ${offset} $((${offset} + ${size} - 1))
+  ${parted} --script -- ${disk_filename} mkpart primary "${fstype}" ${partition_start} $((${offset} + ${size} - 1))
 }
 
 function mkptab() {
