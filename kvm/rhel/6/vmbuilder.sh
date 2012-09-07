@@ -410,9 +410,13 @@ function mkfs2vm() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
 
+  printf "[INFO] Creating file systems\n"
   lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
     case ${part_filename} in
-    *1|*3)
+    *2)
+      ${mkswap} ${part_filename}
+      ;;
+    *)
       ${mkfs} -F -E lazy_itable_init=1 ${part_filename}
 
       # > This filesystem will be automatically checked every 37 mounts or
@@ -422,11 +426,6 @@ function mkfs2vm() {
         printf "[INFO] Setting interval between check(s): %s\n" ${interval_between_check}
         ${tune2fs} -c ${max_mount_count} -i ${interval_between_check} ${part_filename}
       }
-      ;;
-    *2)
-      ${mkswap} ${part_filename}
-      ;;
-    *)
       ;;
     esac
     ${udevadm} settle
