@@ -289,9 +289,9 @@ function lspmap() {
   echo ${PARTEDMAP} | sed "s, ,\n,g"
 }
 
-function showindex() {
+function getpmapindex() {
   local name=$1
-  lspmap | grep :${naem} | awk -F '{print $1}'
+  lspmap | egrep :${name} | awk -F: '{print $1}'
 }
 
 ## rootfs tree
