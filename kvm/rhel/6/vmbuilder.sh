@@ -289,9 +289,17 @@ function lspmap() {
   echo ${PARTEDMAP} | sed "s, ,\n,g"
 }
 
-function getpmapindex() {
+function pmapindex() {
   local name=$1
   lspmap | egrep :${name} | awk -F: '{print $1}'
+}
+
+function ppartuuid() {
+  local disk_filename=$1 mountpoint=$2
+  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+
+  part_filename=$(lsdevmap ${disk_filename} | devmap2path | egrep "$(pmapindex "${mountpoint}")\$")
+  ${blkid} -c /dev/null -sUUID -ovalue ${part_filename}
 }
 
 ## rootfs tree
@@ -529,12 +537,7 @@ function installgrub2vm() {
 	quit
 	_EOS_
 
-  uuids=$(
-    lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
-      ${blkid} -c /dev/null -sUUID -ovalue ${part_filename}
-    done
-  )
-  rootdev_uuid=$(echo ${uuids} | awk '{print $1}')
+  rootdev_uuid=$(ppartuuid ${disk_filename} root)
 
   printf "[INFO] Generating /boot/grub/grub.conf.\n"
   ${cat} <<-_EOS_ > ${chroot_dir}/boot/grub/grub.conf
@@ -609,14 +612,9 @@ function configure_networking() {
 function configure_mounting() {
   local chroot_dir=$1 disk_filename=$2
 
-  uuids=$(
-    lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
-      ${blkid} -c /dev/null -sUUID -ovalue ${part_filename}
-    done
-  )
-  rootdev_uuid=$(echo ${uuids} | awk '{print $1}')
-  swapdev_uuid=$(echo ${uuids} | awk '{print $2}')
-  optdev_uuid=$(echo ${uuids} | awk '{print $3}')
+  rootdev_uuid=$(ppartuuid ${disk_filename} root)
+  swapdev_uuid=$(ppartuuid ${disk_filename} swap)
+  optdev_uuid=$(ppartuuid ${disk_filename} /opt)
 
   printf "[INFO] Overwriting /etc/fstab.\n"
   ${cat} <<-_EOS_ > ${chroot_dir}/etc/fstab
