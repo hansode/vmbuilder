@@ -373,9 +373,9 @@ function mkptab() {
     mkpart ${disk_filename} "swap" ${offset} ${swapsize} "swap"
     offset=$((${offset} + ${swapsize}))
   } || :
-  # opt
+  # /opt
   [[ ${optsize} -gt 0 ]] && {
-    mkpart ${disk_filename} "ext2" ${offset} ${optsize} "opt"
+    mkpart ${disk_filename} "ext2" ${offset} ${optsize} "/opt"
     offset=$((${offset} + ${optsize}))
   } || :
 }
