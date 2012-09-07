@@ -275,6 +275,25 @@ function build_vers() {
   hostname=${hostname:-}
 }
 
+## private functions for partition map
+
+PARTEDMAP=""
+function pushpmap() {
+  local part_index=$1 name=$2
+  PARTEDMAP="${PARTEDMAP} ${part_index}:${name}"
+}
+
+function lspmap() {
+  PARTEDMAP=${PARTEDMAP%% }
+  PARTEDMAP=${PARTEDMAP## }
+  echo ${PARTEDMAP} | sed "s, ,\n,g"
+}
+
+function showindex() {
+  local name=$1
+  lspmap | grep :${naem} | awk -F '{print $1}'
+}
+
 ## rootfs tree
 
 function mkrootfs() {
@@ -316,7 +335,7 @@ function rmdisk() {
 ## ptab
 
 function mkpart() {
-  local disk_filename=$1 type=$2 offset=$3 size=$4
+  local disk_filename=$1 type=$2 offset=$3 size=$4 name=${5-UNKNOWN}
 
   local fstype="${type}"
   case ${type} in
@@ -332,6 +351,9 @@ function mkpart() {
 
   printf "[INFO] Adding type %s partition to disk image: %s\n" ${fstype} ${disk_filename}
   ${parted} --script -- ${disk_filename} mkpart primary "${fstype}" ${partition_start} $((${offset} + ${size} - 1))
+
+  part_index=$(${parted} --script -- ${disk_filename} print | egrep -v ^$ | tail -1 | awk '{print $1}')
+  pushpmap ${part_index} ${name}
 }
 
 function mkptab() {
@@ -344,16 +366,16 @@ function mkptab() {
   local offset=0
 
   # root
-  mkpart ${disk_filename} "ext2" ${offset} ${rootsize}
+  mkpart ${disk_filename} "ext2" ${offset} ${rootsize} "root"
   offset=$((${offset} + ${rootsize}))
   # swap
   [[ ${swapsize} -gt 0 ]] && {
-    mkpart ${disk_filename} "swap" ${offset} ${swapsize}
+    mkpart ${disk_filename} "swap" ${offset} ${swapsize} "swap"
     offset=$((${offset} + ${swapsize}))
   } || :
   # opt
   [[ ${optsize} -gt 0 ]] && {
-    mkpart ${disk_filename} "ext2" ${offset} ${optsize}
+    mkpart ${disk_filename} "ext2" ${offset} ${optsize} "opt"
     offset=$((${offset} + ${optsize}))
   } || :
 }
