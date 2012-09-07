@@ -548,7 +548,9 @@ function installgrub2vm() {
 	        initrd /boot/$(cd ${chroot_dir}/boot && ls initramfs-*| tail -1)
 	_EOS_
   ${cat} ${chroot_dir}/boot/grub/grub.conf
-  ${chroot} ${chroot_dir} ${ln} -fs /boot/grub/grub.conf /boot/grub/menu.lst
+  cd ${chroot_dir}/boot/grub
+  ${ln} -fs grub.conf menu.lst
+  cd -
 
   printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
   ${umount} ${chroot_dir}/${new_filename}
