@@ -412,7 +412,7 @@ function mkfs2vm() {
 
   lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
     case ${part_filename} in
-    *p1|*p3)
+    *1|*3)
       ${mkfs} -F -E lazy_itable_init=1 ${part_filename}
 
       # > This filesystem will be automatically checked every 37 mounts or
@@ -423,7 +423,7 @@ function mkfs2vm() {
         ${tune2fs} -c ${max_mount_count} -i ${interval_between_check} ${part_filename}
       }
       ;;
-    *p2)
+    *2)
       ${mkswap} ${part_filename}
       ;;
     *)
@@ -441,7 +441,7 @@ function mountvm() {
   ${mkdir} -p ${chroot_dir}
   lsdevmap ${disk_filename} | devmap2path | while read part_filename; do
     case ${part_filename} in
-    *p1)
+    *1)
       printf "[DEBUG] Mounting %s\n" ${chroot_dir}
       ${mount} ${part_filename} ${chroot_dir}
       ;;
