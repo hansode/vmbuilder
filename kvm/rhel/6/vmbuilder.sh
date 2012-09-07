@@ -338,6 +338,7 @@ function mkptab() {
   [[ ${optsize} -gt 0 ]] && {
     printf "[INFO] Adding type %s partition to disk image: %s\n" ext2 ${disk_filename}
     ${parted} --script -- ${disk_filename} mkpart  primary ext2 ${offset} $((${offset} + ${optsize} - 1))
+    offset=$((${offset} + ${optsize}))
   } || :
 }
 
