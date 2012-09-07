@@ -545,17 +545,18 @@ function installgrub2vm() {
 	_EOS_
 
   local rootdev_uuid=$(ppartuuid ${disk_filename} root)
+  local bootdir_path=/boot
 
   printf "[INFO] Generating /boot/grub/grub.conf.\n"
   ${cat} <<-_EOS_ > ${chroot_dir}/boot/grub/grub.conf
 	default=0
 	timeout=5
-	splashimage=(hd${grub_id},0)/boot/grub/splash.xpm.gz
+	splashimage=(hd${grub_id},0)${bootdir_path}/grub/splash.xpm.gz
 	hiddenmenu
 	title ${distro} ($(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1 | sed 's,^vmlinuz-,,'))
 	        root (hd${grub_id},0)
-	        kernel /boot/$(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1) ro root=UUID=${rootdev_uuid} rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto  KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM
-	        initrd /boot/$(cd ${chroot_dir}/boot && ls initramfs-*| tail -1)
+	        kernel ${bootdir_path}/$(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1) ro root=UUID=${rootdev_uuid} rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto  KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM
+	        initrd ${bootdir_path}/$(cd ${chroot_dir}/boot && ls initramfs-*| tail -1)
 	_EOS_
   ${cat} ${chroot_dir}/boot/grub/grub.conf
   cd ${chroot_dir}/boot/grub
