@@ -315,6 +315,19 @@ function rmdisk() {
 
 ## ptab
 
+function mkpart() {
+  local disk_filename=$1 type=$2 offset=$3 size=$4
+
+  local fstype="${type}"
+  case ${type} in
+  ext2) ;;
+  swap) fstype="linux-swap(new)" ;;
+  esac
+
+  printf "[INFO] Adding type %s partition to disk image: %s\n" ${fstype} ${disk_filename}
+  ${parted} --script -- ${disk_filename} mkpart primary ${fstype} ${offset} $((${offset} + ${size} - 1))
+}
+
 function mkptab() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
@@ -325,19 +338,16 @@ function mkptab() {
   local offset=0
 
   # root
-  printf "[INFO] Adding type %s partition to disk image: %s\n" ext2 ${disk_filename}
-  ${parted} --script -- ${disk_filename} mkpart  primary ext2 ${offset} $((${rootsize} - 1))
+  mkpart ${disk_filename} "ext2" ${offset} ${rootsize}
   offset=$((${offset} + ${rootsize}))
   # swap
   [[ ${swapsize} -gt 0 ]] && {
-    printf "[INFO] Adding type %s partition to disk image: %s\n" swap ${disk_filename}
-    ${parted} --script -- ${disk_filename} mkpart  primary 'linux-swap(new)' ${offset} $((${offset} + ${swapsize} - 1))
+    mkpart ${disk_filename} "swap" ${offset} ${swapsize}
     offset=$((${offset} + ${swapsize}))
   } || :
   # opt
   [[ ${optsize} -gt 0 ]] && {
-    printf "[INFO] Adding type %s partition to disk image: %s\n" ext2 ${disk_filename}
-    ${parted} --script -- ${disk_filename} mkpart  primary ext2 ${offset} $((${offset} + ${optsize} - 1))
+    mkpart ${disk_filename} "ext2" ${offset} ${optsize}
     offset=$((${offset} + ${optsize}))
   } || :
 }
