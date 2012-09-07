@@ -537,7 +537,7 @@ function installgrub2vm() {
 	quit
 	_EOS_
 
-  rootdev_uuid=$(ppartuuid ${disk_filename} root)
+  local rootdev_uuid=$(ppartuuid ${disk_filename} root)
 
   printf "[INFO] Generating /boot/grub/grub.conf.\n"
   ${cat} <<-_EOS_ > ${chroot_dir}/boot/grub/grub.conf
@@ -612,9 +612,9 @@ function configure_networking() {
 function configure_mounting() {
   local chroot_dir=$1 disk_filename=$2
 
-  rootdev_uuid=$(ppartuuid ${disk_filename} root)
-  swapdev_uuid=$(ppartuuid ${disk_filename} swap)
-  optdev_uuid=$(ppartuuid ${disk_filename} /opt)
+  local rootdev_uuid=$(ppartuuid ${disk_filename} root)
+  local swapdev_uuid=$(ppartuuid ${disk_filename} swap)
+  local optdev_uuid=$(ppartuuid ${disk_filename} /opt)
 
   printf "[INFO] Overwriting /etc/fstab.\n"
   ${cat} <<-_EOS_ > ${chroot_dir}/etc/fstab
