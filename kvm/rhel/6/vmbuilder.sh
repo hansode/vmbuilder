@@ -363,7 +363,7 @@ function mapptab() {
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
 
   printf "[INFO] Creating loop devices corresponding to the created partitions\n"
-  ${kpartx} -vsa ${disk_filename} && ${udevadm} settle
+  ${kpartx} -va ${disk_filename} && ${udevadm} settle
   # add map loop0p1 (253:3): 0 1998013 linear /dev/loop0 34
 }
 
@@ -371,7 +371,7 @@ function unmapptab() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
 
-  ${kpartx} -vsd ${disk_filename}
+  ${kpartx} -vd ${disk_filename}
   # del devmap : loop0p1
 }
 
