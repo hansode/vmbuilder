@@ -137,6 +137,7 @@ function dump_vers() {
 	rootsize="${rootsize}"
 	optsize="${optsize}"
 	swapsize="${swapsize}"
+	homesize="${homesize}"
 	execscript="${execscript}"
 	raw="${raw}"
 	ip="${ip}"
@@ -262,6 +263,7 @@ function build_vers() {
   rootsize=${rootsize:-4096}
   optsize=${optsize:-0}
   swapsize=${swapsize:-1024}
+  homesize=${homesize:-0}
   execscript=${execscript:-}
   raw=${raw:-./${distro}.raw}
 
@@ -385,6 +387,11 @@ function mkptab() {
   [[ ${optsize} -gt 0 ]] && {
     mkpart ${disk_filename} "ext2" ${offset} ${optsize} "/opt"
     offset=$((${offset} + ${optsize}))
+  } || :
+  # /home
+  [[ ${homesize} -gt 0 ]] && {
+    mkpart ${disk_filename} "ext2" ${offset} ${homesize} "/home"
+    offset=$((${offset} + ${homesize}))
   } || :
 }
 
@@ -613,6 +620,7 @@ function configure_mounting() {
   local rootdev_uuid=$(ppartuuid ${disk_filename} root)
   local swapdev_uuid=$(ppartuuid ${disk_filename} swap)
   local optdev_uuid=$(ppartuuid ${disk_filename} /opt)
+  local homedev_uuid=$(ppartuuid ${disk_filename} /home)
 
   printf "[INFO] Overwriting /etc/fstab.\n"
   ${cat} <<-_EOS_ > ${chroot_dir}/etc/fstab
@@ -624,6 +632,10 @@ function configure_mounting() {
 	$([[ ${optsize} -gt 0 ]] && { ${cat} <<-_OPTDEV_
 	UUID=${optdev_uuid} /opt                    ext4    defaults        1 1
 	_OPTDEV_
+	})
+	$([[ ${homesize} -gt 0 ]] && { ${cat} <<-_HOMEDEV_
+	UUID=${homedev_uuid} /home                   ext4    defaults        1 2
+	_HOMEDEV_
 	})
 	tmpfs                   /dev/shm                tmpfs   defaults        0 0
 	devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
@@ -652,7 +664,7 @@ function run_execscript() {
 function task_prepare() {
   mkrootfs ${distro_dir}
   [[ -f ${raw} ]] && rmdisk ${raw}
-  local size=$((${rootsize} + ${optsize} + ${swapsize}))
+  local size=$((${rootsize} + ${optsize} + ${swapsize} + ${homesize}))
   printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${raw} ${size}
   mkdisk  ${raw} ${size}
 }
