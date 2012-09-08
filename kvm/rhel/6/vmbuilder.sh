@@ -541,7 +541,6 @@ function installgrub2vm() {
 	quit
 	_EOS_
 
-  local rootdev_uuid=$(ppartuuid ${disk_filename} root)
   local bootdir_path=/boot
 
   printf "[INFO] Generating /boot/grub/grub.conf.\n"
@@ -552,7 +551,7 @@ function installgrub2vm() {
 	hiddenmenu
 	title ${distro} ($(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1 | sed 's,^vmlinuz-,,'))
 	        root (hd${grub_id},0)
-	        kernel ${bootdir_path}/$(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1) ro root=UUID=${rootdev_uuid} rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto  KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM
+	        kernel ${bootdir_path}/$(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1) ro root=UUID=$(ppartuuid ${disk_filename} root) rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto  KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM
 	        initrd ${bootdir_path}/$(cd ${chroot_dir}/boot && ls initramfs-*| tail -1)
 	_EOS_
   ${cat} ${chroot_dir}/boot/grub/grub.conf
@@ -617,24 +616,19 @@ function configure_networking() {
 function configure_mounting() {
   local chroot_dir=$1 disk_filename=$2
 
-  local rootdev_uuid=$(ppartuuid ${disk_filename} root)
-  local swapdev_uuid=$(ppartuuid ${disk_filename} swap)
-  local optdev_uuid=$(ppartuuid ${disk_filename} /opt)
-  local homedev_uuid=$(ppartuuid ${disk_filename} /home)
-
   printf "[INFO] Overwriting /etc/fstab.\n"
   ${cat} <<-_EOS_ > ${chroot_dir}/etc/fstab
-	UUID=${rootdev_uuid} /                       ext4    defaults        1 1
+	UUID=$(ppartuuid ${disk_filename} root) /                       ext4    defaults        1 1
 	$([[ ${swapsize} -gt 0 ]] && { ${cat} <<-_SWAPDEV_
-	UUID=${swapdev_uuid} swap                    swap    defaults        0 0
+	UUID=$(ppartuuid ${disk_filename} swap) swap                    swap    defaults        0 0
 	_SWAPDEV_
 	})
 	$([[ ${optsize} -gt 0 ]] && { ${cat} <<-_OPTDEV_
-	UUID=${optdev_uuid} /opt                    ext4    defaults        1 1
+	UUID=$(ppartuuid ${disk_filename} /opt) /opt                    ext4    defaults        1 1
 	_OPTDEV_
 	})
 	$([[ ${homesize} -gt 0 ]] && { ${cat} <<-_HOMEDEV_
-	UUID=${homedev_uuid} /home                   ext4    defaults        1 2
+	UUID=$(ppartuuid ${disk_filename} /home) /home                   ext4    defaults        1 2
 	_HOMEDEV_
 	})
 	tmpfs                   /dev/shm                tmpfs   defaults        0 0
