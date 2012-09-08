@@ -391,8 +391,6 @@ function mkptab() {
 function mapptab() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-
-  printf "[INFO] Creating loop devices corresponding to the created partitions\n"
   ${kpartx} -va ${disk_filename} && ${udevadm} settle
   # add map loop0p1 (253:3): 0 1998013 linear /dev/loop0 34
 }
@@ -400,7 +398,6 @@ function mapptab() {
 function unmapptab() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-
   ${kpartx} -vd ${disk_filename}
   # del devmap : loop0p1
 }
@@ -408,8 +405,6 @@ function unmapptab() {
 function unmapptab_r() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-
-  printf "[INFO] Deleting loop devices\n"
   local tries=0 local max_tries=3
   while [[ ${tries} -lt ${max_tries} ]]; do
     unmapptab ${disk_filename}  && break || :
@@ -422,7 +417,6 @@ function unmapptab_r() {
 function lsdevmap() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-
   ${kpartx} -l ${disk_filename} \
    | egrep -v "^(gpt|dos):" \
    | awk '{print $1}'
@@ -665,6 +659,7 @@ function task_prepare() {
 
 function task_setup() {
   mkptab  ${raw}
+  printf "[INFO] Creating loop devices corresponding to the created partitions\n"
   mapptab ${raw}
   mkfs2vm ${raw}
 }
@@ -674,6 +669,7 @@ function task_install() {
 }
 
 function task_postinstall() {
+  printf "[INFO] Deleting loop devices\n"
   unmapptab_r ${raw}
   printf "[INFO] Generated => %s\n" ${raw}
   printf "[INFO] Complete!\n"
