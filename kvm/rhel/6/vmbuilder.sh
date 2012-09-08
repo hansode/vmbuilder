@@ -329,18 +329,14 @@ function mkrootfs() {
 ## disk
 
 function mkdisk() {
-  local disk_filename=$1
+  local disk_filename=$1 size=$2 unit=${3:-m}
   [[ -a ${disk_filename} ]] && { echo "already exists: ${disk_filename}" >&2; return 1; }
-
-  local size=$((${rootsize} + ${optsize} + ${swapsize}))
-  printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${disk_filename} ${size}
-  ${truncate} -s ${size}M ${disk_filename}
+  truncate -s ${size}${unit} ${disk_filename}
 }
 
 function rmdisk() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-
   ${rm} -f ${disk_filename}
 }
 
@@ -662,7 +658,9 @@ function run_execscript() {
 function task_prepare() {
   mkrootfs ${distro_dir}
   [[ -f ${raw} ]] && rmdisk ${raw}
-  mkdisk  ${raw}
+  local size=$((${rootsize} + ${optsize} + ${swapsize}))
+  printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${raw} ${size}
+  mkdisk  ${raw} ${size}
 }
 
 function task_setup() {
