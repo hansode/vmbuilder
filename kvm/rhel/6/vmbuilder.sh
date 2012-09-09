@@ -468,12 +468,10 @@ function mkfs2vm() {
   done
 }
 
-function mountvm() {
+function mountvmroot() {
   local disk_filename=$1 chroot_dir=$2
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  [[ -d "${chroot_dir}" ]] && { echo "already exists: ${chroot_dir}" >&2; return 1; }
-
-  ${mkdir} -p ${chroot_dir}
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   lspmap | while IFS=: read part_index mountpoint; do
     part_filename=$(ppartpath ${disk_filename} ${mountpoint})
     case "${mountpoint}" in
@@ -485,11 +483,24 @@ function mountvm() {
   done
 }
 
-function umountvm() {
-  local chroot_dir=$1
+function mountvm() {
+  local disk_filename=$1 chroot_dir=$2
+  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] && { echo "already exists: ${chroot_dir}" >&2; return 1; }
+  ${mkdir} -p ${chroot_dir}
+  mountvmroot ${disk_filename} ${chroot_dir}
+}
 
+function umountvmroot() {
+  local chroot_dir=$1
   printf "[DEBUG] Unmounting %s\n" ${chroot_dir}
   ${umount} ${chroot_dir}
+}
+
+function umountvm() {
+  local chroot_dir=$1
+  printf "[DEBUG] Unmounting %s\n" ${chroot_dir}
+  umountvmroot ${chroot_dir}
   ${rmdir}  ${chroot_dir}
 }
 
