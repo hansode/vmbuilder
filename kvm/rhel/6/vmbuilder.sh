@@ -293,11 +293,14 @@ function lspmap() {
 
 function pmapindex() {
   local name=$1
+  [[ -n ${name} ]] || return 1
   lspmap | egrep :${name} | awk -F: '{print $1}'
 }
 
 function ppartpath() {
   local disk_filename=$1 mountpoint=$2
+  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -n ${mountpoint} ]] || return 1
   lsdevmap ${disk_filename} | devmap2path | egrep "$(pmapindex "${mountpoint}")\$"
 }
 
