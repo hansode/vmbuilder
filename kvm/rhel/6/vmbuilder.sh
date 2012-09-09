@@ -307,7 +307,7 @@ function ppartpath() {
 function ppartuuid() {
   local disk_filename=$1 mountpoint=$2
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  part_filename=$(ppartpath ${disk_filename} ${mountpoint})
+  local part_filename=$(ppartpath ${disk_filename} ${mountpoint})
   ${blkid} -c /dev/null -sUUID -ovalue ${part_filename}
 }
 
