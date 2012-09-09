@@ -266,6 +266,8 @@ function build_vers() {
   optsize=${optsize:-0}
   swapsize=${swapsize:-1024}
   homesize=${homesize:-0}
+  totalsize=$((${rootsize} + ${optsize} + ${swapsize} + ${homesize}))
+
   execscript=${execscript:-}
   raw=${raw:-./${distro}.raw}
 
@@ -720,9 +722,8 @@ function run_execscript() {
 function task_prepare() {
   mkrootfs ${distro_dir}
   [[ -f ${raw} ]] && rmdisk ${raw}
-  local size=$((${rootsize} + ${optsize} + ${swapsize} + ${homesize}))
-  printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${raw} ${size}
-  mkdisk  ${raw} ${size}
+  printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${raw} ${totalsize}
+  mkdisk  ${raw} ${totalsize}
 }
 
 function task_setup() {
