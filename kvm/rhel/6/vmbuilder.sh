@@ -426,7 +426,7 @@ function unmapptab() {
 function unmapptab_r() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  local tries=0 local max_tries=3
+  local tries=0 max_tries=3
   while [[ ${tries} -lt ${max_tries} ]]; do
     unmapptab ${disk_filename}  && break || :
     tries=$((${tries} + 1))
