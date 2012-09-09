@@ -135,6 +135,7 @@ function dump_vers() {
 	max_mount_count="${max_mount_count}"
 	interval_between_check="${interval_between_check}"
 	rootsize="${rootsize}"
+	bootsize="${bootsize}"
 	optsize="${optsize}"
 	swapsize="${swapsize}"
 	homesize="${homesize}"
@@ -261,6 +262,7 @@ function build_vers() {
   interval_between_check=${interval_between_check:-180}
 
   rootsize=${rootsize:-4096}
+  bootsize=${bootsize:-0}
   optsize=${optsize:-0}
   swapsize=${swapsize:-1024}
   homesize=${homesize:-0}
@@ -378,9 +380,16 @@ function mkptab() {
 
   local offset=0
 
+  # /boot
+  [[ ${bootsize} -gt 0 ]] && {
+    mkpart ${disk_filename} "ext2" ${offset} ${bootsize} "/boot"
+    offset=$((${offset} + ${bootsize}))
+  } || :
   # root
-  mkpart ${disk_filename} "ext2" ${offset} ${rootsize} "root"
-  offset=$((${offset} + ${rootsize}))
+  [[ ${rootsize} -gt 0 ]] && {
+    mkpart ${disk_filename} "ext2" ${offset} ${rootsize} "root"
+    offset=$((${offset} + ${rootsize}))
+  } || :
   # swap
   [[ ${swapsize} -gt 0 ]] && {
     mkpart ${disk_filename} "swap" ${offset} ${swapsize} "swap"
@@ -585,6 +594,9 @@ function installgrub2vm() {
 	_EOS_
 
   local bootdir_path=/boot
+  [[ ${bootsize} -gt 0 ]] && {
+    bootdir_path=
+  }
 
   printf "[INFO] Generating /boot/grub/grub.conf.\n"
   ${cat} <<-_EOS_ > ${chroot_dir}/boot/grub/grub.conf
@@ -661,7 +673,14 @@ function configure_mounting() {
 
   printf "[INFO] Overwriting /etc/fstab.\n"
   ${cat} <<-_EOS_ > ${chroot_dir}/etc/fstab
+	$([[ ${bootsize} -gt 0 ]] && { ${cat} <<-_BOOTDEV_
+	UUID=$(ppartuuid ${disk_filename} /boot) /boot                   ext4    defaults        1 2
+	_BOOTDEV_
+	})
+	$([[ ${rootsize} -gt 0 ]] && { ${cat} <<-_ROOTDEV_
 	UUID=$(ppartuuid ${disk_filename} root) /                       ext4    defaults        1 1
+	_ROOTDEV_
+	})
 	$([[ ${swapsize} -gt 0 ]] && { ${cat} <<-_SWAPDEV_
 	UUID=$(ppartuuid ${disk_filename} swap) swap                    swap    defaults        0 0
 	_SWAPDEV_
