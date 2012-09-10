@@ -386,7 +386,7 @@ function mkpart() {
   }
 
   # 1st logical
-  ${parted} --script -- ${disk_filename} unit s print | egrep -v '^$' | awk '$1 ~ "^[1-9]+"' | tail -1 | egrep -q extended && {
+  ${parted} --script -- ${disk_filename} unit s print | egrep -v '^$' | awk '$1 ~ "^[1-9]+"' | tail -1 | egrep -q 'extended$' && {
     printf "[INFO] Partition at beginning of disk - reserving first cylinder\n"
     partition_start=$(${parted} --script -- ${disk_filename} unit s print | egrep -v '^$' | awk '$1 ~ "^[1-9]+"' | tail -1 | awk '{print $2}' | sed 's,s$,,')
     partition_start=$((${partition_start} + 63))s
