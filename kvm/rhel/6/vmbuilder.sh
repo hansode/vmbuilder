@@ -381,32 +381,28 @@ function mkptab() {
   ${parted} --script ${disk_filename} mklabel msdos
 
   local offset=0
+  while read mountpoint partsize; do
+    case "${mountpoint}" in
+    swap) type=swap;;
+    *)    type=ext2;;
+    esac
 
-  # /boot
-  [[ ${bootsize} -gt 0 ]] && {
-    mkpart ${disk_filename} "ext2" ${offset} ${bootsize} "/boot"
-    offset=$((${offset} + ${bootsize}))
-  } || :
-  # root
-  [[ ${rootsize} -gt 0 ]] && {
-    mkpart ${disk_filename} "ext2" ${offset} ${rootsize} "root"
-    offset=$((${offset} + ${rootsize}))
-  } || :
-  # swap
-  [[ ${swapsize} -gt 0 ]] && {
-    mkpart ${disk_filename} "swap" ${offset} ${swapsize} "swap"
-    offset=$((${offset} + ${swapsize}))
-  } || :
-  # /opt
-  [[ ${optsize} -gt 0 ]] && {
-    mkpart ${disk_filename} "ext2" ${offset} ${optsize} "/opt"
-    offset=$((${offset} + ${optsize}))
-  } || :
-  # /home
-  [[ ${homesize} -gt 0 ]] && {
-    mkpart ${disk_filename} "ext2" ${offset} ${homesize} "/home"
-    offset=$((${offset} + ${homesize}))
-  } || :
+    [[ ${partsize} -gt 0 ]] && {
+      mkpart ${disk_filename} ${type} ${offset} ${partsize} ${mountpoint}
+      offset=$((${offset} + ${partsize}))
+    } || :
+  done < <(
+    cat <<-EOS | egrep -v '^$|^#'
+	#
+	# totalsize:${totalsize}
+	#
+	/boot ${bootsize}
+	root  ${rootsize}
+	swap  ${swapsize}
+	/opt  ${optsize}
+	/home ${homesize}
+	EOS
+  )
 }
 
 function mapptab() {
