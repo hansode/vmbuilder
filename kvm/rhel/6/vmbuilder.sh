@@ -291,16 +291,10 @@ function pushpmap() {
   PARTEDMAP="${PARTEDMAP} ${part_index}:${name}"
 }
 
-function lspmap() {
-  PARTEDMAP=${PARTEDMAP%% }
-  PARTEDMAP=${PARTEDMAP## }
-  echo ${PARTEDMAP} | sed "s, ,\n,g"
-}
-
 function pmapindex() {
   local name=$1
   [[ -n ${name} ]] || return 1
-  lspmap | egrep :${name} | awk -F: '{print $1}'
+  xptabinfo | cat -n | egrep -w ${name} | awk '{print $1}'
 }
 
 function ppartpath() {
