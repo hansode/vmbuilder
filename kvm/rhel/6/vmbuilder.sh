@@ -393,10 +393,8 @@ function mkptab() {
     *)    type=ext2;;
     esac
 
-    [[ ${partsize} -gt 0 ]] && {
-      mkpart ${disk_filename} ${type} ${offset} ${partsize} primary
-      offset=$((${offset} + ${partsize}))
-    } || :
+    mkpart ${disk_filename} ${type} ${offset} ${partsize} primary
+    offset=$((${offset} + ${partsize}))
   done < <(xptabinfo)
 }
 
@@ -676,10 +674,8 @@ function configure_mounting() {
     *)     type=ext4 dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
     esac
 
-    [[ ${partsize} -gt 0 ]] && {
-      uuid=$(ppartuuid ${disk_filename} ${mountpoint})
-      printf "UUID=%s %s\t%s\tdefaults\t%s %s\n" ${uuid} ${mountpath} ${type} ${dumpopt} ${fsckopt}
-    } || :
+    uuid=$(ppartuuid ${disk_filename} ${mountpoint})
+    printf "UUID=%s %s\t%s\tdefaults\t%s %s\n" ${uuid} ${mountpath} ${type} ${dumpopt} ${fsckopt}
   done < <(xptabinfo)
 
   ${cat} <<-_EOS_
