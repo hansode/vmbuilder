@@ -769,9 +769,15 @@ function run_execscript() {
 
 function task_prepare() {
   mkrootfs ${distro_dir}
-  [[ -f ${raw} ]] && rmdisk ${raw}
-  printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${raw} ${totalsize}
-  mkdisk  ${raw} ${totalsize}
+  case "${raw}" in
+  /dev/*)
+    ;;
+  *)
+    [[ -f ${raw} ]] && rmdisk ${raw}
+    printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${raw} ${totalsize}
+    mkdisk  ${raw} ${totalsize}
+    ;;
+  esac
 }
 
 function task_setup() {
@@ -793,7 +799,13 @@ function task_postinstall() {
 }
 
 function task_clean() {
-  [[ -f ${raw} ]] && rmdisk ${raw}
+  case "${raw}" in
+  /dev/*)
+    ;;
+  *)
+    [[ -f ${raw} ]] && rmdisk ${raw}
+    ;;
+  esac
   [[ -d ${distro_dir} ]] && rm -rf ${distro_dir}
 }
 
