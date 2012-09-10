@@ -386,11 +386,17 @@ function mkptab() {
   printf "[INFO] Adding partition table to disk image: %s\n" ${disk_filename}
   ${parted} --script ${disk_filename} mklabel msdos
 
-  local i=1 offset=0
+  local i=1 offset=0  parttype=
   while read mountpoint partsize; do
     case "${mountpoint}" in
     swap) type=swap;;
     *)    type=ext2;;
+    esac
+
+    case "${i}" in
+    [1-3]) parttype=primary ;;
+    4)     parttype=extended;;
+    *)     parttype=logical ;;
     esac
 
     mkpart ${disk_filename} ${type} ${offset} ${partsize} primary
