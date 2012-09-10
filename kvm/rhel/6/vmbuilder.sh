@@ -627,7 +627,7 @@ function installgrub2vm() {
 	_EOS_
 
   local bootdir_path=/boot
-  [[ ${bootsize} -gt 0 ]] && {
+  xptabinfo | egrep -q /boot && {
     bootdir_path=
   }
 
