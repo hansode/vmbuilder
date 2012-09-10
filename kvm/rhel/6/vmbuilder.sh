@@ -381,7 +381,7 @@ function mkpart() {
   local partition_start=${offset}
   [[ ${offset} == 0 ]] && {
     printf "[INFO] Partition at beginning of disk - reserving first cylinder\n"
-    partition_start="63s"
+    partition_start=$((${partition_start} + 63))s
   }
 
   printf "[INFO] Adding type %s partition to disk image: %s\n" ${fstype} ${disk_filename}
