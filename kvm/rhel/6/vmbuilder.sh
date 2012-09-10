@@ -297,6 +297,7 @@ function pmapindex() {
     # part_index 4's part-type is "extended".
     # if part_index is more than 4, need to adjust part_index adding 1.
     echo $((${part_index} + 1))
+    ;;
   esac
 }
 
