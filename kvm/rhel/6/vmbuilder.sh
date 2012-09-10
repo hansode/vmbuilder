@@ -361,7 +361,7 @@ function xptabinfo() {
 }
 
 function mkpart() {
-  local disk_filename=$1 fstype=$2 offset=$3 size=$4 parttype=${5:-primary}
+  local disk_filename=$1 parttype=$2 offset=$3 size=$4 fstype=$5
 
   case "${fstype}" in
   ext2) ;;
@@ -406,7 +406,7 @@ function mkptab() {
     *)     parttype=logical ;;
     esac
 
-    mkpart ${disk_filename} ${fstype} ${offset} ${partsize} primary
+    mkpart ${disk_filename} primary ${offset} ${partsize} ${fstype}
     offset=$((${offset} + ${partsize}))
     i=$((${i} + 1))
   done < <(xptabinfo)
