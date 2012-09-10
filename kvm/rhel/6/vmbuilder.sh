@@ -369,7 +369,7 @@ function xptabinfo() {
 	/home ${homesize}
 	EOS
     }
-  } | egrep -v '^$|^#' | awk '{print $1, $2}'
+  } | egrep -v '^$|^#' | awk '$2 != 0 {print $1, $2}'
 }
 
 function mkpart() {
