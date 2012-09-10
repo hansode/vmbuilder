@@ -672,32 +672,30 @@ function configure_mounting() {
   local chroot_dir=$1 disk_filename=$2
 
   printf "[INFO] Overwriting /etc/fstab.\n"
-  ${cat} <<-_EOS_ > ${chroot_dir}/etc/fstab
-	$([[ ${bootsize} -gt 0 ]] && { ${cat} <<-_BOOTDEV_
-	UUID=$(ppartuuid ${disk_filename} /boot) /boot                   ext4    defaults        1 2
-	_BOOTDEV_
-	})
-	$([[ ${rootsize} -gt 0 ]] && { ${cat} <<-_ROOTDEV_
-	UUID=$(ppartuuid ${disk_filename} root) /                       ext4    defaults        1 1
-	_ROOTDEV_
-	})
-	$([[ ${swapsize} -gt 0 ]] && { ${cat} <<-_SWAPDEV_
-	UUID=$(ppartuuid ${disk_filename} swap) swap                    swap    defaults        0 0
-	_SWAPDEV_
-	})
-	$([[ ${optsize} -gt 0 ]] && { ${cat} <<-_OPTDEV_
-	UUID=$(ppartuuid ${disk_filename} /opt) /opt                    ext4    defaults        1 1
-	_OPTDEV_
-	})
-	$([[ ${homesize} -gt 0 ]] && { ${cat} <<-_HOMEDEV_
-	UUID=$(ppartuuid ${disk_filename} /home) /home                   ext4    defaults        1 2
-	_HOMEDEV_
-	})
+  {
+  while read mountpoint partsize; do
+    case "${mountpoint}" in
+    /boot) type=ext4 dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
+    root)  type=ext4 dumpopt=1 fsckopt=1 mountpath=/             ;;
+    swap)  type=swap dumpopt=0 fsckopt=0 mountpath=${mountpoint} ;;
+    /opt)  type=ext4 dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
+    /home) type=ext4 dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
+    *)     type=ext4 dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
+    esac
+
+    [[ ${partsize} -gt 0 ]] && {
+      uuid=$(ppartuuid ${disk_filename} ${mountpoint})
+      printf "UUID=%s %s\t%s\tdefaults\t%s %s\n" ${uuid} ${mountpath} ${type} ${dumpopt} ${fsckopt}
+    } || :
+  done < <(xptabinfo)
+
+  ${cat} <<-_EOS_
 	tmpfs                   /dev/shm                tmpfs   defaults        0 0
 	devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
 	sysfs                   /sys                    sysfs   defaults        0 0
 	proc                    /proc                   proc    defaults        0 0
 	_EOS_
+  } > ${chroot_dir}/etc/fstab
   ${cat} ${chroot_dir}/etc/fstab
 }
 
