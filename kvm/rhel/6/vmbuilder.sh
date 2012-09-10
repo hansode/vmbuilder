@@ -462,7 +462,7 @@ function mkfs2vm() {
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
 
   printf "[INFO] Creating file systems\n"
-  lspmap | while IFS=: read part_index mountpoint; do
+  while read mountpoint partsize; do
     printf "[DEBUG] Creating file system: %s\n" ${mountpoint}
     part_filename=$(ppartpath ${disk_filename} ${mountpoint})
     case "${mountpoint}" in
@@ -482,14 +482,14 @@ function mkfs2vm() {
       ;;
     esac
     ${udevadm} settle
-  done
+  done < <(xptabinfo)
 }
 
 function mountvm_root() {
   local disk_filename=$1 chroot_dir=$2
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  lspmap | while IFS=: read part_index mountpoint; do
+  while read mountpoint partsize; do
     part_filename=$(ppartpath ${disk_filename} ${mountpoint})
     case "${mountpoint}" in
     root)
@@ -497,7 +497,7 @@ function mountvm_root() {
       ${mount} ${part_filename} ${chroot_dir}
       ;;
     esac
-  done
+  done < <(xptabinfo)
 }
 
 function mountvm_nonroot() {
@@ -505,7 +505,7 @@ function mountvm_nonroot() {
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
 
-  lspmap | while IFS=: read part_index mountpoint; do
+  while read mountpoint partsize; do
     part_filename=$(ppartpath ${disk_filename} ${mountpoint})
     case "${mountpoint}" in
     root|swap) ;;
@@ -515,7 +515,7 @@ function mountvm_nonroot() {
       ${mount} ${part_filename} ${chroot_dir}${mountpoint}
       ;;
     esac
-  done
+  done < <(xptabinfo)
 }
 
 function mountvm() {
