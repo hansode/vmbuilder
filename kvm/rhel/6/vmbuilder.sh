@@ -361,10 +361,9 @@ function xptabinfo() {
 }
 
 function mkpart() {
-  local disk_filename=$1 type=$2 offset=$3 size=$4 parttype=${5:-primary}
+  local disk_filename=$1 fstype=$2 offset=$3 size=$4 parttype=${5:-primary}
 
-  local fstype="${type}"
-  case ${type} in
+  case "${fstype}" in
   ext2) ;;
   swap) fstype="linux-swap(new)" ;;
   esac
@@ -397,8 +396,8 @@ function mkptab() {
   local i=1 offset=0  parttype=
   while read mountpoint partsize; do
     case "${mountpoint}" in
-    swap) type=swap;;
-    *)    type=ext2;;
+    swap) fstype=swap;;
+    *)    fstype=ext2;;
     esac
 
     case "${i}" in
@@ -407,7 +406,7 @@ function mkptab() {
     *)     parttype=logical ;;
     esac
 
-    mkpart ${disk_filename} ${type} ${offset} ${partsize} primary
+    mkpart ${disk_filename} ${fstype} ${offset} ${partsize} primary
     offset=$((${offset} + ${partsize}))
     i=$((${i} + 1))
   done < <(xptabinfo)
@@ -681,16 +680,16 @@ function configure_mounting() {
   {
   while read mountpoint partsize; do
     case "${mountpoint}" in
-    /boot) type=ext4 dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
-    root)  type=ext4 dumpopt=1 fsckopt=1 mountpath=/             ;;
-    swap)  type=swap dumpopt=0 fsckopt=0 mountpath=${mountpoint} ;;
-    /opt)  type=ext4 dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
-    /home) type=ext4 dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
-    *)     type=ext4 dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
+    /boot) fstype=ext4 dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
+    root)  fstype=ext4 dumpopt=1 fsckopt=1 mountpath=/             ;;
+    swap)  fstype=swap dumpopt=0 fsckopt=0 mountpath=${mountpoint} ;;
+    /opt)  fstype=ext4 dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
+    /home) fstype=ext4 dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
+    *)     fstype=ext4 dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
     esac
 
     uuid=$(ppartuuid ${disk_filename} ${mountpoint})
-    printf "UUID=%s %s\t%s\tdefaults\t%s %s\n" ${uuid} ${mountpath} ${type} ${dumpopt} ${fsckopt}
+    printf "UUID=%s %s\t%s\tdefaults\t%s %s\n" ${uuid} ${mountpath} ${fstype} ${dumpopt} ${fsckopt}
   done < <(xptabinfo)
 
   ${cat} <<-_EOS_
