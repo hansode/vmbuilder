@@ -417,6 +417,8 @@ function mkptab() {
       parttype=extended
       # no need to set fstype about extended partition to mkpart function
       mkpart ${disk_filename} ${parttype} ${offset} ${extended_disk_size}
+      # disable lba flagg
+      ${parted} --script -- ${disk_filename} set ${i} lba off
       parttype=logical
       ;;
     *)
@@ -426,6 +428,13 @@ function mkptab() {
 
     mkpart ${disk_filename} ${parttype} ${offset} ${partsize} ${fstype}
     offset=$((${offset} + ${partsize}))
+
+    case "${mountpoint}" in
+    /boot)
+      # set boot flag
+      ${parted} --script -- ${disk_filename} set ${i} boot on
+      ;;
+    esac
 
     i=$((${i} + 1))
   done < <(xptabinfo)
