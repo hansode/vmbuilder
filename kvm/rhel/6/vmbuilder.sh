@@ -285,12 +285,6 @@ function build_vers() {
 
 ## private functions for partition map
 
-PARTEDMAP=""
-function pushpmap() {
-  local part_index=$1 name=$2
-  PARTEDMAP="${PARTEDMAP} ${part_index}:${name}"
-}
-
 function pmapindex() {
   local name=$1
   [[ -n ${name} ]] || return 1
@@ -385,7 +379,6 @@ function mkpart() {
   ${parted} --script -- ${disk_filename} mkpart primary "${fstype}" ${partition_start} $((${offset} + ${size} - 1))
 
   local part_index=$(${parted} --script -- ${disk_filename} print | egrep -v ^$ | tail -1 | awk '{print $1}')
-  pushpmap ${part_index} ${name}
 }
 
 function mkptab() {
