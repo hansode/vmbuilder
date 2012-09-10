@@ -288,7 +288,16 @@ function build_vers() {
 function pmapindex() {
   local name=$1
   [[ -n ${name} ]] || return 1
-  xptabinfo | cat -n | egrep -w ${name} | awk '{print $1}'
+  local part_index=$(xptabinfo | cat -n | egrep -w ${name} | awk '{print $1}')
+  case "${part_index}" in
+  [1-3])
+    echo ${part_index}
+    ;;
+  *)
+    # part_index 4's part-type is "extended".
+    # if part_index is more than 4, need to adjust part_index adding 1.
+    echo $((${part_index} + 1))
+  esac
 }
 
 function ppartpath() {
@@ -393,7 +402,7 @@ function mkptab() {
     i=$((${i} + 1))
   done < <(xptabinfo)
 
-  local i=1 offset=0  parttype=
+  local i=1 offset=0 parttype=
   while read mountpoint partsize; do
     case "${mountpoint}" in
     swap) fstype=swap;;
@@ -401,13 +410,23 @@ function mkptab() {
     esac
 
     case "${i}" in
-    [1-3]) parttype=primary ;;
-    4)     parttype=extended;;
-    *)     parttype=logical ;;
+    [1-3])
+      parttype=primary
+      ;;
+    4)
+      parttype=extended
+      # no need to set fstype about extended partition to mkpart function
+      mkpart ${disk_filename} ${parttype} ${offset} ${extended_disk_size}
+      parttype=logical
+      ;;
+    *)
+      parttype=logical
+      ;;
     esac
 
-    mkpart ${disk_filename} primary ${offset} ${partsize} ${fstype}
+    mkpart ${disk_filename} ${parttype} ${offset} ${partsize} ${fstype}
     offset=$((${offset} + ${partsize}))
+
     i=$((${i} + 1))
   done < <(xptabinfo)
 }
