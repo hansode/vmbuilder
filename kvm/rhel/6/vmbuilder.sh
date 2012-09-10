@@ -361,7 +361,7 @@ function xptabinfo() {
 }
 
 function mkpart() {
-  local disk_filename=$1 type=$2 offset=$3 size=$4
+  local disk_filename=$1 type=$2 offset=$3 size=$4 parttype=${5:-primary}
 
   local fstype="${type}"
   case ${type} in
@@ -376,7 +376,7 @@ function mkpart() {
   }
 
   printf "[INFO] Adding type %s partition to disk image: %s\n" ${fstype} ${disk_filename}
-  ${parted} --script -- ${disk_filename} mkpart primary "${fstype}" ${partition_start} $((${offset} + ${size} - 1))
+  ${parted} --script -- ${disk_filename} mkpart ${parttype} "${fstype}" ${partition_start} $((${offset} + ${size} - 1))
 }
 
 function mkptab() {
@@ -394,7 +394,7 @@ function mkptab() {
     esac
 
     [[ ${partsize} -gt 0 ]] && {
-      mkpart ${disk_filename} ${type} ${offset} ${partsize}
+      mkpart ${disk_filename} ${type} ${offset} ${partsize} primary
       offset=$((${offset} + ${partsize}))
     } || :
   done < <(xptabinfo)
