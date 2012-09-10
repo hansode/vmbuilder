@@ -386,6 +386,14 @@ function mkptab() {
   printf "[INFO] Adding partition table to disk image: %s\n" ${disk_filename}
   ${parted} --script ${disk_filename} mklabel msdos
 
+  # calculate a whole extended disk size
+  local i=0 extended_disk_size=0
+  while read mountpoint partsize; do
+    [[ ${i} -gt 3 ]] && continue
+    extended_disk_size=$((${extended_disk_size} + ${partsize}))
+    i=$((${i} + 1))
+  done < <(xptabinfo)
+
   local i=1 offset=0  parttype=
   while read mountpoint partsize; do
     case "${mountpoint}" in
