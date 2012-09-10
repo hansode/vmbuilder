@@ -371,6 +371,7 @@ function xptabinfo() {
 
 function mkpart() {
   local disk_filename=$1 parttype=$2 offset=$3 size=$4 fstype=$5
+  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
 
   case "${fstype}" in
   ext2) ;;
@@ -554,6 +555,7 @@ function mountvm() {
 
 function umountvm_root() {
   local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   printf "[DEBUG] Unmounting %s\n" ${chroot_dir}
   ${umount} ${chroot_dir}
 }
@@ -578,6 +580,7 @@ function umountvm() {
 function installos() {
   local distro_dir=$1 disk_filename=$2
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
+  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
 
   local chroot_dir=/tmp/tmp$(date +%s)
 
@@ -594,6 +597,8 @@ function installos() {
 
 function installdistro2vm() {
   local distro_dir=$1 chroot_dir=$2
+  [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
 
   printf "[DEBUG] Installing OS to %s\n" ${chroot_dir}
   ${rsync} -aHA ${distro_dir}/ ${chroot_dir}
@@ -605,6 +610,8 @@ function installdistro2vm() {
 
 function installgrub2vm() {
   local chroot_dir=$1 disk_filename=$2
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
 
   local tmpdir=/tmp/vmbuilder-grub
   ${mkdir} -p ${chroot_dir}/${tmpdir}
@@ -656,6 +663,7 @@ function installgrub2vm() {
 
 function configure_networking() {
   local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
 
   # /etc/sysconfig/network-scripts/ifcfg-eth0
   [[ -z "${ip}" ]] || {
@@ -703,6 +711,8 @@ function configure_networking() {
 
 function configure_mounting() {
   local chroot_dir=$1 disk_filename=$2
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
 
   printf "[INFO] Overwriting /etc/fstab.\n"
   {
@@ -732,6 +742,7 @@ function configure_mounting() {
 
 function run_execscript() {
   local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
 
   [[ -n "${execscript}" ]] || {
     ${chroot} ${chroot_dir} bash -c "echo root:root | chpasswd"
