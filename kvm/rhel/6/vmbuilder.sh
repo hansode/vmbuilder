@@ -361,7 +361,7 @@ function xptabinfo() {
 }
 
 function mkpart() {
-  local disk_filename=$1 type=$2 offset=$3 size=$4 name=${5-UNKNOWN}
+  local disk_filename=$1 type=$2 offset=$3 size=$4
 
   local fstype="${type}"
   case ${type} in
@@ -394,7 +394,7 @@ function mkptab() {
     esac
 
     [[ ${partsize} -gt 0 ]] && {
-      mkpart ${disk_filename} ${type} ${offset} ${partsize} ${mountpoint}
+      mkpart ${disk_filename} ${type} ${offset} ${partsize}
       offset=$((${offset} + ${partsize}))
     } || :
   done < <(xptabinfo)
