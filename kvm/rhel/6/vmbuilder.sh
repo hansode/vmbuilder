@@ -380,17 +380,19 @@ function mkpart() {
   esac
 
   local partition_start=${offset}
-  [[ ${offset} == 0 ]] && {
-    printf "[INFO] Partition at beginning of disk - reserving first cylinder\n"
-    partition_start=$((${partition_start} + 63))s
-  }
+  local previous_partition=$(${parted} --script -- ${disk_filename} unit s print | egrep -v '^$' | awk '$1 ~ "^[1-9]+"' | tail -1)
 
+  case "${previous_partition}" in
+  # 1st primary
+  "") ;;
   # 1st logical
-  ${parted} --script -- ${disk_filename} unit s print | egrep -v '^$' | awk '$1 ~ "^[1-9]+"' | tail -1 | egrep -q 'extended$' && {
+  *extended) partition_start=$(echo "${previous_partition}" | awk '{print $2}' | sed 's,s$,,') ;;
+  # others
+  *) false ;;
+  esac && {
     printf "[INFO] Partition at beginning of disk - reserving first cylinder\n"
-    partition_start=$(${parted} --script -- ${disk_filename} unit s print | egrep -v '^$' | awk '$1 ~ "^[1-9]+"' | tail -1 | awk '{print $2}' | sed 's,s$,,')
     partition_start=$((${partition_start} + 63))s
-  }
+  } || :
 
   printf "[INFO] Adding type %s partition to disk image: %s\n" ${fstype} ${disk_filename}
   ${parted} --script -- ${disk_filename} mkpart ${parttype} ${fstype} ${partition_start} $((${offset} + ${size} - 1))
