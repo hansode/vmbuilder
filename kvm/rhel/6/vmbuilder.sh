@@ -139,6 +139,7 @@ function dump_vers() {
 	optsize="${optsize}"
 	swapsize="${swapsize}"
 	homesize="${homesize}"
+	xpart="${xpart}"
 	execscript="${execscript}"
 	raw="${raw}"
 	ip="${ip}"
@@ -268,6 +269,7 @@ function build_vers() {
   homesize=${homesize:-0}
   totalsize=$((${rootsize} + ${optsize} + ${swapsize} + ${homesize}))
 
+  xpart=${xpart:-}
   execscript=${execscript:-}
   raw=${raw:-./${distro}.raw}
 
@@ -352,7 +354,11 @@ function rmdisk() {
 ## ptab
 
 function xptabinfo() {
-    cat <<-EOS | egrep -v '^$|^#'
+  {
+    [[ -n "${xpart}" ]] && [[ -f "${xpart}" ]] && {
+      ${cat} ${xpart}
+    } || {
+      ${cat} <<-EOS
 	#
 	# totalsize:${totalsize}
 	#
@@ -362,6 +368,8 @@ function xptabinfo() {
 	/opt  ${optsize}
 	/home ${homesize}
 	EOS
+    }
+  } | egrep -v '^$|^#' | awk '{print $1, $2}'
 }
 
 function mkpart() {
