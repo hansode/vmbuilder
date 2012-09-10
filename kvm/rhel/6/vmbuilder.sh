@@ -351,6 +351,19 @@ function rmdisk() {
 
 ## ptab
 
+function xptabinfo() {
+    cat <<-EOS | egrep -v '^$|^#'
+	#
+	# totalsize:${totalsize}
+	#
+	/boot ${bootsize}
+	root  ${rootsize}
+	swap  ${swapsize}
+	/opt  ${optsize}
+	/home ${homesize}
+	EOS
+}
+
 function mkpart() {
   local disk_filename=$1 type=$2 offset=$3 size=$4 name=${5-UNKNOWN}
 
@@ -391,18 +404,7 @@ function mkptab() {
       mkpart ${disk_filename} ${type} ${offset} ${partsize} ${mountpoint}
       offset=$((${offset} + ${partsize}))
     } || :
-  done < <(
-    cat <<-EOS | egrep -v '^$|^#'
-	#
-	# totalsize:${totalsize}
-	#
-	/boot ${bootsize}
-	root  ${rootsize}
-	swap  ${swapsize}
-	/opt  ${optsize}
-	/home ${homesize}
-	EOS
-  )
+  done < <(xptabinfo)
 }
 
 function mapptab() {
