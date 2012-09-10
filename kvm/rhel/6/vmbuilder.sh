@@ -386,7 +386,7 @@ function mkptab() {
   printf "[INFO] Adding partition table to disk image: %s\n" ${disk_filename}
   ${parted} --script ${disk_filename} mklabel msdos
 
-  local offset=0
+  local i=1 offset=0
   while read mountpoint partsize; do
     case "${mountpoint}" in
     swap) type=swap;;
@@ -395,6 +395,7 @@ function mkptab() {
 
     mkpart ${disk_filename} ${type} ${offset} ${partsize} primary
     offset=$((${offset} + ${partsize}))
+    i=$((${i} + 1))
   done < <(xptabinfo)
 }
 
