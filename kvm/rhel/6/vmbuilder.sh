@@ -375,7 +375,7 @@ function mkpart() {
   }
 
   printf "[INFO] Adding type %s partition to disk image: %s\n" ${fstype} ${disk_filename}
-  ${parted} --script -- ${disk_filename} mkpart ${parttype} "${fstype}" ${partition_start} $((${offset} + ${size} - 1))
+  ${parted} --script -- ${disk_filename} mkpart ${parttype} ${fstype} ${partition_start} $((${offset} + ${size} - 1))
 }
 
 function mkptab() {
