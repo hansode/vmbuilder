@@ -499,7 +499,14 @@ function lsdevmap() {
 
 function devmap2path() {
   cat | while read devmap; do
-    echo /dev/mapper/${devmap}
+    case "${devmap}" in
+    loop*)
+      echo /dev/mapper/${devmap}
+      ;;
+    *)
+      echo /dev/${devmap}
+      ;;
+    esac
   done
 }
 
