@@ -649,10 +649,18 @@ function installgrub2vm() {
   ${touch} ${chroot_dir}/${devmapfile}
 
   local grub_id=0
-  local new_filename=${tmpdir}/$(basename ${disk_filename})
-  ${touch} ${chroot_dir}/${new_filename}
-  ${mount} --bind ${disk_filename} ${chroot_dir}/${new_filename}
-  printf "(hd%d) %s\n" ${grub_id} ${new_filename} >> ${chroot_dir}/${devmapfile}
+
+  case "${disk_filename}" in
+  /dev/*)
+    printf "(hd%d) %s\n" ${grub_id} ${disk_filename} >> ${chroot_dir}/${devmapfile}
+    ;;
+  *)
+    local new_filename=${tmpdir}/$(basename ${disk_filename})
+    ${touch} ${chroot_dir}/${new_filename}
+    ${mount} --bind ${disk_filename} ${chroot_dir}/${new_filename}
+    printf "(hd%d) %s\n" ${grub_id} ${new_filename} >> ${chroot_dir}/${devmapfile}
+    ;;
+  esac
   ${cat} ${chroot_dir}/${devmapfile}
 
   # install grub
@@ -683,8 +691,14 @@ function installgrub2vm() {
   ${ln} -fs grub.conf menu.lst
   cd -
 
-  printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
-  ${umount} ${chroot_dir}/${new_filename}
+  case "${disk_filename}" in
+  /dev/*)
+    ;;
+  *)
+    printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
+    ${umount} ${chroot_dir}/${new_filename}
+    ;;
+  esac
 
   printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
   ${rm} -rf ${chroot_dir}/${tmpdir}
