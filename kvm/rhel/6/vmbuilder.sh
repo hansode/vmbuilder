@@ -827,8 +827,14 @@ function task_prepare() {
 
 function task_setup() {
   mkptab  ${raw}
-  printf "[INFO] Creating loop devices corresponding to the created partitions\n"
-  mapptab ${raw}
+  case "${raw}" in
+  /dev/*)
+    ;;
+  *)
+    printf "[INFO] Creating loop devices corresponding to the created partitions\n"
+    mapptab ${raw}
+    ;;
+  esac
 }
 
 function task_build() {
@@ -840,8 +846,14 @@ function task_install() {
 }
 
 function task_postinstall() {
-  printf "[INFO] Deleting loop devices\n"
-  unmapptab_r ${raw}
+  case "${raw}" in
+  /dev/*)
+    ;;
+  *)
+    printf "[INFO] Deleting loop devices\n"
+    unmapptab_r ${raw}
+    ;;
+  esac
   printf "[INFO] Generated => %s\n" ${raw}
   printf "[INFO] Complete!\n"
 }
