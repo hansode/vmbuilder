@@ -784,6 +784,9 @@ function task_setup() {
   mkptab  ${raw}
   printf "[INFO] Creating loop devices corresponding to the created partitions\n"
   mapptab ${raw}
+}
+
+function task_build() {
   mkfs2vm ${raw}
 }
 
@@ -845,6 +848,9 @@ prep|prepare)
 setup)
   task_setup
   ;;
+build)
+  task_build
+  ;;
 install)
   task_install
   ;;
@@ -860,6 +866,7 @@ status)
 *)
   task_prepare
   task_setup
+  task_build
   task_install
   task_postinstall
   ;;
