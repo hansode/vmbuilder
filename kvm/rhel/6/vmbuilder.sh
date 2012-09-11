@@ -650,15 +650,22 @@ function installgrub2vm() {
 
   local grub_id=0
 
+  case "${disk_filename}" in
+  /dev/*)
+    ;;
+  *)
+    local new_filename=${tmpdir}/$(basename ${disk_filename})
+    ${touch} ${chroot_dir}/${new_filename}
+    ${mount} --bind ${disk_filename} ${chroot_dir}/${new_filename}
+    ;;
+  esac
+
   printf "[INFO] Generating %s.\n" ${devmapfile}
   case "${disk_filename}" in
   /dev/*)
     printf "(hd%d) %s\n" ${grub_id} ${disk_filename} >> ${chroot_dir}/${devmapfile}
     ;;
   *)
-    local new_filename=${tmpdir}/$(basename ${disk_filename})
-    ${touch} ${chroot_dir}/${new_filename}
-    ${mount} --bind ${disk_filename} ${chroot_dir}/${new_filename}
     printf "(hd%d) %s\n" ${grub_id} ${new_filename} >> ${chroot_dir}/${devmapfile}
     ;;
   esac
