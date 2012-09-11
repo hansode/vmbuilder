@@ -873,6 +873,13 @@ clean)
 status)
   task_status
   ;;
+soft-test)
+  task_prepare
+  task_setup
+  task_build
+  task_postinstall
+  task_clean
+  ;;
 *)
   task_rootfs
   task_prepare
