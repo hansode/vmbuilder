@@ -650,6 +650,7 @@ function installgrub2vm() {
 
   local grub_id=0
 
+  printf "[INFO] Generating %s.\n" ${devmapfile}
   case "${disk_filename}" in
   /dev/*)
     printf "(hd%d) %s\n" ${grub_id} ${disk_filename} >> ${chroot_dir}/${devmapfile}
@@ -663,6 +664,7 @@ function installgrub2vm() {
   esac
   ${cat} ${chroot_dir}/${devmapfile}
 
+  printf "[INFO] Installing grub.\n"
   # install grub
   ${cat} <<-_EOS_ | ${chroot} ${chroot_dir} ${grub} --device-map=${devmapfile} --batch
 	root (hd${grub_id},0)
@@ -670,12 +672,11 @@ function installgrub2vm() {
 	quit
 	_EOS_
 
+  printf "[INFO] Generating /boot/grub/grub.conf.\n"
   local bootdir_path=/boot
   xptabinfo | egrep -q /boot && {
     bootdir_path=
   }
-
-  printf "[INFO] Generating /boot/grub/grub.conf.\n"
   ${cat} <<-_EOS_ > ${chroot_dir}/boot/grub/grub.conf
 	default=0
 	timeout=5
