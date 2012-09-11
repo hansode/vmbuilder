@@ -380,6 +380,7 @@ function mkpart() {
   esac
 
   local partition_start=${offset}
+  local partition_end=$((${offset} + ${size} - 1))
   local previous_partition=$(${parted} --script -- ${disk_filename} unit s print | egrep -v '^$' | awk '$1 ~ "^[1-9]+"' | tail -1)
 
   case "${previous_partition}" in
@@ -395,7 +396,7 @@ function mkpart() {
   } || :
 
   printf "[INFO] Adding type %s partition to disk image: %s\n" ${fstype} ${disk_filename}
-  ${parted} --script -- ${disk_filename} mkpart ${parttype} ${fstype} ${partition_start} $((${offset} + ${size} - 1))
+  ${parted} --script -- ${disk_filename} mkpart ${parttype} ${fstype} ${partition_start} ${partition_end}
 }
 
 function mkptab() {
