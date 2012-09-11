@@ -5,7 +5,7 @@
 #  tr, dirname, pwd
 #  sed, head
 #  build_rootfs_tree.sh
-#  cat, truncate, parted, kpartx, udevadm, blkid
+#  cat, truncate, dd, parted, kpartx, udevadm, blkid
 #  mkfs, tune2fs, mkswap
 #  mount, umount, mkdir, rmdir
 #  rsync, sync, touch, ln, rm
@@ -152,6 +152,7 @@ function dump_vers() {
 	build_rootfs_tree_sh="${build_rootfs_tree_sh}"
 	cat="${cat}"
 	truncate="${truncate}"
+	dd="${dd}"
 	parted="${parted}"
 	kpartx="${kpartx}"
 	udevadm="${udevadm}"
@@ -205,6 +206,7 @@ function build_vers() {
   build_rootfs_tree_sh=${build_rootfs_tree_sh:-"${abs_path}/build-rootfs-tree.sh"}
   cat=${cat:-"cat"}
   truncate=${truncate:-"truncate"}
+  dd=${dd-"dd"}
   parted=${parted:-"parted"}
   kpartx=${kpartx:-"kpartx"}
   udevadm=${udevadm:-"udevadm"}
@@ -232,6 +234,7 @@ function build_vers() {
     build_rootfs_tree_sh="echo ${abs_path}/build-rootfs-tree.sh"
     cat="echo ${cat}"
     truncate="echo ${truncate}"
+    dd="echo ${dd}"
     parted="echo ${parted}"
     kpartx="echo ${kpartx}"
     udevadm="echo ${udevadm}"
@@ -347,6 +350,14 @@ function rmdisk() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   ${rm} -f ${disk_filename}
+}
+
+## mbr(master boot record)
+
+function rmmbr() {
+  local disk_filename=$1
+  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  ${dd} if=/dev/zero of=${disk_filename} bs=512 count=1
 }
 
 ## ptab
@@ -773,6 +784,7 @@ function task_rootfs() {
 function task_prepare() {
   case "${raw}" in
   /dev/*)
+    rmmbr ${raw}
     ;;
   *)
     [[ -f ${raw} ]] && rmdisk ${raw}
@@ -806,6 +818,7 @@ function task_postinstall() {
 function task_clean() {
   case "${raw}" in
   /dev/*)
+    rmmbr ${raw}
     ;;
   *)
     [[ -f ${raw} ]] && {
