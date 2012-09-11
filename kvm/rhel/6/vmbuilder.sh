@@ -413,6 +413,8 @@ function mkpart() {
 
   printf "[INFO] Adding type %s partition to disk image: %s\n" ${fstype} ${disk_filename}
   ${parted} --script -- ${disk_filename} mkpart ${parttype} ${fstype} ${partition_start} ${partition_end}
+  # for physical /dev/XXX
+  ${udevadm} settle
 }
 
 function mkptab() {
