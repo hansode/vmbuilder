@@ -809,7 +809,8 @@ function task_clean() {
     [[ -f ${raw} ]] && rmdisk ${raw}
     ;;
   esac
-  [[ -d ${distro_dir} ]] && rm -rf ${distro_dir}
+  # don't need to clean at least in this task.
+  # [[ -d ${distro_dir} ]] && rm -rf ${distro_dir}
 }
 
 function task_status() {
