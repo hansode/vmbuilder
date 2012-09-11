@@ -663,12 +663,12 @@ function installgrub2vm() {
   printf "[INFO] Generating %s.\n" ${devmapfile}
   case "${disk_filename}" in
   /dev/*)
-    printf "(hd%d) %s\n" ${grub_id} ${disk_filename} >> ${chroot_dir}/${devmapfile}
+    printf "(hd%d) %s\n" ${grub_id} ${disk_filename}
     ;;
   *)
-    printf "(hd%d) %s\n" ${grub_id} ${new_filename} >> ${chroot_dir}/${devmapfile}
+    printf "(hd%d) %s\n" ${grub_id} ${new_filename}
     ;;
-  esac
+  esac >> ${chroot_dir}/${devmapfile}
   ${cat} ${chroot_dir}/${devmapfile}
 
   printf "[INFO] Installing grub.\n"
