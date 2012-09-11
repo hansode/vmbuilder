@@ -673,7 +673,16 @@ function installgrub2vm() {
 
   printf "[INFO] Installing grub.\n"
   # install grub
-  ${cat} <<-_EOS_ | ${chroot} ${chroot_dir} ${grub} --device-map=${devmapfile} --batch
+  local grub_cmd=
+  case "${disk_filename}" in
+  /dev/*)
+    grub_cmd="${grub} --device-map=${chroot_dir}/${devmapfile} --batch"
+    ;;
+  *)
+    grub_cmd="${chroot} ${chroot_dir} ${grub} --device-map=${devmapfile} --batch"
+    ;;
+  esac
+  ${cat} <<-_EOS_ | ${grub_cmd}
 	root (hd${grub_id},0)
 	setup (hd0)
 	quit
