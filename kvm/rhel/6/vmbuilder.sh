@@ -395,6 +395,11 @@ function mkpart() {
     partition_start=$((${partition_start} + 63))s
   } || :
 
+  # whole disk
+  [[ ${size} == -1 ]] && {
+    partition_end=-1
+  }
+
   printf "[INFO] Adding type %s partition to disk image: %s\n" ${fstype} ${disk_filename}
   ${parted} --script -- ${disk_filename} mkpart ${parttype} ${fstype} ${partition_start} ${partition_end}
 }
@@ -405,14 +410,6 @@ function mkptab() {
 
   printf "[INFO] Adding partition table to disk image: %s\n" ${disk_filename}
   ${parted} --script ${disk_filename} mklabel msdos
-
-  # calculate a whole extended disk size
-  local i=0 extended_disk_size=0
-  while read mountpoint partsize; do
-    [[ ${i} -gt 3 ]] && continue
-    extended_disk_size=$((${extended_disk_size} + ${partsize}))
-    i=$((${i} + 1))
-  done < <(xptabinfo)
 
   local i=1 offset=0 parttype=
   while read mountpoint partsize; do
@@ -427,8 +424,9 @@ function mkptab() {
       ;;
     4)
       parttype=extended
-      # no need to set fstype about extended partition to mkpart function
-      mkpart ${disk_filename} ${parttype} ${offset} ${extended_disk_size}
+      # don't need to set fstype about extended partition to mkpart function.
+      # extended partition ses other whole disk. "-1" measn whole disk in parted command.
+      mkpart ${disk_filename} ${parttype} ${offset} -1
       # disable lba flagg
       ${parted} --script -- ${disk_filename} set ${i} lba off
       parttype=logical
