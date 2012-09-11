@@ -767,8 +767,11 @@ function run_execscript() {
 
 ## task
 
-function task_prepare() {
+function task_rootfs() {
   mkrootfs ${distro_dir}
+}
+
+function task_prepare() {
   case "${raw}" in
   /dev/*)
     ;;
@@ -843,6 +846,9 @@ case "${cmd}" in
 debug|dump)
   dump_vers
   ;;
+rootfs)
+  task_rootfs
+  ;;
 prep|prepare)
   task_prepare
   ;;
@@ -865,6 +871,7 @@ status)
   task_status
   ;;
 *)
+  task_rootfs
   task_prepare
   task_setup
   task_build
