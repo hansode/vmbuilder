@@ -257,8 +257,8 @@ function build_vers() {
   } || :
 
   # * tune2fs
-  # > This filesystem will be automatically checked every 37 mounts or
-  # > 180 days, whichever comes first.  Use tune2fs -c or -i to override.
+  # > This filesystem will be automatically checked every 37 mounts or 180 days, whichever comes first.
+  # > Use tune2fs -c or -i to override.
   max_mount_count=${max_mount_count:-37}
   interval_between_check=${interval_between_check:-180}
 
@@ -508,8 +508,8 @@ function mkfs2vm() {
     *)
       ${mkfs} -F -E lazy_itable_init=1 ${part_filename}
 
-      # > This filesystem will be automatically checked every 37 mounts or
-      # > 180 days, whichever comes first.  Use tune2fs -c or -i to override.
+      # > This filesystem will be automatically checked every 37 mounts or 180 days, whichever comes first.
+      # > Use tune2fs -c or -i to override.
       [ ! "${max_mount_count}" -eq 37 -o ! "${interval_between_check}" -eq 180 ] && {
         printf "[INFO] Setting maximal mount count: %s\n" ${max_mount_count}
         printf "[INFO] Setting interval between check(s): %s\n" ${interval_between_check}
