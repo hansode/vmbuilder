@@ -809,7 +809,10 @@ function task_clean() {
   /dev/*)
     ;;
   *)
-    [[ -f ${raw} ]] && rmdisk ${raw}
+    [[ -f ${raw} ]] && {
+      printf "[INFO] Deleting disk image: \"%s\"\n" ${raw}
+      rmdisk ${raw}
+    }
     ;;
   esac
   # don't need to clean at least in this task.
