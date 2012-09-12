@@ -656,10 +656,12 @@ function installgrub2vm() {
   local devmapfile=${tmpdir}/device.map
   ${touch} ${chroot_dir}/${devmapfile}
   printf "[INFO] Generating %s.\n" ${devmapfile}
-  is_dev ${disk_filename} && {
-    printf "(hd%d) %s\n" ${grub_id} ${disk_filename}
-  } || {
-    printf "(hd%d) %s\n" ${grub_id} ${new_filename}
+  {
+    is_dev ${disk_filename} && {
+      printf "(hd%d) %s\n" ${grub_id} ${disk_filename}
+    } || {
+      printf "(hd%d) %s\n" ${grub_id} ${new_filename}
+    }
   } >> ${chroot_dir}/${devmapfile}
   ${cat} ${chroot_dir}/${devmapfile}
 
