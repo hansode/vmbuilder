@@ -645,9 +645,6 @@ function installgrub2vm() {
   local tmpdir=/tmp/vmbuilder-grub
   ${mkdir} -p ${chroot_dir}/${tmpdir}
 
-  local devmapfile=${tmpdir}/device.map
-  ${touch} ${chroot_dir}/${devmapfile}
-
   local grub_id=0
 
   is_dev ${disk_filename} || {
@@ -656,6 +653,8 @@ function installgrub2vm() {
     ${mount} --bind ${disk_filename} ${chroot_dir}/${new_filename}
   }
 
+  local devmapfile=${tmpdir}/device.map
+  ${touch} ${chroot_dir}/${devmapfile}
   printf "[INFO] Generating %s.\n" ${devmapfile}
   is_dev ${disk_filename} && {
     printf "(hd%d) %s\n" ${grub_id} ${disk_filename}
