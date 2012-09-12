@@ -518,7 +518,7 @@ function mkfs2vm() {
 
   printf "[INFO] Creating file systems\n"
   while read mountpoint partsize; do
-    printf "[DEBUG] Creating file system: %s\n" ${mountpoint}
+    printf "[DEBUG] Creating file system: \"%s\" of size: %dMB\n" ${mountpoint} ${partsize}
     part_filename=$(ppartpath ${disk_filename} ${mountpoint})
     case "${mountpoint}" in
     swap)
