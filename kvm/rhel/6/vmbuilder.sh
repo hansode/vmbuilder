@@ -650,38 +650,31 @@ function installgrub2vm() {
 
   local grub_id=0
 
-  case "${disk_filename}" in
-  /dev/*)
-    ;;
-  *)
+  is_dev ${disk_filename} || {
     local new_filename=${tmpdir}/$(basename ${disk_filename})
     ${touch} ${chroot_dir}/${new_filename}
     ${mount} --bind ${disk_filename} ${chroot_dir}/${new_filename}
-    ;;
-  esac
+  }
 
   printf "[INFO] Generating %s.\n" ${devmapfile}
-  case "${disk_filename}" in
-  /dev/*)
+  {
+  is_dev ${disk_filename} && {
     printf "(hd%d) %s\n" ${grub_id} ${disk_filename}
-    ;;
-  *)
+  } || {
     printf "(hd%d) %s\n" ${grub_id} ${new_filename}
-    ;;
-  esac >> ${chroot_dir}/${devmapfile}
+  }
+  } >> ${chroot_dir}/${devmapfile}
   ${cat} ${chroot_dir}/${devmapfile}
 
   printf "[INFO] Installing grub.\n"
   # install grub
   local grub_cmd=
-  case "${disk_filename}" in
-  /dev/*)
+
+  is_dev ${disk_filename} && {
     grub_cmd="${grub} --device-map=${chroot_dir}/${devmapfile} --batch"
-    ;;
-  *)
+  } || {
     grub_cmd="${chroot} ${chroot_dir} ${grub} --device-map=${devmapfile} --batch"
-    ;;
-  esac
+  }
   ${cat} <<-_EOS_ | ${grub_cmd}
 	root (hd${grub_id},0)
 	setup (hd0)
@@ -708,14 +701,10 @@ function installgrub2vm() {
   ${ln} -fs grub.conf menu.lst
   cd -
 
-  case "${disk_filename}" in
-  /dev/*)
-    ;;
-  *)
+  is_dev ${disk_filename} || {
     printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
     ${umount} ${chroot_dir}/${new_filename}
-    ;;
-  esac
+  }
 
   printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
   ${rm} -rf ${chroot_dir}/${tmpdir}
@@ -815,6 +804,16 @@ function run_execscript() {
   ${setarch} ${distro_arch} ${execscript} ${chroot_dir}
 }
 
+function is_dev() {
+  local disk_filename=$1 mountpoint=$2
+  # do not use "-a" in this case.
+  [[ -n ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  case "${disk_filename}" in
+  /dev/*) return 0 ;;
+       *) return 1 ;;
+  esac
+}
+
 ## task
 
 function task_rootfs() {
@@ -822,28 +821,21 @@ function task_rootfs() {
 }
 
 function task_prepare() {
-  case "${raw}" in
-  /dev/*)
+  is_dev ${raw} && {
     rmmbr ${raw}
-    ;;
-  *)
+  } || {
     [[ -f ${raw} ]] && rmdisk ${raw}
     printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${raw} ${totalsize}
     mkdisk  ${raw} ${totalsize}
-    ;;
-  esac
+  }
 }
 
 function task_setup() {
   mkptab  ${raw}
-  case "${raw}" in
-  /dev/*)
-    ;;
-  *)
+  is_dev ${raw} || {
     printf "[INFO] Creating loop devices corresponding to the created partitions\n"
     mapptab ${raw}
-    ;;
-  esac
+  }
 }
 
 function task_build() {
@@ -855,30 +847,23 @@ function task_install() {
 }
 
 function task_postinstall() {
-  case "${raw}" in
-  /dev/*)
-    ;;
-  *)
+  is_dev ${raw} || {
     printf "[INFO] Deleting loop devices\n"
     unmapptab_r ${raw}
-    ;;
-  esac
+  }
   printf "[INFO] Generated => %s\n" ${raw}
   printf "[INFO] Complete!\n"
 }
 
 function task_clean() {
-  case "${raw}" in
-  /dev/*)
+  is_dev ${raw} && {
     rmmbr ${raw}
-    ;;
-  *)
+  } || {
     [[ -f ${raw} ]] && {
       printf "[INFO] Deleting disk image: \"%s\"\n" ${raw}
       rmdisk ${raw}
     }
-    ;;
-  esac
+  }
   # don't need to clean at least in this task.
   # [[ -d ${distro_dir} ]] && rm -rf ${distro_dir}
 }
