@@ -852,6 +852,13 @@ function task_postinstall() {
   printf "[INFO] Complete!\n"
 }
 
+function task_execscript() {
+  local chroot_dir=/tmp/tmp$(date +%s)
+  mountvm ${raw} ${chroot_dir}
+  run_execscript ${chroot_dir}
+  umountvm       ${chroot_dir}
+}
+
 function task_clean() {
   is_dev ${raw} && {
     rmmbr ${raw}
@@ -911,6 +918,11 @@ install)
   task_install
   ;;
 post|postinstall)
+  task_postinstall
+  ;;
+execscript)
+  task_setup
+  task_execscript
   task_postinstall
   ;;
 clean)
