@@ -852,7 +852,7 @@ function task_postinstall() {
   printf "[INFO] Complete!\n"
 }
 
-function task_execscript() {
+function task_run_execscript() {
   local chroot_dir=/tmp/tmp$(date +%s)
   mountvm ${raw} ${chroot_dir}
   run_execscript ${chroot_dir}
@@ -920,16 +920,16 @@ install)
 post|postinstall)
   task_postinstall
   ;;
-execscript)
-  task_setup
-  task_execscript
-  task_postinstall
-  ;;
 clean)
   task_clean
   ;;
 status)
   task_status
+  ;;
+test::execscript)
+  task_setup
+  task_run_execscript
+  task_postinstall
   ;;
 soft-test)
   task_prepare
