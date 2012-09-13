@@ -573,6 +573,17 @@ function mountvm_nonroot() {
   done < <(xptabinfo)
 }
 
+function mountvm_devel() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+
+  local vfs_paths="/proc /dev"
+  for mountpoint in ${vfs_paths}; do
+     printf "[DEBUG] Mounting %s\n" ${chroot_dir}${mountpoint}
+    ${mount} --bind ${mountpoint} ${chroot_dir}${mountpoint}
+  done
+}
+
 function mountvm() {
   local disk_filename=$1 chroot_dir=$2
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
@@ -619,6 +630,7 @@ function installos() {
   installgrub2vm       ${chroot_dir} ${disk_filename}
   configure_networking ${chroot_dir}
   configure_mounting   ${chroot_dir} ${disk_filename}
+  mountvm_devel        ${chroot_dir}
   run_execscript       ${chroot_dir}
 
   umountvm             ${chroot_dir}
@@ -858,6 +870,7 @@ function task_postinstall() {
 function task_run_execscript() {
   local chroot_dir=/tmp/tmp$(date +%s)
   mountvm ${raw} ${chroot_dir}
+  mountvm_devel  ${chroot_dir}
   run_execscript ${chroot_dir}
   umountvm       ${chroot_dir}
 }
