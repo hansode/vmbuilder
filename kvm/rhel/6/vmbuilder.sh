@@ -580,7 +580,7 @@ function mountvm_devel() {
 
   local vfs_paths="proc dev"
   for mountpoint in ${vfs_paths}; do
-     printf "[DEBUG] Mounting %s\n" ${chroot_dir}/${mountpoint}
+     printf "[DEBUG] Mounting %s\n" ${chroot_dir}${mountpoint}
     ${mount} --bind /${vfs} ${chroot_dir}/${mountpoint}
   done
 }
