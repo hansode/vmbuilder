@@ -655,7 +655,7 @@ function installgrub2vm() {
 
   local devmapfile=${tmpdir}/device.map
   ${touch} ${chroot_dir}/${devmapfile}
-  printf "[INFO] Generating %s.\n" ${devmapfile}
+  printf "[INFO] Generating %s\n" ${devmapfile}
   {
     is_dev ${disk_filename} && {
       printf "(hd%d) %s\n" ${grub_id} ${disk_filename}
@@ -665,7 +665,7 @@ function installgrub2vm() {
   } >> ${chroot_dir}/${devmapfile}
   ${cat} ${chroot_dir}/${devmapfile}
 
-  printf "[INFO] Installing grub.\n"
+  printf "[INFO] Installing grub\n"
   # install grub
   local grub_cmd=
 
@@ -680,7 +680,7 @@ function installgrub2vm() {
 	quit
 	_EOS_
 
-  printf "[INFO] Generating /boot/grub/grub.conf.\n"
+  printf "[INFO] Generating /boot/grub/grub.conf\n"
   local bootdir_path=/boot
   xptabinfo | egrep -q /boot && {
     bootdir_path=
@@ -713,9 +713,9 @@ function configure_networking() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
 
-  # /etc/sysconfig/network-scripts/ifcfg-eth0
+  printf "[INFO] Generating /etc/sysconfig/network-scripts/ifcfg-eth0\n"
   [[ -z "${ip}" ]] || {
-    printf "[INFO] Unsetting /etc/sysconfig/network-scripts/ifcfg-eth0.\n"
+    printf "[INFO] Unsetting /etc/sysconfig/network-scripts/ifcfg-eth0\n"
     ${cat} <<-_EOS_ > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
 	DEVICE=eth0
 	BOOTPROTO=static
@@ -728,9 +728,10 @@ function configure_networking() {
   }
   ${cat} ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
 
+  printf "[INFO] Generating /etc/resolv.conf\n"
   # /etc/resolv.conf
   [[ -z "${dns}" ]] || {
-    printf "[INFO] Unsetting /etc/resolv.conf.\n"
+    printf "[INFO] Unsetting /etc/resolv.conf\n"
     ${cat} <<-_EOS_ > ${chroot_dir}/etc/resolv.conf
 	nameserver ${dns}
 	_EOS_
@@ -752,7 +753,7 @@ function configure_networking() {
   }
 
   # disable mac address caching
-  printf "[INFO] Unsetting udev 70-persistent-net.rules.\n"
+  printf "[INFO] Unsetting udev 70-persistent-net.rules\n"
   ${rm} -f ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
   ${ln} -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
 }
@@ -762,7 +763,7 @@ function configure_mounting() {
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
 
-  printf "[INFO] Overwriting /etc/fstab.\n"
+  printf "[INFO] Overwriting /etc/fstab\n"
   {
   while read mountpoint partsize; do
     case "${mountpoint}" in
