@@ -639,7 +639,6 @@ function installos() {
   installgrub2vm       ${chroot_dir} ${disk_filename}
   configure_networking ${chroot_dir}
   configure_mounting   ${chroot_dir} ${disk_filename}
-  mountvm_devel        ${chroot_dir}
   run_execscript       ${chroot_dir}
 
   umountvm             ${chroot_dir}
@@ -821,6 +820,9 @@ function run_execscript() {
 
   [[ -f "${execscript}" ]] || return 0
   [[ -x "${execscript}" ]] || return 0
+
+  mountvm_devel  ${chroot_dir}
+
   printf "[INFO] Excecuting after script\n"
   ${setarch} ${distro_arch} ${execscript} ${chroot_dir}
 }
@@ -879,7 +881,6 @@ function task_postinstall() {
 function task_run_execscript() {
   local chroot_dir=${chroot_dir_path}
   mountvm ${raw} ${chroot_dir}
-  mountvm_devel  ${chroot_dir}
   run_execscript ${chroot_dir}
   umountvm       ${chroot_dir}
 }
