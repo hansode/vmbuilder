@@ -276,6 +276,8 @@ function build_vers() {
   execscript=${execscript:-}
   raw=${raw:-./${distro}.raw}
 
+  chroot_dir_path=${chroot_dir_path:-/tmp/tmp$(date +%s)}
+
   #domain=${domain:-}
   ip=${ip:-}
   mask=${mask:-}
@@ -629,7 +631,7 @@ function installos() {
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
 
-  local chroot_dir=/tmp/tmp$(date +%s)
+  local chroot_dir=${chroot_dir_path}
 
   mountvm ${disk_filename} ${chroot_dir}
 
@@ -875,7 +877,7 @@ function task_postinstall() {
 }
 
 function task_run_execscript() {
-  local chroot_dir=/tmp/tmp$(date +%s)
+  local chroot_dir=${chroot_dir_path}
   mountvm ${raw} ${chroot_dir}
   mountvm_devel  ${chroot_dir}
   run_execscript ${chroot_dir}
