@@ -381,6 +381,13 @@ function xptabinfo() {
   } | egrep -v '^$|^#' | awk '$2 != 0 {print $1, $2}'
 }
 
+function xptabproc() {
+  local blk="$(cat)"
+  while read mountpoint partsize; do
+    eval "${blk}"
+  done < <(xptabinfo)
+}
+
 function mkpart() {
   local disk_filename=$1 parttype=$2 offset=$3 size=$4 fstype=$5
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
@@ -425,7 +432,7 @@ function mkptab() {
   ${parted} --script ${disk_filename} mklabel msdos
 
   local i=1 offset=0 parttype=
-  while read mountpoint partsize; do
+  xptabproc <<'EOS'
     case "${mountpoint}" in
     swap) fstype=swap;;
     *)    fstype=ext2;;
@@ -460,7 +467,7 @@ function mkptab() {
     esac
 
     i=$((${i} + 1))
-  done < <(xptabinfo)
+EOS
 }
 
 function mapptab() {
@@ -517,7 +524,7 @@ function mkfs2vm() {
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
 
   printf "[INFO] Creating file systems\n"
-  while read mountpoint partsize; do
+  xptabproc <<'EOS'
     printf "[DEBUG] Creating file system: \"%s\" of size: %dMB\n" ${mountpoint} ${partsize}
     part_filename=$(ppartpath ${disk_filename} ${mountpoint})
     case "${mountpoint}" in
@@ -537,14 +544,14 @@ function mkfs2vm() {
       ;;
     esac
     ${udevadm} settle
-  done < <(xptabinfo)
+EOS
 }
 
 function mountvm_root() {
   local disk_filename=$1 chroot_dir=$2
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  while read mountpoint partsize; do
+  xptabproc <<'EOS'
     part_filename=$(ppartpath ${disk_filename} ${mountpoint})
     case "${mountpoint}" in
     root)
@@ -552,7 +559,7 @@ function mountvm_root() {
       ${mount} ${part_filename} ${chroot_dir}
       ;;
     esac
-  done < <(xptabinfo)
+EOS
 }
 
 function mountvm_nonroot() {
@@ -560,7 +567,7 @@ function mountvm_nonroot() {
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
 
-  while read mountpoint partsize; do
+  xptabproc <<'EOS'
     part_filename=$(ppartpath ${disk_filename} ${mountpoint})
     case "${mountpoint}" in
     root|swap) ;;
@@ -570,7 +577,7 @@ function mountvm_nonroot() {
       ${mount} ${part_filename} ${chroot_dir}${mountpoint}
       ;;
     esac
-  done < <(xptabinfo)
+EOS
 }
 
 function mountvm_devel() {
@@ -777,7 +784,7 @@ function configure_mounting() {
 
   printf "[INFO] Overwriting /etc/fstab\n"
   {
-  while read mountpoint partsize; do
+  xptabproc <<'EOS'
     case "${mountpoint}" in
     /boot) fstype=ext4 dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
     root)  fstype=ext4 dumpopt=1 fsckopt=1 mountpath=/             ;;
@@ -789,7 +796,7 @@ function configure_mounting() {
 
     uuid=$(ppartuuid ${disk_filename} ${mountpoint})
     printf "UUID=%s %s\t%s\tdefaults\t%s %s\n" ${uuid} ${mountpath} ${fstype} ${dumpopt} ${fsckopt}
-  done < <(xptabinfo)
+EOS
 
   ${cat} <<-_EOS_
 	tmpfs                   /dev/shm                tmpfs   defaults        0 0
