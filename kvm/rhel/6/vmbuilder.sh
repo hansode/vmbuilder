@@ -633,15 +633,10 @@ function installos() {
 
   local chroot_dir=${chroot_dir_path}
 
-  mountvm ${disk_filename} ${chroot_dir}
-
   installdistro2vm     ${distro_dir} ${chroot_dir}
   installgrub2vm       ${chroot_dir} ${disk_filename}
   configure_networking ${chroot_dir}
   configure_mounting   ${chroot_dir} ${disk_filename}
-  run_execscript       ${chroot_dir}
-
-  umountvm             ${chroot_dir}
 }
 
 function installdistro2vm() {
@@ -839,11 +834,11 @@ function is_dev() {
 
 ## task
 
-function task_rootfs() {
+function task_mkrootfs() {
   mkrootfs ${distro_dir}
 }
 
-function task_prepare() {
+function task_mkdisk() {
   is_dev ${raw} && {
     rmmbr ${raw}
   } || {
@@ -853,16 +848,23 @@ function task_prepare() {
   }
 }
 
-function task_setup() {
+function task_mkptab() {
   mkptab  ${raw}
+}
+
+function task_mapptab() {
   is_dev ${raw} || {
     printf "[INFO] Creating loop devices corresponding to the created partitions\n"
     mapptab ${raw}
   }
 }
 
-function task_build() {
+function task_mkfs() {
   mkfs2vm ${raw}
+}
+
+function task_mount() {
+  mountvm ${raw} ${chroot_dir_path}
 }
 
 function task_install() {
@@ -870,19 +872,23 @@ function task_install() {
 }
 
 function task_postinstall() {
+  run_execscript ${chroot_dir_path}
+}
+
+function task_umount() {
+  umountvm ${chroot_dir_path}
+}
+
+function task_unmapptab() {
   is_dev ${raw} || {
     printf "[INFO] Deleting loop devices\n"
     unmapptab_r ${raw}
   }
-  printf "[INFO] Generated => %s\n" ${raw}
-  printf "[INFO] Complete!\n"
 }
 
-function task_run_execscript() {
-  local chroot_dir=${chroot_dir_path}
-  mountvm ${raw} ${chroot_dir}
-  run_execscript ${chroot_dir}
-  umountvm       ${chroot_dir}
+function task_finish() {
+  printf "[INFO] Generated => %s\n" ${raw}
+  printf "[INFO] Complete!\n"
 }
 
 function task_clean() {
@@ -904,9 +910,8 @@ function task_status() {
 }
 
 function task_trap() {
-  local chroot_dir=${chroot_dir_path}
   printf "[TRAP] Unmounting files.\n"
-  [[ -d ${chroot_dir} ]] && umountvm ${chroot_dir} || :
+  [[ -d ${chroot_dir_path} ]] && umountvm ${chroot_dir_path} || :
   is_dev ${raw} || {
     printf "[TRAP] Unmapping files.\n"
     unmapptab_r ${raw}
@@ -941,22 +946,27 @@ debug|dump)
   dump_vers
   ;;
 rootfs)
-  task_rootfs
+  task_mkrootfs
   ;;
 prep|prepare)
-  task_prepare
+  task_mkdisk
   ;;
 setup)
-  task_setup
+  task_mkptab
+  task_mapptab
   ;;
 build)
-  task_build
+  task_mkfs
   ;;
 install)
+  task_mount
   task_install
+  task_postinstall
+  task_umount
   ;;
 post|postinstall)
-  task_postinstall
+  task_unmapptab
+  task_finish
   ;;
 clean)
   task_clean
@@ -965,23 +975,31 @@ status)
   task_status
   ;;
 test::execscript)
-  task_setup
-  task_run_execscript
-  task_postinstall
+  task_mkptab
+  task_mapptab
+  task_unmapptab
+  task_finish
   ;;
 soft-test)
-  task_prepare
-  task_setup
-  task_build
-  task_postinstall
+  task_mkdisk
+  task_mkptab
+  task_mapptab
+  task_mkfs
+  task_unmapptab
+  task_finish
   task_clean
   ;;
 *)
-  task_rootfs
-  task_prepare
-  task_setup
-  task_build
+  task_mkrootfs
+  task_mkdisk
+  task_mkptab
+  task_mapptab
+  task_mkfs
+  task_mount
   task_install
   task_postinstall
+  task_umount
+  task_unmapptab
+  task_finish
   ;;
 esac
