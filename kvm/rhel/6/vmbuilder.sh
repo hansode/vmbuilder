@@ -975,10 +975,11 @@ status)
   task_status
   ;;
 test::execscript)
-  task_mkptab
   task_mapptab
+  task_mount
+  task_postinstall
+  task_umount
   task_unmapptab
-  task_finish
   ;;
 soft-test)
   task_mkdisk
