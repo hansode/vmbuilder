@@ -903,6 +903,16 @@ function task_status() {
   ${dmsetup} ls
 }
 
+function task_trap() {
+  local chroot_dir=${chroot_dir_path}
+  printf "[TRAP] Unmounting files.\n"
+  [[ -d ${chroot_dir} ]] && umountvm ${chroot_dir} || :
+  is_dev ${raw} || {
+    printf "[TRAP] Unmapping files.\n"
+    unmapptab_r ${raw}
+  }
+}
+
 function check_user() {
   [[ $UID -ne 0 ]] && {
     echo "[ERROR] Must run as root." >&2
@@ -923,6 +933,8 @@ readonly abs_path=$(cd $(dirname $0) && pwd)
 build_vers
 check_user
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
+
+trap task_trap INT
 
 case "${cmd}" in
 debug|dump)
