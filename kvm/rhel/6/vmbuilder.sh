@@ -990,15 +990,21 @@ soft-test)
   task_clean
   ;;
 *)
+  # %rootfs
   task_mkrootfs
+  # %prep
   task_mkdisk
+  # %setup
   task_mkptab
   task_mapptab
+  # %build
   task_mkfs
+  # %install
   task_mount
   task_install
   task_postinstall
   task_umount
+  # %post
   task_unmapptab
   task_finish
   ;;
