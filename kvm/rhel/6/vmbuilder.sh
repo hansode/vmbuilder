@@ -823,7 +823,7 @@ function run_execscript() {
 
   mountvm_devel  ${chroot_dir}
 
-  printf "[INFO] Excecuting after script\n"
+  printf "[INFO] Excecuting script: %s\n" ${execscript}
   ${setarch} ${distro_arch} ${execscript} ${chroot_dir}
 }
 
