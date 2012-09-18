@@ -531,7 +531,9 @@ function mkfs2vm() {
     part_filename=$(ppartpath ${disk_filename} ${mountpoint})
     case "${mountpoint}" in
     swap)
-      ${mkswap} ${part_filename}
+      # > mkswap: /dev/mapper/loop0p7: warning: don't erase bootbits sectors
+      # >  on whole disk. Use -f to force.
+      ${mkswap} -f ${part_filename}
       ;;
     *)
       ${mkfs} -F -E lazy_itable_init=1 -L ${mountpoint} ${part_filename}
