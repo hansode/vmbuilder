@@ -913,7 +913,7 @@ function task_trap() {
   }
 }
 
-function check_user() {
+function checkroot() {
   [[ $UID -ne 0 ]] && {
     echo "[ERROR] Must run as root." >&2
     return 1
@@ -931,7 +931,7 @@ readonly abs_path=$(cd $(dirname $0) && pwd)
 ## main
 
 build_vers
-check_user
+checkroot
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
 trap task_trap INT
