@@ -941,7 +941,8 @@ build_vers
 checkroot
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
-trap task_trap INT
+trap 'exit 1'  HUP INT PIPE QUIT TERM
+trap task_trap EXIT
 
 case "${cmd}" in
 debug|dump)
