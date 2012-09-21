@@ -246,24 +246,36 @@ function configure_networking() {
 }
 configure_networking
 
-# passwd
-/usr/sbin/chroot ${chroot_dir} pwconv
+function converting_passwd() {
+  # passwd
+  /usr/sbin/chroot ${chroot_dir} pwconv
+}
+converting_passwd
 
-# TimeZone
-/bin/cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
+function configure_tz() {
+  # TimeZone
+  /bin/cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
+}
+configure_tz
 
-# needless services
-/usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --list |grep -v :on |\
- while read svc dummy; do
-   /usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --del ${svc}
- done
+function configure_service() {
+  # needless services
+  /usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --list |grep -v :on |\
+   while read svc dummy; do
+     /usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --del ${svc}
+   done
+}
+configure_service
 
-#
-for grub_distro_name in redhat unknown; do
-  grub_src_dir=${chroot_dir}/usr/share/grub/${basearch}-${grub_distro_name}
-  [ -d ${grub_src_dir} ] || continue
-  rsync -a ${grub_src_dir}/ ${chroot_dir}/boot/grub/
-done
+function installgrub() {
+  #
+  for grub_distro_name in redhat unknown; do
+    grub_src_dir=${chroot_dir}/usr/share/grub/${basearch}-${grub_distro_name}
+    [ -d ${grub_src_dir} ] || continue
+    rsync -a ${grub_src_dir}/ ${chroot_dir}/boot/grub/
+  done
+}
+installgrub
 
 #
 # clean-up
