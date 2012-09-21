@@ -912,10 +912,8 @@ function task_status() {
 }
 
 function task_trap() {
-  printf "[TRAP] Unmounting files.\n"
   [[ -d ${chroot_dir_path} ]] && umountvm ${chroot_dir_path} || :
   is_dev ${raw} || {
-    printf "[TRAP] Unmapping files.\n"
     unmapptab_r ${raw}
   }
 }
