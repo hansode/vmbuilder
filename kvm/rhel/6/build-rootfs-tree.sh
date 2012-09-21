@@ -110,11 +110,6 @@ build_vers
 checkroot
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
-which yum >/dev/null 2>&1 || {
-  echo "[error] command not found: 'yum'" >&2
-  exit 1;
-}
-
 # validate
 case "${distro_name}" in
 "")
@@ -133,7 +128,6 @@ keepcache:   ${keepcache}
 --------------------
 EOS
 
-#exit 0
 [ -n "${batch}" ] && {
   yorn=y
 } || {
@@ -243,9 +237,6 @@ EOS
 
 # TimeZone
 /bin/cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
-
-# diet
-#${yum_cmd} erase kbd ed ustr checkpolicy
 
 # needless services
 /usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --list |grep -v :on |\
