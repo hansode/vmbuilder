@@ -32,44 +32,26 @@ function extract_args() {
   CMD_ARGS=${CMD_ARGS## }
 }
 
-### prepare
+function build_vers() {
+  debug=${debug:-}
+  [ -z ${debug} ] || set -x
 
-extract_args $*
+  distro_arch=${distro_arch:-$(arch)}
+  case "${distro_arch}" in
+  i*86)   basearch=i386; distro_arch=i686;;
+  x86_64) basearch=${distro_arch};;
+  esac
 
-debug=${debug:-}
-[ -z ${debug} ] || set -x
+  distro_ver=${distro_ver:-6.3}
+  distro_name=${distro_name:-centos}
+  root_dev=${root_dev:-/dev/sda1}
 
-#
-# vars
-#
-distro_arch=${distro_arch:-$(arch)}
-case ${distro_arch} in
-i*86)   basearch=i386; distro_arch=i686;;
-x86_64) basearch=${distro_arch};;
-esac
-
-distro_ver=${distro_ver:-6.3}
-distro_name=${distro_name:-centos}
-root_dev=${root_dev:-/dev/sda1}
-
-# check
-[[ $UID -ne 0 ]] && {
-  echo "ERROR: Run as root" >/dev/stderr
-  exit 1
-}
-
-which yum >/dev/null 2>&1 || {
-  echo "[error] command not found: 'yum'" >&2
-  exit 1;
-}
-
-# validate
-case ${distro_name} in
+  case "${distro_name}" in
   centos)
     distro_short=centos
     distro_snake=CentOS
     baseurl=http://ftp.riken.go.jp/pub/Linux/centos/${distro_ver}/os/${basearch}
-    case ${distro_ver} in
+    case "${distro_ver}" in
     6|6.*)
       gpgkey="${baseurl}/RPM-GPG-KEY-${distro_snake}-6"
       ;;
@@ -79,25 +61,65 @@ case ${distro_name} in
     distro_short=sl
     distro_snake="Scientific Linux"
     baseurl=http://ftp.riken.go.jp/pub/Linux/scientific/${distro_ver}/${basearch}/os
-    case ${distro_ver} in
+    case "${distro_ver}" in
     6|6.*)
       gpgkey="${baseurl}/RPM-GPG-KEY-sl ${baseurl}/RPM-GPG-KEY-sl6"
       ;;
     esac
     ;;
-  *)
-    echo "no mutch distro" >&2
-    exit 1;
-esac
+  esac
 
-abs_path=$(cd $(dirname $0) && pwd)
-chroot_dir=${chroot_dir:-${abs_path}/${distro_short}-${distro_ver}_${distro_arch}}
+  chroot_dir=${chroot_dir:-${abs_path}/${distro_short}-${distro_ver}_${distro_arch}}
 
-keepcache=${keepcache:-0}
-# keepcache should be [ 0 | 1 ]
-case ${keepcache} in
-[01]) ;;
-*)    keepcache=0 ;;
+  keepcache=${keepcache:-0}
+  # keepcache should be [ 0 | 1 ]
+  case "${keepcache}" in
+  [01]) ;;
+  *)    keepcache=0 ;;
+  esac
+
+  repo=${abs_path}/yum-${distro_short}-${distro_ver}.repo
+  yum_cmd="
+    yum \
+     -c ${repo} \
+     --disablerepo="\*" \
+     --enablerepo="${distro_short}" \
+     --installroot=${chroot_dir} \
+     -y
+  "
+}
+
+function checkroot() {
+  [[ $UID -ne 0 ]] && {
+    echo "[ERROR] Must run as root." >&2
+    return 1
+  } || :
+}
+
+### prepare
+
+extract_args $*
+
+### read-only variables
+
+readonly abs_path=$(cd $(dirname $0) && pwd)
+
+## main
+
+build_vers
+checkroot
+cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
+
+which yum >/dev/null 2>&1 || {
+  echo "[error] command not found: 'yum'" >&2
+  exit 1;
+}
+
+# validate
+case "${distro_name}" in
+"")
+  echo "no mutch distro" >&2
+  exit 1;
 esac
 
 # dump vars
@@ -132,20 +154,6 @@ function do_cleanup() {
   printf "[DEBUG] Cleaned up\n"
 }
 trap do_cleanup 1 2 3 15
-
-#
-#
-#
-repo=${abs_path}/yum-${distro_short}-${distro_ver}.repo
-yum_cmd="
-yum \
- -c ${repo} \
- --disablerepo="\*" \
- --enablerepo="${distro_short}" \
- --installroot=${chroot_dir} \
- -y
-"
-
 
 [ -d ${chroot_dir} ] && { echo "${chroot_dir} already exists." >&2; exit 1; }
 mkdir -p ${chroot_dir}
@@ -264,5 +272,3 @@ umount -l ${chroot_dir}/proc
 
 printf "[INFO] Installed => %s\n" ${chroot_dir}
 printf "[INFO] Complete!\n"
-
-exit 0
