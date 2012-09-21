@@ -9,26 +9,32 @@
 #        --keepcache=1
 #        --debug=1
 #
-export PATH=/bin:/usr/bin:/sbin:/usr/sbin
-
-#
 set -e
 
-args=
-while [ $# -gt 0 ]; do
-  arg="$1"
-  case "${arg}" in
-    --*=*)
-      key=${arg%%=*}; key=$(echo ${key##--} | tr - _)
-      value=${arg##--*=}
-      eval "${key}=\"${value}\""
-      ;;
-    *)
-      args="${args} ${arg}"
-      ;;
-  esac
-  shift
-done
+## private functions
+
+function extract_args() {
+  CMD_ARGS=
+  for arg in $*; do
+    case $arg in
+      --*=*)
+        key=${arg%%=*}; key=$(echo ${key##--} | tr - _)
+        value=${arg##--*=}
+        eval "${key}=\"${value}\""
+        ;;
+      *)
+        CMD_ARGS="${CMD_ARGS} ${arg}"
+        ;;
+    esac
+  done
+  # trim
+  CMD_ARGS=${CMD_ARGS%% }
+  CMD_ARGS=${CMD_ARGS## }
+}
+
+### prepare
+
+extract_args $*
 
 debug=${debug:-}
 [ -z ${debug} ] || set -x
