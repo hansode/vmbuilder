@@ -153,85 +153,98 @@ trap do_cleanup 1 2 3 15
 [ -d ${chroot_dir} ] && { echo "${chroot_dir} already exists." >&2; exit 1; }
 mkdir -p ${chroot_dir}
 
-# /proc
-mkdir ${chroot_dir}/proc
-# mount -t proc none ${chroot_dir}/proc
-mount --bind /proc ${chroot_dir}/proc
+function mkprocdir() {
+  # /proc
+  mkdir ${chroot_dir}/proc
+  # mount -t proc none ${chroot_dir}/proc
+  mount --bind /proc ${chroot_dir}/proc
+}
+mkprocdir
 
-# /dev
-mkdir ${chroot_dir}/dev
-for i in console null tty1 tty2 tty3 tty4 zero; do
- /sbin/MAKEDEV -d ${chroot_dir}/dev -x $i
-done
-
+function mkdevdir() {
+  # /dev
+  mkdir ${chroot_dir}/dev
+  for i in console null tty1 tty2 tty3 tty4 zero; do
+   /sbin/MAKEDEV -d ${chroot_dir}/dev -x $i
+  done
+}
+mkdevdir
 
 # yum
-cat <<EOS > ${repo}
-[main]
-cachedir=/var/cache/yum
-keepcache=${keepcache}
-debuglevel=2
-logfile=/var/log/yum.log
-exactarch=1
-obsoletes=1
-gpgcheck=0
-plugins=1
-metadata_expire=1800
-installonly_limit=2
+function gen_yumrepo() {
+  cat <<-EOS > ${repo}
+	[main]
+	cachedir=/var/cache/yum
+	keepcache=${keepcache}
+	debuglevel=2
+	logfile=/var/log/yum.log
+	exactarch=1
+	obsoletes=1
+	gpgcheck=0
+	plugins=1
+	metadata_expire=1800
+	installonly_limit=2
+	
+	# PUT YOUR REPOS HERE OR IN separate files named file.repo
+	# in /etc/yum.repos.d
+	[${distro_short}]
+	name=${distro_snake} ${distro_ver} - ${basearch}
+	failovermethod=priority
+	baseurl=${baseurl}
+	enabled=1
+	gpgcheck=1
+	gpgkey=${gpgkey}
+	EOS
+}
+gen_yumrepo
 
-# PUT YOUR REPOS HERE OR IN separate files named file.repo
-# in /etc/yum.repos.d
-[${distro_short}]
-name=${distro_snake} ${distro_ver} - ${basearch}
-failovermethod=priority
-baseurl=${baseurl}
-enabled=1
-gpgcheck=1
-gpgkey=${gpgkey}
-EOS
-
-
-# install packages
-${yum_cmd} groupinstall Core
-${yum_cmd} install \
+function installdistro() {
+  # install packages
+  ${yum_cmd} groupinstall Core
+  ${yum_cmd} install \
              kernel dracut openssh openssh-clients openssh-server rpm yum curl dhclient \
              passwd grub \
              vim-minimal
-${yum_cmd} erase selinux*
+  ${yum_cmd} erase selinux*
+}
+installdistro
 
+function configure_mounting() {
+  # /etc/fstab
+  cat <<-EOS > ${chroot_dir}/etc/fstab
+	${root_dev}             /                       ext4    defaults        1 1
+	tmpfs                   /dev/shm                tmpfs   defaults        0 0
+	devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
+	sysfs                   /sys                    sysfs   defaults        0 0
+	proc                    /proc                   proc    defaults        0 0
+	EOS
+}
+configure_mounting
 
+function configure_networking() {
+  # /etc/hosts
+  cat <<-EOS > ${chroot_dir}/etc/hosts
+	127.0.0.1       localhost
+	EOS
 
+  # /etc/resolv.conf
+  cat <<-EOS > ${chroot_dir}/etc/resolv.conf
+	nameserver 8.8.8.8
+	EOS
 
-# /etc/fstab
-cat <<EOS > ${chroot_dir}/etc/fstab
-${root_dev}             /                       ext4    defaults        1 1
-tmpfs                   /dev/shm                tmpfs   defaults        0 0
-devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
-sysfs                   /sys                    sysfs   defaults        0 0
-proc                    /proc                   proc    defaults        0 0
-EOS
+  # /etc/sysconfig/network
+  cat <<-EOS > ${chroot_dir}/etc/sysconfig/network
+	NETWORKING=yes
+	EOS
 
-# /etc/hosts
-cat <<EOS > ${chroot_dir}/etc/hosts
-127.0.0.1       localhost
-EOS
-
-# /etc/resolv.conf
-cat <<EOS > ${chroot_dir}/etc/resolv.conf
-nameserver 8.8.8.8
-EOS
-
-# /etc/sysconfig/network
-cat <<EOS > ${chroot_dir}/etc/sysconfig/network
-NETWORKING=yes
-EOS
-
-# /etc/sysconfig/network-scripts/ifcfg-eth0
-cat <<EOS > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
-DEVICE=eth0
-BOOTPROTO=dhcp
-ONBOOT=yes
-EOS
+  # /etc/sysconfig/network-scripts/ifcfg-eth0
+  cat <<-EOS > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
+	DEVICE=eth0
+	BOOTPROTO=dhcp
+	ONBOOT=yes
+	EOS
+}
+configure_networking
 
 # passwd
 /usr/sbin/chroot ${chroot_dir} pwconv
