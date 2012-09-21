@@ -277,15 +277,24 @@ function installgrub() {
 }
 installgrub
 
-#
-# clean-up
-#
-rm -f  ${chroot_dir}/boot/grub/splash.xpm.gz
-find   ${chroot_dir}/var/log/ -type f | xargs rm
-rm -rf ${chroot_dir}/tmp/*
-rm -f  ${repo}
+function cleanup() {
+  #
+  # clean-up
+  #
+  rm -f  ${chroot_dir}/boot/grub/splash.xpm.gz
+  find   ${chroot_dir}/var/log/ -type f | xargs rm
+  rm -rf ${chroot_dir}/tmp/*
+  rm -f  ${repo}
+}
+cleanup
 
-umount -l ${chroot_dir}/proc
+function umount_proc() {
+  umount -l ${chroot_dir}/proc
+}
+umount_proc
 
-printf "[INFO] Installed => %s\n" ${chroot_dir}
-printf "[INFO] Complete!\n"
+function task_finish() {
+  printf "[INFO] Installed => %s\n" ${chroot_dir}
+  printf "[INFO] Complete!\n"
+}
+task_finish
