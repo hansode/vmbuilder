@@ -1,5 +1,8 @@
 #!/bin/bash
 #
+# requires:
+#  bash
+#
 # OPTIONS
 #        --distro-arch=[x86_64 | i686]
 #        --distro-name=[centos | sl]
