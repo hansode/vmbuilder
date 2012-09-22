@@ -133,6 +133,7 @@ function umount_proc() {
 }
 
 function mkrepofile() {
+  local repofile=$1
   cat <<-EOS > ${repofile}
 	[main]
 	cachedir=/var/cache/yum
@@ -159,6 +160,7 @@ function mkrepofile() {
 }
 
 function rmrepofile() {
+  local repofile=$1
   rm -f ${repofile}
 }
 
@@ -174,7 +176,7 @@ function installdistro() {
   "
   local yum_cmd="yum ${yum_opts}"
 
-  mkrepofile
+  mkrepofile ${repofile}
 
   ${yum_cmd} groupinstall Core
   ${yum_cmd} install \
@@ -183,7 +185,7 @@ function installdistro() {
              vim-minimal
   ${yum_cmd} erase selinux*
 
-  rmrepofile
+  rmrepofile ${repofile}
 }
 
 function configure_mounting() {
