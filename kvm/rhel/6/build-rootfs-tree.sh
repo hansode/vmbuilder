@@ -92,42 +92,6 @@ function build_vers() {
   "
 }
 
-function do_cleanup() {
-  printf "[DEBUG] Caught signal\n"
-  umount -l ${chroot_dir}/proc
-  [ -d ${chroot_dir} ] && rm -rf ${chroot_dir}
-  [ -f ${repo} ] && rm -f ${repo}
-  printf "[DEBUG] Cleaned up\n"
-}
-
-function checkroot() {
-  [[ $UID -ne 0 ]] && {
-    echo "[ERROR] Must run as root." >&2
-    return 1
-  } || :
-}
-
-### prepare
-
-extract_args $*
-
-### read-only variables
-
-readonly abs_path=$(cd $(dirname $0) && pwd)
-
-## main
-
-build_vers
-checkroot
-cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
-
-# validate
-case "${distro_name}" in
-"")
-  echo "no mutch distro" >&2
-  exit 1;
-esac
-
 function banner() {
   cat <<-EOS
 	--------------------
@@ -139,7 +103,6 @@ function banner() {
 	--------------------
 	EOS
 }
-banner
 
 function yorn() {
   [ -n "${batch}" ] && {
@@ -153,12 +116,6 @@ function yorn() {
     n|N|no|NO) exit 1;;
   esac
 }
-yorn
-
-trap do_cleanup 1 2 3 15
-
-[ -d ${chroot_dir} ] && { echo "${chroot_dir} already exists." >&2; exit 1; }
-mkdir -p ${chroot_dir}
 
 function mkprocdir() {
   # /proc
@@ -166,7 +123,6 @@ function mkprocdir() {
   # mount -t proc none ${chroot_dir}/proc
   mount --bind /proc ${chroot_dir}/proc
 }
-mkprocdir
 
 function mkdevdir() {
   # /dev
@@ -175,9 +131,7 @@ function mkdevdir() {
    /sbin/MAKEDEV -d ${chroot_dir}/dev -x $i
   done
 }
-mkdevdir
 
-# yum
 function gen_yumrepo() {
   cat <<-EOS > ${repo}
 	[main]
@@ -203,7 +157,6 @@ function gen_yumrepo() {
 	gpgkey=${gpgkey}
 	EOS
 }
-gen_yumrepo
 
 function installdistro() {
   # install packages
@@ -214,7 +167,6 @@ function installdistro() {
              vim-minimal
   ${yum_cmd} erase selinux*
 }
-installdistro
 
 function configure_mounting() {
   # /etc/fstab
@@ -226,7 +178,6 @@ function configure_mounting() {
 	proc                    /proc                   proc    defaults        0 0
 	EOS
 }
-configure_mounting
 
 function configure_networking() {
   # /etc/hosts
@@ -251,19 +202,16 @@ function configure_networking() {
 	ONBOOT=yes
 	EOS
 }
-configure_networking
 
 function converting_passwd() {
   # passwd
   /usr/sbin/chroot ${chroot_dir} pwconv
 }
-converting_passwd
 
 function configure_tz() {
   # TimeZone
   /bin/cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
 }
-configure_tz
 
 function configure_service() {
   # needless services
@@ -272,7 +220,6 @@ function configure_service() {
      /usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --del ${svc}
    done
 }
-configure_service
 
 function installgrub() {
   #
@@ -282,7 +229,6 @@ function installgrub() {
     rsync -a ${grub_src_dir}/ ${chroot_dir}/boot/grub/
   done
 }
-installgrub
 
 function cleanup() {
   #
@@ -293,15 +239,71 @@ function cleanup() {
   rm -rf ${chroot_dir}/tmp/*
   rm -f  ${repo}
 }
-cleanup
 
 function umount_proc() {
   umount -l ${chroot_dir}/proc
 }
-umount_proc
+
+function do_cleanup() {
+  printf "[DEBUG] Caught signal\n"
+  umount -l ${chroot_dir}/proc
+  [ -d ${chroot_dir} ] && rm -rf ${chroot_dir}
+  [ -f ${repo} ] && rm -f ${repo}
+  printf "[DEBUG] Cleaned up\n"
+}
+
+function checkroot() {
+  [[ $UID -ne 0 ]] && {
+    echo "[ERROR] Must run as root." >&2
+    return 1
+  } || :
+}
 
 function task_finish() {
   printf "[INFO] Installed => %s\n" ${chroot_dir}
   printf "[INFO] Complete!\n"
 }
+
+### prepare
+
+extract_args $*
+
+### read-only variables
+
+readonly abs_path=$(cd $(dirname $0) && pwd)
+
+## main
+
+build_vers
+checkroot
+cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
+
+# validate
+case "${distro_name}" in
+"")
+  echo "no mutch distro" >&2
+  exit 1;
+esac
+
+banner
+yorn
+
+trap do_cleanup 1 2 3 15
+
+[ -d ${chroot_dir} ] && { echo "${chroot_dir} already exists." >&2; exit 1; }
+mkdir -p ${chroot_dir}
+
+mkprocdir
+mkdevdir
+
+gen_yumrepo
+installdistro
+configure_mounting
+configure_networking
+converting_passwd
+configure_tz
+configure_service
+installgrub
+cleanup
+umount_proc
 task_finish
