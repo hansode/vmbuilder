@@ -113,7 +113,7 @@ function mkdevdir() {
   local chroot_dir=$1
   mkdir ${chroot_dir}/dev
   for i in console null tty1 tty2 tty3 tty4 zero; do
-   /sbin/MAKEDEV -d ${chroot_dir}/dev -x $i
+    /sbin/MAKEDEV -d ${chroot_dir}/dev -x $i
   done
 }
 
@@ -132,7 +132,7 @@ function umount_proc() {
   umount -l ${chroot_dir}/proc
 }
 
-function gen_repofile() {
+function mkrepofile() {
   cat <<-EOS > ${repofile}
 	[main]
 	cachedir=/var/cache/yum
@@ -158,6 +158,10 @@ function gen_repofile() {
 	EOS
 }
 
+function rmrepofile() {
+  rm -f ${repofile}
+}
+
 function installdistro() {
   local chroot_dir=$1
 
@@ -170,7 +174,7 @@ function installdistro() {
   "
   local yum_cmd="yum ${yum_opts}"
 
-  gen_repofile
+  mkrepofile
 
   ${yum_cmd} groupinstall Core
   ${yum_cmd} install \
@@ -178,6 +182,8 @@ function installdistro() {
              passwd grub \
              vim-minimal
   ${yum_cmd} erase selinux*
+
+  rmrepofile
 }
 
 function configure_mounting() {
@@ -244,7 +250,6 @@ function cleanup() {
   rm -f  ${chroot_dir}/boot/grub/splash.xpm.gz
   find   ${chroot_dir}/var/log/ -type f | xargs rm
   rm -rf ${chroot_dir}/tmp/*
-  rm -f  ${repofile}
 }
 
 function do_cleanup() {
