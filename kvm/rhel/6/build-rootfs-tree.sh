@@ -117,19 +117,25 @@ function yorn() {
   esac
 }
 
-function mkprocdir() {
-  # /proc
-  mkdir ${chroot_dir}/proc
-  # mount -t proc none ${chroot_dir}/proc
-  mount --bind /proc ${chroot_dir}/proc
-}
-
 function mkdevdir() {
   # /dev
   mkdir ${chroot_dir}/dev
   for i in console null tty1 tty2 tty3 tty4 zero; do
    /sbin/MAKEDEV -d ${chroot_dir}/dev -x $i
   done
+}
+
+function mkprocdir() {
+  # /proc
+  mkdir ${chroot_dir}/proc
+}
+
+function mount_proc() {
+  mount --bind /proc ${chroot_dir}/proc
+}
+
+function umount_proc() {
+  umount -l ${chroot_dir}/proc
 }
 
 function gen_yumrepo() {
@@ -240,10 +246,6 @@ function cleanup() {
   rm -f  ${repo}
 }
 
-function umount_proc() {
-  umount -l ${chroot_dir}/proc
-}
-
 function do_cleanup() {
   printf "[DEBUG] Caught signal\n"
   umount -l ${chroot_dir}/proc
@@ -298,9 +300,12 @@ trap do_cleanup 1 2 3 15
 [ -d ${chroot_dir} ] && { echo "${chroot_dir} already exists." >&2; exit 1; }
 mkdir -p ${chroot_dir}
 
-mkprocdir
 mkdevdir
+mkprocdir
+mount_proc
+
 gen_yumrepo
+
 installdistro
 configure_mounting
 configure_networking
@@ -309,5 +314,6 @@ configure_tz
 configure_service
 installgrub
 cleanup
+
 umount_proc
 task_finish
