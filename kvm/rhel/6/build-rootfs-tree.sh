@@ -82,14 +82,6 @@ function build_vers() {
   esac
 
   repo=${abs_path}/yum-${distro_short}-${distro_ver}.repo
-  yum_cmd="
-    yum \
-     -c ${repo} \
-     --disablerepo="\*" \
-     --enablerepo="${distro_short}" \
-     --installroot=${chroot_dir} \
-     -y
-  "
 }
 
 function banner() {
@@ -167,6 +159,17 @@ function gen_yumrepo() {
 }
 
 function installdistro() {
+  local chroot_dir=$1
+
+  local yum_opts="
+     -c ${repo} \
+     --disablerepo="\*" \
+     --enablerepo="${distro_short}" \
+     --installroot=${chroot_dir} \
+     -y
+  "
+  local yum_cmd="yum ${yum_opts}"
+
   ${yum_cmd} groupinstall Core
   ${yum_cmd} install \
              kernel dracut openssh openssh-clients openssh-server rpm yum curl dhclient \
@@ -303,7 +306,7 @@ mount_proc ${chroot_dir}
 
 gen_yumrepo
 
-installdistro
+installdistro        ${chroot_dir}
 configure_mounting   ${chroot_dir}
 configure_networking ${chroot_dir}
 configure_passwd     ${chroot_dir}
