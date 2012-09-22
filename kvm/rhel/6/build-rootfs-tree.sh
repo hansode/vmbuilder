@@ -104,8 +104,8 @@ function yorn() {
     read yorn
     echo ${yorn}
   }
-  case ${yorn} in
-    n|N|no|NO) exit 1;;
+  case "${yorn}" in
+    ""|n|N|no|NO) return 1 ;;
   esac
 }
 
