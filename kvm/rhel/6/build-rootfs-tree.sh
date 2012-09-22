@@ -209,7 +209,7 @@ function configure_networking() {
 	EOS
 }
 
-function converting_passwd() {
+function configure_passwd() {
   # passwd
   /usr/sbin/chroot ${chroot_dir} pwconv
 }
@@ -309,7 +309,7 @@ gen_yumrepo
 installdistro
 configure_mounting
 configure_networking
-converting_passwd
+configure_passwd
 configure_tz
 configure_service
 installgrub
