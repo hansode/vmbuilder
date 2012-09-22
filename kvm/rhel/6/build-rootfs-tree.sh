@@ -118,7 +118,6 @@ function yorn() {
 }
 
 function mkdevdir() {
-  # /dev
   mkdir ${chroot_dir}/dev
   for i in console null tty1 tty2 tty3 tty4 zero; do
    /sbin/MAKEDEV -d ${chroot_dir}/dev -x $i
@@ -126,7 +125,6 @@ function mkdevdir() {
 }
 
 function mkprocdir() {
-  # /proc
   mkdir ${chroot_dir}/proc
 }
 
@@ -165,7 +163,6 @@ function gen_yumrepo() {
 }
 
 function installdistro() {
-  # install packages
   ${yum_cmd} groupinstall Core
   ${yum_cmd} install \
              kernel dracut openssh openssh-clients openssh-server rpm yum curl dhclient \
@@ -175,7 +172,6 @@ function installdistro() {
 }
 
 function configure_mounting() {
-  # /etc/fstab
   cat <<-EOS > ${chroot_dir}/etc/fstab
 	${root_dev}             /                       ext4    defaults        1 1
 	tmpfs                   /dev/shm                tmpfs   defaults        0 0
@@ -186,22 +182,18 @@ function configure_mounting() {
 }
 
 function configure_networking() {
-  # /etc/hosts
   cat <<-EOS > ${chroot_dir}/etc/hosts
 	127.0.0.1       localhost
 	EOS
 
-  # /etc/resolv.conf
   cat <<-EOS > ${chroot_dir}/etc/resolv.conf
 	nameserver 8.8.8.8
 	EOS
 
-  # /etc/sysconfig/network
   cat <<-EOS > ${chroot_dir}/etc/sysconfig/network
 	NETWORKING=yes
 	EOS
 
-  # /etc/sysconfig/network-scripts/ifcfg-eth0
   cat <<-EOS > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
 	DEVICE=eth0
 	BOOTPROTO=dhcp
@@ -210,25 +202,21 @@ function configure_networking() {
 }
 
 function configure_passwd() {
-  # passwd
   /usr/sbin/chroot ${chroot_dir} pwconv
 }
 
 function configure_tz() {
-  # TimeZone
   /bin/cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
 }
 
 function configure_service() {
-  # needless services
-  /usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --list |grep -v :on |\
+  /usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --list | grep -v :on |\
    while read svc dummy; do
      /usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --del ${svc}
    done
 }
 
 function installgrub() {
-  #
   for grub_distro_name in redhat unknown; do
     grub_src_dir=${chroot_dir}/usr/share/grub/${basearch}-${grub_distro_name}
     [ -d ${grub_src_dir} ] || continue
@@ -237,9 +225,6 @@ function installgrub() {
 }
 
 function cleanup() {
-  #
-  # clean-up
-  #
   rm -f  ${chroot_dir}/boot/grub/splash.xpm.gz
   find   ${chroot_dir}/var/log/ -type f | xargs rm
   rm -rf ${chroot_dir}/tmp/*
