@@ -252,6 +252,13 @@ function do_cleanup() {
   printf "[DEBUG] Cleaned up\n"
 }
 
+## task
+
+function task_finish() {
+  printf "[INFO] Installed => %s\n" ${chroot_dir}
+  printf "[INFO] Complete!\n"
+}
+
 function checkroot() {
   [[ $UID -ne 0 ]] && {
     echo "[ERROR] Must run as root." >&2
@@ -259,9 +266,13 @@ function checkroot() {
   } || :
 }
 
-function task_finish() {
-  printf "[INFO] Installed => %s\n" ${chroot_dir}
-  printf "[INFO] Complete!\n"
+function checkdistrodir() {
+  case "${distro_name}" in
+  "")
+    echo "no mutch distro" >&2
+    return 1
+    ;;
+  esac
 }
 
 ### prepare
@@ -276,14 +287,8 @@ readonly abs_path=$(cd $(dirname $0) && pwd)
 
 build_vers
 checkroot
+checkdistrodir
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
-
-# validate
-case "${distro_name}" in
-"")
-  echo "no mutch distro" >&2
-  exit 1;
-esac
 
 banner
 yorn
@@ -295,7 +300,6 @@ mkdir -p ${chroot_dir}
 
 mkprocdir
 mkdevdir
-
 gen_yumrepo
 installdistro
 configure_mounting
