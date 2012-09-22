@@ -81,7 +81,7 @@ function build_vers() {
   *)    keepcache=0 ;;
   esac
 
-  repo=${abs_path}/yum-${distro_short}-${distro_ver}.repo
+  repofile=${abs_path}/yum-${distro_short}-${distro_ver}.repo
 }
 
 function banner() {
@@ -132,8 +132,8 @@ function umount_proc() {
   umount -l ${chroot_dir}/proc
 }
 
-function gen_yumrepo() {
-  cat <<-EOS > ${repo}
+function gen_repofile() {
+  cat <<-EOS > ${repofile}
 	[main]
 	cachedir=/var/cache/yum
 	keepcache=${keepcache}
@@ -162,13 +162,15 @@ function installdistro() {
   local chroot_dir=$1
 
   local yum_opts="
-     -c ${repo} \
+     -c ${repofile} \
      --disablerepo="\*" \
      --enablerepo="${distro_short}" \
      --installroot=${chroot_dir} \
      -y
   "
   local yum_cmd="yum ${yum_opts}"
+
+  gen_repofile
 
   ${yum_cmd} groupinstall Core
   ${yum_cmd} install \
@@ -242,7 +244,7 @@ function cleanup() {
   rm -f  ${chroot_dir}/boot/grub/splash.xpm.gz
   find   ${chroot_dir}/var/log/ -type f | xargs rm
   rm -rf ${chroot_dir}/tmp/*
-  rm -f  ${repo}
+  rm -f  ${repofile}
 }
 
 function do_cleanup() {
@@ -250,7 +252,7 @@ function do_cleanup() {
   printf "[DEBUG] Caught signal\n"
   umount -l ${chroot_dir}/proc
   [ -d ${chroot_dir} ] && rm -rf ${chroot_dir}
-  [ -f ${repo} ] && rm -f ${repo}
+  [ -f ${repofile} ] && rm -f ${repofile}
   printf "[DEBUG] Cleaned up\n"
 }
 
@@ -303,8 +305,6 @@ mkdir -p ${chroot_dir}
 mkdevdir   ${chroot_dir}
 mkprocdir  ${chroot_dir}
 mount_proc ${chroot_dir}
-
-gen_yumrepo
 
 installdistro        ${chroot_dir}
 configure_mounting   ${chroot_dir}
