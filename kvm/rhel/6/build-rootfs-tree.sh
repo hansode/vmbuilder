@@ -128,28 +128,32 @@ case "${distro_name}" in
   exit 1;
 esac
 
-# dump vars
-cat <<EOS
---------------------
-distro_arch: ${distro_arch}
-distro_name: ${distro_name} ${distro_snake}
-distro_ver:  ${distro_ver}
-chroot_dir:  ${chroot_dir}
-keepcache:   ${keepcache}
---------------------
-EOS
-
-[ -n "${batch}" ] && {
-  yorn=y
-} || {
-  echo -n "OK? [y/n] "
-  read yorn
-  echo ${yorn}
+function banner() {
+  cat <<-EOS
+	--------------------
+	distro_arch: ${distro_arch}
+	distro_name: ${distro_name} ${distro_snake}
+	distro_ver:  ${distro_ver}
+	chroot_dir:  ${chroot_dir}
+	keepcache:   ${keepcache}
+	--------------------
+	EOS
 }
+banner
 
-case ${yorn} in
-  n|N|no|NO) exit 1;;
-esac
+function yorn() {
+  [ -n "${batch}" ] && {
+    yorn=y
+  } || {
+    echo -n "OK? [y/n] "
+    read yorn
+    echo ${yorn}
+  }
+  case ${yorn} in
+    n|N|no|NO) exit 1;;
+  esac
+}
+yorn
 
 trap do_cleanup 1 2 3 15
 
