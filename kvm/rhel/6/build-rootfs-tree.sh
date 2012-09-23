@@ -259,7 +259,7 @@ function do_cleanup() {
   printf "[DEBUG] Caught signal\n"
   umount -l ${chroot_dir}/proc
   [ -d ${chroot_dir} ] && rm -rf ${chroot_dir}
-  [ -f ${repofile} ] && rm -f ${repofile}
+  [ -f ${repofile} ] && rmrepofile ${repofile}
   printf "[DEBUG] Cleaned up\n"
 }
 
