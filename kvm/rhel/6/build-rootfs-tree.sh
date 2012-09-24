@@ -278,7 +278,7 @@ function cleanup() {
   rm -rf ${chroot_dir}/tmp/*
 }
 
-function do_cleanup() {
+function task_trap() {
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   printf "[DEBUG] Caught signal\n"
   umount_proc ${chroot_dir}
@@ -359,7 +359,7 @@ checkdistrodir
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
 
-trap do_cleanup 1 2 3 15
+trap task_trap 1 2 3 15
 
 case "${cmd}" in
 prep)
