@@ -358,7 +358,6 @@ checkroot
 checkdistrodir
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
-
 trap task_trap 1 2 3 15
 
 case "${cmd}" in
