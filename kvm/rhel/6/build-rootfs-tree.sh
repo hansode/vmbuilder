@@ -278,15 +278,6 @@ function cleanup() {
   rm -rf ${chroot_dir}/tmp/*
 }
 
-function task_trap() {
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  printf "[DEBUG] Caught signal\n"
-  umount_proc ${chroot_dir}
-  [ -d ${chroot_dir} ] && rm -rf ${chroot_dir}
-  [ -f ${repofile} ] && rmrepofile ${repofile}
-  printf "[DEBUG] Cleaned up\n"
-}
-
 ## task
 
 function task_prep() {
@@ -325,6 +316,15 @@ function task_clean() {
 function task_finish() {
   printf "[INFO] Installed => %s\n" ${chroot_dir}
   printf "[INFO] Complete!\n"
+}
+
+function task_trap() {
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  printf "[DEBUG] Caught signal\n"
+  umount_proc ${chroot_dir}
+  [ -d ${chroot_dir} ] && rm -rf ${chroot_dir}
+  [ -f ${repofile} ] && rmrepofile ${repofile}
+  printf "[DEBUG] Cleaned up\n"
 }
 
 function checkroot() {
