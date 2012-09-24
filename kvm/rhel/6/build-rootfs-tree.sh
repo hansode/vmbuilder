@@ -167,6 +167,7 @@ function mkrepofile() {
 
 function rmrepofile() {
   local repofile=$1
+  [[ -a ${repofile} ]] || { echo "file not found: ${repofile}" >&2; return 1; }
   rm -f ${repofile}
 }
 
