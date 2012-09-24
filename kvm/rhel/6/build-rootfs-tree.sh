@@ -271,7 +271,6 @@ function installgrub() {
 function cleanup() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  rm -f  ${chroot_dir}/boot/grub/splash.xpm.gz
   find   ${chroot_dir}/var/log/ -type f | xargs rm
   rm -rf ${chroot_dir}/tmp/*
 }
