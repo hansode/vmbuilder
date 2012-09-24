@@ -279,7 +279,6 @@ function cleanup() {
 }
 
 function do_cleanup() {
-  local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   printf "[DEBUG] Caught signal\n"
   umount_proc ${chroot_dir}
