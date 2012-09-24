@@ -53,7 +53,7 @@ function build_vers() {
   centos)
     distro_short=centos
     distro_snake=CentOS
-    baseurl=http://ftp.riken.go.jp/pub/Linux/centos/${distro_ver}/os/${basearch}
+    baseurl=${baseurl:-http://ftp.riken.go.jp/pub/Linux/centos/${distro_ver}/os/${basearch}}
     case "${distro_ver}" in
     6|6.*)
       gpgkey="${baseurl}/RPM-GPG-KEY-${distro_snake}-6"
@@ -63,7 +63,7 @@ function build_vers() {
   sl|scientific|scientificlinux)
     distro_short=sl
     distro_snake="Scientific Linux"
-    baseurl=http://ftp.riken.go.jp/pub/Linux/scientific/${distro_ver}/${basearch}/os
+    baseurl=${baseurl:-http://ftp.riken.go.jp/pub/Linux/scientific/${distro_ver}/${basearch}/os}
     case "${distro_ver}" in
     6|6.*)
       gpgkey="${baseurl}/RPM-GPG-KEY-sl ${baseurl}/RPM-GPG-KEY-sl6"
@@ -92,6 +92,7 @@ function banner() {
 	distro_ver:  ${distro_ver}
 	chroot_dir:  ${chroot_dir}
 	keepcache:   ${keepcache}
+	baseurl:     ${baseurl}
 	--------------------
 	EOS
 }
