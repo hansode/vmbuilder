@@ -56,7 +56,7 @@ function build_vers() {
     baseurl=${baseurl:-http://ftp.riken.go.jp/pub/Linux/centos/${distro_ver}/os/${basearch}}
     case "${distro_ver}" in
     6|6.*)
-      gpgkey="${baseurl}/RPM-GPG-KEY-${distro_snake}-6"
+      gpgkey="${gpgkey:-${baseurl}/RPM-GPG-KEY-${distro_snake}-6}"
       ;;
     esac
     ;;
@@ -66,7 +66,7 @@ function build_vers() {
     baseurl=${baseurl:-http://ftp.riken.go.jp/pub/Linux/scientific/${distro_ver}/${basearch}/os}
     case "${distro_ver}" in
     6|6.*)
-      gpgkey="${baseurl}/RPM-GPG-KEY-sl ${baseurl}/RPM-GPG-KEY-sl6"
+      gpgkey="${gpgkey:-${baseurl}/RPM-GPG-KEY-sl ${baseurl}/RPM-GPG-KEY-sl6}"
       ;;
     esac
     ;;
@@ -93,6 +93,7 @@ function banner() {
 	chroot_dir:  ${chroot_dir}
 	keepcache:   ${keepcache}
 	baseurl:     ${baseurl}
+	gpgkey:      ${gpgkey}
 	--------------------
 	EOS
 }
