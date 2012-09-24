@@ -287,6 +287,39 @@ function do_cleanup() {
 
 ## task
 
+function task_prep() {
+  [ -d ${chroot_dir} ] && { echo "${chroot_dir} already exists." >&2; return 1; } || :
+  banner
+  yorn
+
+  mkdir -p ${chroot_dir}
+}
+
+function task_setup() {
+  mkdevdir  ${chroot_dir}
+  mkprocdir ${chroot_dir}
+}
+
+function task_install() {
+  mount_proc ${chroot_dir}
+
+  installdistro        ${chroot_dir}
+  configure_mounting   ${chroot_dir}
+  configure_networking ${chroot_dir}
+  configure_passwd     ${chroot_dir}
+  configure_tz         ${chroot_dir}
+  configure_service    ${chroot_dir}
+  installgrub          ${chroot_dir}
+  cleanup              ${chroot_dir}
+
+  umount_proc ${chroot_dir}
+}
+
+function task_clean() {
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  rm -rf ${chroot_dir}
+}
+
 function task_finish() {
   printf "[INFO] Installed => %s\n" ${chroot_dir}
   printf "[INFO] Complete!\n"
@@ -323,26 +356,33 @@ checkroot
 checkdistrodir
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
-banner
-yorn
 
 trap do_cleanup 1 2 3 15
 
-[ -d ${chroot_dir} ] && { echo "${chroot_dir} already exists." >&2; exit 1; }
-mkdir -p ${chroot_dir}
-
-mkdevdir   ${chroot_dir}
-mkprocdir  ${chroot_dir}
-mount_proc ${chroot_dir}
-
-installdistro        ${chroot_dir}
-configure_mounting   ${chroot_dir}
-configure_networking ${chroot_dir}
-configure_passwd     ${chroot_dir}
-configure_tz         ${chroot_dir}
-configure_service    ${chroot_dir}
-installgrub          ${chroot_dir}
-cleanup              ${chroot_dir}
-
-umount_proc ${chroot_dir}
-task_finish
+case "${cmd}" in
+prep)
+  task_prep
+  ;;
+setup)
+  task_setup
+  ;;
+install)
+  task_install
+  ;;
+post)
+  task_finish
+  ;;
+clean)
+  task_clean
+  ;;
+*)
+  # %prep
+  task_prep
+  # %setup
+  task_setup
+  # %install
+  task_install
+  # %post
+  task_finish
+  ;;
+esac
