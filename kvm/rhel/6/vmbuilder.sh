@@ -149,7 +149,7 @@ function dump_vers() {
 	dns="${dns}"
 	hostname="${hostname}"
 	# required commands
-	build_rootfs_tree_sh="${build_rootfs_tree_sh}"
+	cebootstrap_sh="${cebootstrap_sh}"
 	cat="${cat}"
 	truncate="${truncate}"
 	dd="${dd}"
@@ -203,7 +203,7 @@ function build_vers() {
   esac
 
   # requires:
-  build_rootfs_tree_sh=${build_rootfs_tree_sh:-"${abs_path}/build-rootfs-tree.sh"}
+  cebootstrap_sh=${cebootstrap_sh:-"${abs_path}/cebootstrap.sh"}
   cat=${cat:-"cat"}
   truncate=${truncate:-"truncate"}
   dd=${dd-"dd"}
@@ -231,7 +231,7 @@ function build_vers() {
   dmsetup=${dmsetup:-"dmsetup"}
 
   [[ -n ${dry_run} ]] && {
-    build_rootfs_tree_sh="echo ${abs_path}/build-rootfs-tree.sh"
+    cebootstrap_sh="echo ${abs_path}/cebootstrap.sh"
     cat="echo ${cat}"
     truncate="echo ${truncate}"
     dd="echo ${dd}"
@@ -329,7 +329,7 @@ function mkrootfs() {
     printf "[INFO] already exists: %s\n" ${distro_dir}
   } || {
     printf "[INFO] Building OS tree: %s\n" ${distro_dir}
-    ${build_rootfs_tree_sh} \
+    ${cebootstrap_sh} \
      --distro-name=${distro_name} \
      --distro-ver=${distro_ver}   \
      --distro-arch=${distro_arch} \
