@@ -113,6 +113,7 @@ function yorn() {
 
 function mkdevdir() {
   local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   mkdir ${chroot_dir}/dev
   for i in console null tty1 tty2 tty3 tty4 zero; do
     /sbin/MAKEDEV -d ${chroot_dir}/dev -x $i
@@ -121,16 +122,19 @@ function mkdevdir() {
 
 function mkprocdir() {
   local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   mkdir ${chroot_dir}/proc
 }
 
 function mount_proc() {
   local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   mount --bind /proc ${chroot_dir}/proc
 }
 
 function umount_proc() {
   local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   umount -l ${chroot_dir}/proc
 }
 
@@ -168,6 +172,7 @@ function rmrepofile() {
 
 function installdistro() {
   local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
 
   local yum_opts="
      -c ${repofile} \
@@ -192,6 +197,7 @@ function installdistro() {
 
 function configure_mounting() {
   local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   cat <<-EOS > ${chroot_dir}/etc/fstab
 	${root_dev}             /                       ext4    defaults        1 1
 	tmpfs                   /dev/shm                tmpfs   defaults        0 0
@@ -203,6 +209,7 @@ function configure_mounting() {
 
 function configure_networking() {
   local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   cat <<-EOS > ${chroot_dir}/etc/hosts
 	127.0.0.1       localhost
 	EOS
@@ -224,16 +231,19 @@ function configure_networking() {
 
 function configure_passwd() {
   local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   /usr/sbin/chroot ${chroot_dir} pwconv
 }
 
 function configure_tz() {
   local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   /bin/cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
 }
 
 function configure_service() {
   local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   /usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --list | grep -v :on |\
    while read svc dummy; do
      /usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --del ${svc}
@@ -242,6 +252,7 @@ function configure_service() {
 
 function installgrub() {
   local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   for grub_distro_name in redhat unknown; do
     grub_src_dir=${chroot_dir}/usr/share/grub/${basearch}-${grub_distro_name}
     [ -d ${grub_src_dir} ] || continue
@@ -251,6 +262,7 @@ function installgrub() {
 
 function cleanup() {
   local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   rm -f  ${chroot_dir}/boot/grub/splash.xpm.gz
   find   ${chroot_dir}/var/log/ -type f | xargs rm
   rm -rf ${chroot_dir}/tmp/*
@@ -258,6 +270,7 @@ function cleanup() {
 
 function do_cleanup() {
   local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   printf "[DEBUG] Caught signal\n"
   umount -l ${chroot_dir}/proc
   [ -d ${chroot_dir} ] && rm -rf ${chroot_dir}
