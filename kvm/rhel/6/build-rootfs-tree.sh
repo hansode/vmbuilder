@@ -2,6 +2,13 @@
 #
 # requires:
 #  bash
+#  tr, dirname, pwd
+#  sed, head
+#  arch, cat
+#  mount, umount, MAKEDEV, yum, chkconfig
+#  chroot, pwconv
+#  mkdir, cp, rm, rsync, find
+#  grep, xargs, printf
 #
 # OPTIONS
 #        --distro-arch=[x86_64 | i686]
