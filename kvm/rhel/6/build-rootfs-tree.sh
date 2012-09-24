@@ -116,7 +116,7 @@ function mkdevdir() {
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   mkdir ${chroot_dir}/dev
   for i in console null tty1 tty2 tty3 tty4 zero; do
-    /sbin/MAKEDEV -d ${chroot_dir}/dev -x $i
+    MAKEDEV -d ${chroot_dir}/dev -x $i
   done
 }
 
@@ -233,21 +233,21 @@ function configure_networking() {
 function configure_passwd() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  /usr/sbin/chroot ${chroot_dir} pwconv
+  chroot ${chroot_dir} pwconv
 }
 
 function configure_tz() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  /bin/cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
+  cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
 }
 
 function configure_service() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  /usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --list | grep -v :on |\
+  chroot ${chroot_dir} chkconfig --list | grep -v :on |\
   while read svc dummy; do
-    /usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --del ${svc}
+    chroot ${chroot_dir} chkconfig --del ${svc}
   done
 }
 
