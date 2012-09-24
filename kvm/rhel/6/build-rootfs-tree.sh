@@ -280,7 +280,7 @@ function do_cleanup() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   printf "[DEBUG] Caught signal\n"
-  umount -l ${chroot_dir}/proc
+  umount_proc ${chroot_dir}
   [ -d ${chroot_dir} ] && rm -rf ${chroot_dir}
   [ -f ${repofile} ] && rmrepofile ${repofile}
   printf "[DEBUG] Cleaned up\n"
