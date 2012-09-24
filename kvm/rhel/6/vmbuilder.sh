@@ -105,14 +105,14 @@ function extract_args() {
   CMD_ARGS=
   for arg in $*; do
     case $arg in
-      --*=*)
-        key=${arg%%=*}; key=$(echo ${key##--} | tr - _)
-        value=${arg##--*=}
-        eval "${key}=\"${value}\""
-        ;;
-      *)
-        CMD_ARGS="${CMD_ARGS} ${arg}"
-        ;;
+    --*=*)
+      key=${arg%%=*}; key=$(echo ${key##--} | tr - _)
+      value=${arg##--*=}
+      eval "${key}=\"${value}\""
+      ;;
+    *)
+      CMD_ARGS="${CMD_ARGS} ${arg}"
+      ;;
     esac
   done
   # trim
