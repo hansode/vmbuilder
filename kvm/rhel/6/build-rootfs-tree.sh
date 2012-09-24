@@ -142,7 +142,10 @@ function mount_proc() {
 function umount_proc() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  umount -l ${chroot_dir}/proc
+  egrep ${chroot_dir}/ /etc/mtab | awk '{print $2}' | while read mountpoint; do
+    printf "[DEBUG] Unmounting %s\n" ${mountpoint}
+    umount ${mountpoint}
+  done
 }
 
 function mkrepofile() {
