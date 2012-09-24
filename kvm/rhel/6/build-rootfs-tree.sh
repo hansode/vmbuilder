@@ -246,9 +246,9 @@ function configure_service() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   /usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --list | grep -v :on |\
-   while read svc dummy; do
-     /usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --del ${svc}
-   done
+  while read svc dummy; do
+    /usr/sbin/chroot ${chroot_dir} /sbin/chkconfig --del ${svc}
+  done
 }
 
 function installgrub() {
