@@ -77,6 +77,10 @@ function build_vers() {
       ;;
     esac
     ;;
+  *)
+    echo "no mutch distro" >&2
+    return 1
+    ;;
   esac
 
   chroot_dir=${chroot_dir:-${abs_dirname}/${distro_short}-${distro_ver}_${distro_arch}}
@@ -334,15 +338,6 @@ function checkroot() {
   } || :
 }
 
-function checkdistrodir() {
-  case "${distro_name}" in
-  "")
-    echo "no mutch distro" >&2
-    return 1
-    ;;
-  esac
-}
-
 ### prepare
 
 extract_args $*
@@ -355,7 +350,6 @@ readonly abs_dirname=$(cd $(dirname $0) && pwd)
 
 build_vers
 checkroot
-checkdistrodir
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
 trap task_trap 1 2 3 15
