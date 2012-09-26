@@ -335,8 +335,7 @@ function mkrootfs() {
      --distro-arch=${distro_arch} \
      --chroot-dir=${distro_dir}   \
      --keepcache=${keepcache}     \
-     --batch=1                    \
-     --debug=1
+     --batch=1
   }
 }
 
