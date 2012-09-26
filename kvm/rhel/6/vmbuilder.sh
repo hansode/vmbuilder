@@ -148,33 +148,6 @@ function dump_vers() {
 	gw="${gw}"
 	dns="${dns}"
 	hostname="${hostname}"
-	# required commands
-	cebootstrap_sh="${cebootstrap_sh}"
-	cat="${cat}"
-	truncate="${truncate}"
-	dd="${dd}"
-	parted="${parted}"
-	kpartx="${kpartx}"
-	udevadm="${udevadm}"
-	blkid="${blkid}"
-	mkfs="${mkfs}"
-	tune2fs="${tune2fs}"
-	mkswap="${mkswap}"
-	mount="${mount}"
-	umount"=${umount}"
-	mkdir="${mkdir}"
-	rmdir="${rmdir}"
-	rsync="${rsync}"
-	sync="${sync}"
-	sed="${sed}"
-	touch="${touch}"
-	ln="${ln}"
-	rm="${rm}"
-	chroot="${chroot}"
-	grub="${grub}"
-	setarch="${setarch}"
-	losetup="${losetup}"
-	dmsetup="${dmsetup}"
 	EOS
 }
 
@@ -201,63 +174,6 @@ function build_vers() {
   [01]) ;;
   *)    keepcache=0 ;;
   esac
-
-  # requires:
-  cebootstrap_sh=${cebootstrap_sh:-"${abs_dirname}/cebootstrap.sh"}
-  cat=${cat:-"cat"}
-  truncate=${truncate:-"truncate"}
-  dd=${dd-"dd"}
-  parted=${parted:-"parted"}
-  kpartx=${kpartx:-"kpartx"}
-  udevadm=${udevadm:-"udevadm"}
-  blkid=${blkid:-"blkid"}
-  mkfs=${mkfs:-"mkfs.ext4"}
-  tune2fs=${tune2fs:-"tune2fs"}
-  mkswap=${mkswap:-"mkswap"}
-  mount=${mount:-"mount"}
-  umount=${umount:-"umount"}
-  mkdir=${mkdir:-"mkdir"}
-  rmdir=${rmdir:-"rmdir"}
-  rsync=${rsync:-"rsync"}
-  sync=${sync:-"sync"}
-  sed=${sed:-"sed"}
-  touch=${touch:-"touch"}
-  ln=${ln:-"ln"}
-  rm=${rm:-"rm"}
-  chroot=${chroot:-"chroot"}
-  grub=${grub:-"grub"}
-  setarch=${setarch:-"setarch"}
-  losetup=${losetup:-"losetup"}
-  dmsetup=${dmsetup:-"dmsetup"}
-
-  [[ -n ${dry_run} ]] && {
-    cebootstrap_sh="echo ${abs_dirname}/cebootstrap.sh"
-    cat="echo ${cat}"
-    truncate="echo ${truncate}"
-    dd="echo ${dd}"
-    parted="echo ${parted}"
-    kpartx="echo ${kpartx}"
-    udevadm="echo ${udevadm}"
-    blkid="echo ${blkid}"
-    mkfs="echo ${mkfs}"
-    tune2fs="echo ${tune2fs}"
-    mkswap="echo ${mkswap}"
-    mount="echo ${mount}"
-    umount="echo ${umount}"
-    mkdir="echo ${mkdir}"
-    rmdir="echo ${rmdir}"
-    rsync="echo ${rsync}"
-    sync="echo ${sync}"
-    sed="echo ${sed}"
-    touch="echo ${touch}"
-    ln="echo ${ln}"
-    rm="echo ${rm}"
-    chroot="echo ${chroot}"
-    grub="echo ${grub}"
-    setarch="echo ${setarch}"
-    losetup="echo ${losetup}"
-    dmsetup="echo ${dmsetup}"
-  } || :
 
   # * tune2fs
   # > This filesystem will be automatically checked every 37 mounts or 180 days, whichever comes first.
@@ -317,7 +233,7 @@ function ppartuuid() {
   local disk_filename=$1 mountpoint=$2
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   local part_filename=$(ppartpath ${disk_filename} ${mountpoint})
-  ${blkid} -c /dev/null -sUUID -ovalue ${part_filename}
+  blkid -c /dev/null -sUUID -ovalue ${part_filename}
 }
 
 ## rootfs tree
@@ -329,7 +245,7 @@ function mkrootfs() {
     printf "[INFO] already exists: %s\n" ${distro_dir}
   } || {
     printf "[INFO] Building OS tree: %s\n" ${distro_dir}
-    ${cebootstrap_sh} \
+    ${abs_dirname}/cebootstrap.sh \
      --distro-name=${distro_name} \
      --distro-ver=${distro_ver}   \
      --distro-arch=${distro_arch} \
@@ -344,13 +260,13 @@ function mkrootfs() {
 function mkdisk() {
   local disk_filename=$1 size=$2 unit=${3:-m}
   [[ -a ${disk_filename} ]] && { echo "already exists: ${disk_filename}" >&2; return 1; }
-  ${truncate} -s ${size}${unit} ${disk_filename}
+  truncate -s ${size}${unit} ${disk_filename}
 }
 
 function rmdisk() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  ${rm} -f ${disk_filename}
+  rm -f ${disk_filename}
 }
 
 ## mbr(master boot record)
@@ -358,7 +274,7 @@ function rmdisk() {
 function rmmbr() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  ${dd} if=/dev/zero of=${disk_filename} bs=512 count=1
+  dd if=/dev/zero of=${disk_filename} bs=512 count=1
 }
 
 ## ptab
@@ -366,9 +282,9 @@ function rmmbr() {
 function xptabinfo() {
   {
     [[ -n "${xpart}" ]] && [[ -f "${xpart}" ]] && {
-      ${cat} ${xpart}
+      cat ${xpart}
     } || {
-      ${cat} <<-EOS
+      cat <<-EOS
 	#
 	# totalsize:${totalsize}
 	#
@@ -400,7 +316,7 @@ function mkpart() {
 
   local partition_start=${offset}
   local partition_end=$((${offset} + ${size} - 1))
-  local previous_partition=$(${parted} --script -- ${disk_filename} unit s print | egrep -v '^$' | awk '$1 ~ "^[1-9]+"' | tail -1)
+  local previous_partition=$(parted --script -- ${disk_filename} unit s print | egrep -v '^$' | awk '$1 ~ "^[1-9]+"' | tail -1)
 
   case "${previous_partition}" in
   # 1st primary
@@ -420,9 +336,9 @@ function mkpart() {
   }
 
   printf "[INFO] Adding type %s partition to disk image: %s\n" ${fstype} ${disk_filename}
-  ${parted} --script -- ${disk_filename} mkpart ${parttype} ${fstype} ${partition_start} ${partition_end}
+  parted --script -- ${disk_filename} mkpart ${parttype} ${fstype} ${partition_start} ${partition_end}
   # for physical /dev/XXX
-  ${udevadm} settle
+  udevadm settle
 }
 
 function mkptab() {
@@ -430,7 +346,7 @@ function mkptab() {
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
 
   printf "[INFO] Adding partition table to disk image: %s\n" ${disk_filename}
-  ${parted} --script ${disk_filename} mklabel msdos
+  parted --script ${disk_filename} mklabel msdos
 
   local i=1 offset=0 parttype=
   xptabproc <<'EOS'
@@ -449,7 +365,7 @@ function mkptab() {
       # extended partition ses other whole disk. "-1" measn whole disk in parted command.
       mkpart ${disk_filename} ${parttype} ${offset} -1
       # disable lba flagg
-      ${parted} --script -- ${disk_filename} set ${i} lba off
+      parted --script -- ${disk_filename} set ${i} lba off
       parttype=logical
       ;;
     *)
@@ -463,7 +379,7 @@ function mkptab() {
     case "${mountpoint}" in
     /boot)
       # set boot flag
-      ${parted} --script -- ${disk_filename} set ${i} boot on
+      parted --script -- ${disk_filename} set ${i} boot on
       ;;
     esac
 
@@ -474,14 +390,14 @@ EOS
 function mapptab() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  ${kpartx} -va ${disk_filename} && ${udevadm} settle
+  kpartx -va ${disk_filename} && udevadm settle
   # add map loop0p1 (253:3): 0 1998013 linear /dev/loop0 34
 }
 
 function unmapptab() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  ${kpartx} -vd ${disk_filename}
+  kpartx -vd ${disk_filename}
   # del devmap : loop0p1
 }
 
@@ -500,7 +416,7 @@ function unmapptab_r() {
 function lsdevmap() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  ${kpartx} -l ${disk_filename} \
+  kpartx -l ${disk_filename} \
    | egrep -v "^(gpt|dos):" \
    | awk '{print $1}'
 }
@@ -532,21 +448,21 @@ function mkfs2vm() {
     swap)
       # > mkswap: /dev/mapper/loop0p7: warning: don't erase bootbits sectors
       # >  on whole disk. Use -f to force.
-      ${mkswap} -f ${part_filename}
+      mkswap -f ${part_filename}
       ;;
     *)
-      ${mkfs} -F -E lazy_itable_init=1 -L ${mountpoint} ${part_filename}
+      mkfs -F -E lazy_itable_init=1 -L ${mountpoint} ${part_filename}
 
       # > This filesystem will be automatically checked every 37 mounts or 180 days, whichever comes first.
       # > Use tune2fs -c or -i to override.
       [ ! "${max_mount_count}" -eq 37 -o ! "${interval_between_check}" -eq 180 ] && {
         printf "[INFO] Setting maximal mount count: %s\n" ${max_mount_count}
         printf "[INFO] Setting interval between check(s): %s\n" ${interval_between_check}
-        ${tune2fs} -c ${max_mount_count} -i ${interval_between_check} ${part_filename}
+        tune2fs -c ${max_mount_count} -i ${interval_between_check} ${part_filename}
       }
       ;;
     esac
-    ${udevadm} settle
+    udevadm settle
 EOS
 }
 
@@ -559,7 +475,7 @@ function mountvm_root() {
     case "${mountpoint}" in
     root)
       printf "[DEBUG] Mounting %s\n" ${chroot_dir}
-      ${mount} ${part_filename} ${chroot_dir}
+      mount ${part_filename} ${chroot_dir}
       ;;
     esac
 EOS
@@ -577,7 +493,7 @@ function mountvm_nonroot() {
     *)
       printf "[DEBUG] Mounting %s\n" ${chroot_dir}${mountpoint}
       [[ -d ${chroot_dir}${mountpoint} ]] || mkdir -p ${chroot_dir}${mountpoint}
-      ${mount} ${part_filename} ${chroot_dir}${mountpoint}
+      mount ${part_filename} ${chroot_dir}${mountpoint}
       ;;
     esac
 EOS
@@ -590,7 +506,7 @@ function mountvm_devel() {
   local vfs_paths="/proc /dev"
   for mountpoint in ${vfs_paths}; do
      printf "[DEBUG] Mounting %s\n" ${chroot_dir}${mountpoint}
-    ${mount} --bind ${mountpoint} ${chroot_dir}${mountpoint}
+    mount --bind ${mountpoint} ${chroot_dir}${mountpoint}
   done
 }
 
@@ -598,7 +514,7 @@ function mountvm() {
   local disk_filename=$1 chroot_dir=$2
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   [[ -d "${chroot_dir}" ]] && { echo "already exists: ${chroot_dir}" >&2; return 1; }
-  ${mkdir} -p ${chroot_dir}
+  mkdir -p ${chroot_dir}
   mountvm_root ${disk_filename} ${chroot_dir}
   mountvm_nonroot ${disk_filename} ${chroot_dir}
 }
@@ -607,7 +523,7 @@ function umountvm_root() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   printf "[DEBUG] Unmounting %s\n" ${chroot_dir}
-  ${umount} ${chroot_dir}
+  umount ${chroot_dir}
 }
 
 function umountvm_nonroot() {
@@ -615,7 +531,7 @@ function umountvm_nonroot() {
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   while read mountpoint; do
     printf "[DEBUG] Unmounting %s\n" ${mountpoint}
-    ${umount} ${mountpoint}
+    umount ${mountpoint}
   done < <(egrep ${chroot_dir}/ /etc/mtab | awk '{print $2}')
 }
 
@@ -624,7 +540,7 @@ function umountvm() {
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   umountvm_nonroot ${chroot_dir}
   umountvm_root    ${chroot_dir}
-  ${rmdir} ${chroot_dir}
+  rmdir ${chroot_dir}
 }
 
 function installos() {
@@ -646,11 +562,11 @@ function installdistro2vm() {
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
 
   printf "[DEBUG] Installing OS to %s\n" ${chroot_dir}
-  ${rsync} -aHA ${distro_dir}/ ${chroot_dir}
-  ${sync}
+  rsync -aHA ${distro_dir}/ ${chroot_dir}
+  sync
 
   printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
-  ${sed} -i s,^keepcache=.*,keepcache=${keepcache}, ${chroot_dir}/etc/yum.conf
+  sed -i s,^keepcache=.*,keepcache=${keepcache}, ${chroot_dir}/etc/yum.conf
 }
 
 function installgrub2vm() {
@@ -659,18 +575,18 @@ function installgrub2vm() {
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
 
   local tmpdir=/tmp/vmbuilder-grub
-  ${mkdir} -p ${chroot_dir}/${tmpdir}
+  mkdir -p ${chroot_dir}/${tmpdir}
 
   local grub_id=0
 
   is_dev ${disk_filename} || {
     local new_filename=${tmpdir}/$(basename ${disk_filename})
-    ${touch} ${chroot_dir}/${new_filename}
-    ${mount} --bind ${disk_filename} ${chroot_dir}/${new_filename}
+    touch ${chroot_dir}/${new_filename}
+    mount --bind ${disk_filename} ${chroot_dir}/${new_filename}
   }
 
   local devmapfile=${tmpdir}/device.map
-  ${touch} ${chroot_dir}/${devmapfile}
+  touch ${chroot_dir}/${devmapfile}
   printf "[INFO] Generating %s\n" ${devmapfile}
   {
     is_dev ${disk_filename} && {
@@ -679,18 +595,18 @@ function installgrub2vm() {
       printf "(hd%d) %s\n" ${grub_id} ${new_filename}
     }
   } >> ${chroot_dir}/${devmapfile}
-  ${cat} ${chroot_dir}/${devmapfile}
+  cat ${chroot_dir}/${devmapfile}
 
   printf "[INFO] Installing grub\n"
   # install grub
   local grub_cmd=
 
   is_dev ${disk_filename} && {
-    grub_cmd="${grub} --device-map=${chroot_dir}/${devmapfile} --batch"
+    grub_cmd="grub --device-map=${chroot_dir}/${devmapfile} --batch"
   } || {
-    grub_cmd="${chroot} ${chroot_dir} ${grub} --device-map=${devmapfile} --batch"
+    grub_cmd="chroot ${chroot_dir} grub --device-map=${devmapfile} --batch"
   }
-  ${cat} <<-_EOS_ | ${grub_cmd}
+  cat <<-_EOS_ | ${grub_cmd}
 	root (hd${grub_id},0)
 	setup (hd0)
 	quit
@@ -701,7 +617,7 @@ function installgrub2vm() {
   xptabinfo | egrep -q /boot && {
     bootdir_path=
   }
-  ${cat} <<-_EOS_ > ${chroot_dir}/boot/grub/grub.conf
+  cat <<-_EOS_ > ${chroot_dir}/boot/grub/grub.conf
 	default=0
 	timeout=5
 	splashimage=(hd${grub_id},0)${bootdir_path}/grub/splash.xpm.gz
@@ -711,18 +627,18 @@ function installgrub2vm() {
 	        kernel ${bootdir_path}/$(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1) ro root=UUID=$(ppartuuid ${disk_filename} root) rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto  KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM
 	        initrd ${bootdir_path}/$(cd ${chroot_dir}/boot && ls initramfs-*| tail -1)
 	_EOS_
-  ${cat} ${chroot_dir}/boot/grub/grub.conf
+  cat ${chroot_dir}/boot/grub/grub.conf
   cd ${chroot_dir}/boot/grub
-  ${ln} -fs grub.conf menu.lst
+  ln -fs grub.conf menu.lst
   cd -
 
   is_dev ${disk_filename} || {
     printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
-    ${umount} ${chroot_dir}/${new_filename}
+    umount ${chroot_dir}/${new_filename}
   }
 
   printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
-  ${rm} -rf ${chroot_dir}/${tmpdir}
+  rm -rf ${chroot_dir}/${tmpdir}
 }
 
 function configure_networking() {
@@ -732,7 +648,7 @@ function configure_networking() {
   printf "[INFO] Generating /etc/sysconfig/network-scripts/ifcfg-eth0\n"
   [[ -z "${ip}" ]] || {
     printf "[INFO] Unsetting /etc/sysconfig/network-scripts/ifcfg-eth0\n"
-    ${cat} <<-_EOS_ > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
+    cat <<-_EOS_ > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
 	DEVICE=eth0
 	BOOTPROTO=static
 	ONBOOT=yes
@@ -742,36 +658,36 @@ function configure_networking() {
 	$([[ -z "${gw}"    ]] || echo "GATEWAY=${gw}")
 	_EOS_
   }
-  ${cat} ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
+  cat ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
 
   printf "[INFO] Generating /etc/resolv.conf\n"
   # /etc/resolv.conf
   [[ -z "${dns}" ]] || {
     printf "[INFO] Unsetting /etc/resolv.conf\n"
-    ${cat} <<-_EOS_ > ${chroot_dir}/etc/resolv.conf
+    cat <<-_EOS_ > ${chroot_dir}/etc/resolv.conf
 	nameserver ${dns}
 	_EOS_
   }
-  ${cat} ${chroot_dir}/etc/resolv.conf
+  cat ${chroot_dir}/etc/resolv.conf
 
   # hostname
   [[ -z "${hostname}" ]] || {
     printf "[INFO] Setting hostname: %s\n" ${hostname}
     egrep ^HOSTNAME= ${chroot_dir}/etc/sysconfig/network -q && {
-      ${sed} -i "s,^HOSTNAME=.*,HOSTNAME=${hostname}," ${chroot_dir}/etc/sysconfig/network
+      sed -i "s,^HOSTNAME=.*,HOSTNAME=${hostname}," ${chroot_dir}/etc/sysconfig/network
     } || {
       echo HOSTNAME=${hostname} >> ${chroot_dir}/etc/sysconfig/network
     }
-    ${cat} ${chroot_dir}/etc/sysconfig/network
+    cat ${chroot_dir}/etc/sysconfig/network
 
     echo 127.0.0.1 ${hostname} >> ${chroot_dir}/etc/hosts
-    ${cat} ${chroot_dir}/etc/hosts
+    cat ${chroot_dir}/etc/hosts
   }
 
   # disable mac address caching
   printf "[INFO] Unsetting udev 70-persistent-net.rules\n"
-  ${rm} -f ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
-  ${ln} -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
+  rm -f ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
+  ln -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
 }
 
 function configure_mounting() {
@@ -795,14 +711,14 @@ function configure_mounting() {
     printf "UUID=%s %s\t%s\tdefaults\t%s %s\n" ${uuid} ${mountpath} ${fstype} ${dumpopt} ${fsckopt}
 EOS
 
-  ${cat} <<-_EOS_
+  cat <<-_EOS_
 	tmpfs                   /dev/shm                tmpfs   defaults        0 0
 	devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
 	sysfs                   /sys                    sysfs   defaults        0 0
 	proc                    /proc                   proc    defaults        0 0
 	_EOS_
   } > ${chroot_dir}/etc/fstab
-  ${cat} ${chroot_dir}/etc/fstab
+  cat ${chroot_dir}/etc/fstab
 }
 
 function run_execscript() {
@@ -810,7 +726,7 @@ function run_execscript() {
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
 
   [[ -n "${execscript}" ]] || {
-    ${chroot} ${chroot_dir} bash -c "echo root:root | chpasswd"
+    chroot ${chroot_dir} bash -c "echo root:root | chpasswd"
     return 0
   }
 
@@ -820,7 +736,7 @@ function run_execscript() {
   mountvm_devel  ${chroot_dir}
 
   printf "[INFO] Excecuting script: %s\n" ${execscript}
-  ${setarch} ${distro_arch} ${execscript} ${chroot_dir}
+  setarch ${distro_arch} ${execscript} ${chroot_dir}
 }
 
 function is_dev() {
@@ -906,8 +822,8 @@ function task_clean() {
 }
 
 function task_status() {
-  ${losetup} -a
-  ${dmsetup} ls
+  losetup -a
+  dmsetup ls
 }
 
 function task_trap() {
