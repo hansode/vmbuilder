@@ -79,7 +79,7 @@ function build_vers() {
     ;;
   esac
 
-  chroot_dir=${chroot_dir:-${abs_path}/${distro_short}-${distro_ver}_${distro_arch}}
+  chroot_dir=${chroot_dir:-${abs_dirname}/${distro_short}-${distro_ver}_${distro_arch}}
 
   keepcache=${keepcache:-0}
   # keepcache should be [ 0 | 1 ]
@@ -88,7 +88,7 @@ function build_vers() {
   *)    keepcache=0 ;;
   esac
 
-  repofile=${abs_path}/yum-${distro_short}-${distro_ver}.repo
+  repofile=${abs_dirname}/yum-${distro_short}-${distro_ver}.repo
 }
 
 function banner() {
@@ -349,7 +349,7 @@ extract_args $*
 
 ### read-only variables
 
-readonly abs_path=$(cd $(dirname $0) && pwd)
+readonly abs_dirname=$(cd $(dirname $0) && pwd)
 
 ## main
 

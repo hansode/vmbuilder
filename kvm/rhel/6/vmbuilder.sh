@@ -193,7 +193,7 @@ function build_vers() {
   esac
 
   distro=${distro_name}-${distro_ver}_${distro_arch}
-  distro_dir=${distro_dir:-${abs_path}/${distro}}
+  distro_dir=${distro_dir:-${abs_dirname}/${distro}}
 
   keepcache=${keepcache:-0}
   # keepcache should be [ 0 | 1 ]
@@ -203,7 +203,7 @@ function build_vers() {
   esac
 
   # requires:
-  cebootstrap_sh=${cebootstrap_sh:-"${abs_path}/cebootstrap.sh"}
+  cebootstrap_sh=${cebootstrap_sh:-"${abs_dirname}/cebootstrap.sh"}
   cat=${cat:-"cat"}
   truncate=${truncate:-"truncate"}
   dd=${dd-"dd"}
@@ -231,7 +231,7 @@ function build_vers() {
   dmsetup=${dmsetup:-"dmsetup"}
 
   [[ -n ${dry_run} ]] && {
-    cebootstrap_sh="echo ${abs_path}/cebootstrap.sh"
+    cebootstrap_sh="echo ${abs_dirname}/cebootstrap.sh"
     cat="echo ${cat}"
     truncate="echo ${truncate}"
     dd="echo ${dd}"
@@ -931,7 +931,7 @@ extract_args $*
 
 ### read-only variables
 
-readonly abs_path=$(cd $(dirname $0) && pwd)
+readonly abs_dirname=$(cd $(dirname $0) && pwd)
 
 ## main
 
