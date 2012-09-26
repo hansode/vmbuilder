@@ -161,7 +161,7 @@ function build_vers() {
 
   distro_arch=${distro_arch:-$(arch)}
   case "${distro_arch}" in
-  i*86)   distro_arch=i686;;
+  i*86)   distro_arch=i686 ;;
   x86_64) ;;
   esac
 
@@ -351,8 +351,8 @@ function mkptab() {
   local i=1 offset=0 parttype=
   xptabproc <<'EOS'
     case "${mountpoint}" in
-    swap) fstype=swap;;
-    *)    fstype=ext2;;
+    swap) fstype=swap ;;
+    *)    fstype=ext2 ;;
     esac
 
     case "${i}" in
@@ -505,7 +505,7 @@ function mountvm_devel() {
 
   local vfs_paths="/proc /dev"
   for mountpoint in ${vfs_paths}; do
-     printf "[DEBUG] Mounting %s\n" ${chroot_dir}${mountpoint}
+    printf "[DEBUG] Mounting %s\n" ${chroot_dir}${mountpoint}
     mount --bind ${mountpoint} ${chroot_dir}${mountpoint}
   done
 }

@@ -48,8 +48,8 @@ function build_vers() {
 
   distro_arch=${distro_arch:-$(arch)}
   case "${distro_arch}" in
-  i*86)   basearch=i386; distro_arch=i686;;
-  x86_64) basearch=${distro_arch};;
+  i*86)   basearch=i386; distro_arch=i686 ;;
+  x86_64) basearch=${distro_arch} ;;
   esac
 
   distro_ver=${distro_ver:-6.3}
