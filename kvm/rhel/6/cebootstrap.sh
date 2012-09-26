@@ -146,10 +146,10 @@ function mount_proc() {
 function umount_proc() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  egrep ${chroot_dir}/ /etc/mtab | awk '{print $2}' | while read mountpoint; do
+  while read mountpoint; do
     printf "[DEBUG] Unmounting %s\n" ${mountpoint}
     umount ${mountpoint}
-  done
+  done < <(egrep ${chroot_dir}/ /etc/mtab | awk '{print $2}')
 }
 
 function mkrepofile() {
@@ -259,10 +259,9 @@ function configure_tz() {
 function configure_service() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  chroot ${chroot_dir} chkconfig --list | grep -v :on |\
   while read svc dummy; do
     chroot ${chroot_dir} chkconfig --del ${svc}
-  done
+  done < <(chroot ${chroot_dir} chkconfig --list | grep -v :on)
 }
 
 function installgrub() {

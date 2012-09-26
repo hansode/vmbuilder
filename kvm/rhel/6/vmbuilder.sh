@@ -507,7 +507,7 @@ function lsdevmap() {
 }
 
 function devmap2path() {
-  cat | while read devmap; do
+  while read devmap; do
     case "${devmap}" in
     loop*)
       echo /dev/mapper/${devmap}
@@ -516,7 +516,7 @@ function devmap2path() {
       echo /dev/${devmap}
       ;;
     esac
-  done
+  done < <(cat)
 }
 
 ## vmimage
@@ -614,10 +614,10 @@ function umountvm_root() {
 function umountvm_nonroot() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  egrep ${chroot_dir}/ /etc/mtab | awk '{print $2}' | while read mountpoint; do
+  while read mountpoint; do
     printf "[DEBUG] Unmounting %s\n" ${mountpoint}
     ${umount} ${mountpoint}
-  done
+  done < <(egrep ${chroot_dir}/ /etc/mtab | awk '{print $2}')
 }
 
 function umountvm() {
