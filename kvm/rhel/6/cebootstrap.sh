@@ -8,7 +8,7 @@
 #  mount, umount, MAKEDEV, yum, chkconfig
 #  chroot, pwconv
 #  mkdir, cp, rm, rsync, find
-#  grep, xargs, printf
+#  egrep, xargs, printf
 #
 # OPTIONS
 #        --distro-arch=[x86_64 | i686]
@@ -261,7 +261,7 @@ function configure_service() {
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   while read svc dummy; do
     chroot ${chroot_dir} chkconfig --del ${svc}
-  done < <(chroot ${chroot_dir} chkconfig --list | grep -v :on)
+  done < <(chroot ${chroot_dir} chkconfig --list | egrep -v :on)
 }
 
 function installgrub() {
