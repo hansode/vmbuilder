@@ -236,20 +236,6 @@ function mkrootfs() {
   }
 }
 
-## disk
-
-function mkdisk() {
-  local disk_filename=$1 size=$2 unit=${3:-m}
-  [[ -a ${disk_filename} ]] && { echo "already exists: ${disk_filename}" >&2; return 1; }
-  truncate -s ${size}${unit} ${disk_filename}
-}
-
-function rmdisk() {
-  local disk_filename=$1
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  rm -f ${disk_filename}
-}
-
 ## mbr(master boot record)
 
 function rmmbr() {
@@ -821,6 +807,7 @@ readonly abs_dirname=$(cd $(dirname $0) && pwd)
 ### include files
 
 . ${abs_dirname}/functions.utils
+. ${abs_dirname}/functions.disk
 
 ### prepare
 
