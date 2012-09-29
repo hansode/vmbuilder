@@ -383,7 +383,7 @@ function mkptab() {
       ;;
     esac
 
-    i=$((${i} + 1))
+    let i++
 EOS
 }
 
@@ -407,7 +407,7 @@ function unmapptab_r() {
   local tries=0 max_tries=3
   while [[ ${tries} -lt ${max_tries} ]]; do
     unmapptab ${disk_filename}  && break || :
-    tries=$((${tries} + 1))
+    let tries++
     sleep 1
   done
   unmapptab ${disk_filename}
