@@ -3,6 +3,8 @@
 # requires:
 #  bash
 #  truncate, rm
+#  cat, egrep, awk
+#  parted, kpartx, udevadm
 #
 
 ## disk

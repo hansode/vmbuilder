@@ -5,7 +5,7 @@
 #  tr, dirname, pwd
 #  sed, head
 #  build_rootfs_tree.sh
-#  cat, truncate, dd, parted, kpartx, udevadm, blkid
+#  cat, udevadm, blkid
 #  mkfs, tune2fs, mkswap
 #  mount, umount, mkdir, rmdir
 #  rsync, sync, touch, ln, rm
