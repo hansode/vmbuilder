@@ -236,14 +236,6 @@ function mkrootfs() {
   }
 }
 
-## mbr(master boot record)
-
-function rmmbr() {
-  local disk_filename=$1
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  dd if=/dev/zero of=${disk_filename} bs=512 count=1
-}
-
 ## ptab
 
 function xptabinfo() {
