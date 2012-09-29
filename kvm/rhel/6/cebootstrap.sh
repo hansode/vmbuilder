@@ -23,25 +23,6 @@ set -e
 
 ## private functions
 
-function extract_args() {
-  CMD_ARGS=
-  for arg in $*; do
-    case $arg in
-    --*=*)
-      key=${arg%%=*}; key=$(echo ${key##--} | tr - _)
-      value=${arg##--*=}
-      eval "${key}=\"${value}\""
-      ;;
-    *)
-      CMD_ARGS="${CMD_ARGS} ${arg}"
-      ;;
-    esac
-  done
-  # trim
-  CMD_ARGS=${CMD_ARGS%% }
-  CMD_ARGS=${CMD_ARGS## }
-}
-
 function build_vers() {
   debug=${debug:-}
   [ -z ${debug} ] || set -x
@@ -337,13 +318,17 @@ function checkroot() {
   } || :
 }
 
-### prepare
-
-extract_args $*
-
 ### read-only variables
 
 readonly abs_dirname=$(cd $(dirname $0) && pwd)
+
+### include files
+
+. ${abs_dirname}/functions.utils
+
+### prepare
+
+extract_args $*
 
 ## main
 
