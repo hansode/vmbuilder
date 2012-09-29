@@ -814,13 +814,6 @@ function task_trap() {
   }
 }
 
-function checkroot() {
-  [[ $UID -ne 0 ]] && {
-    echo "[ERROR] Must run as root." >&2
-    return 1
-  } || :
-}
-
 ### read-only variables
 
 readonly abs_dirname=$(cd $(dirname $0) && pwd)
