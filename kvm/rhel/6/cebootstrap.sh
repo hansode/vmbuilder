@@ -151,7 +151,7 @@ function mkrepofile() {
 	# PUT YOUR REPOS HERE OR IN separate files named file.repo
 	# in /etc/yum.repos.d
 	[${distro_short}]
-	name=${distro_snake} ${distro_ver} - ${basearch}
+	name=${distro_short}
 	failovermethod=priority
 	baseurl=${baseurl}
 	enabled=1
