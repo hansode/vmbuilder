@@ -73,7 +73,6 @@ function build_vers() {
   *)    keepcache=0 ;;
   esac
 
-  repofile=${abs_dirname}/yum-${distro_short}-${distro_ver}.repo
 }
 
 function banner() {
@@ -160,15 +159,13 @@ function mkrepofile() {
 	EOS
 }
 
-function rmrepofile() {
-  local repofile=$1
-  [[ -a ${repofile} ]] || { echo "file not found: ${repofile}" >&2; return 1; }
-  rm -f ${repofile}
-}
-
 function installdistro() {
   local chroot_dir=$1 reponame=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+
+  local tmpdir=${chroot_dir}/tmp
+  mkdir ${tmpdir}
+  local repofile=${tmpdir}/yum-${reponame}.repo
 
   local yum_opts="
      -c ${repofile} \
@@ -187,8 +184,6 @@ function installdistro() {
              passwd grub \
              vim-minimal
   ${yum_cmd} erase selinux*
-
-  rmrepofile ${repofile}
 }
 
 function configure_mounting() {
@@ -307,7 +302,6 @@ function task_trap() {
   printf "[DEBUG] Caught signal\n"
   umount_proc ${chroot_dir}
   [ -d ${chroot_dir} ] && rm -rf ${chroot_dir}
-  [ -f ${repofile} ] && rmrepofile ${repofile}
   printf "[DEBUG] Cleaned up\n"
 }
 
