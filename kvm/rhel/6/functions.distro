@@ -65,7 +65,8 @@ function genrepofile() {
 }
 
 function installdistro() {
-  local chroot_dir=$1 reponame=$2
+  local chroot_dir=$1 reponame=$2 baseurl=$3 gpgkey=$4 keepcache=$5
+
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
 
   local tmpdir=${chroot_dir}/tmp

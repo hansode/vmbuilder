@@ -115,7 +115,7 @@ function task_setup() {
 function task_install() {
   mount_proc ${chroot_dir}
 
-  installdistro        ${chroot_dir} ${distro_short}
+  installdistro        ${chroot_dir} ${distro_short} ${baseurl} ${gpgkey} ${keepcache}
   configure_mounting   ${chroot_dir}
   configure_networking ${chroot_dir}
   configure_passwd     ${chroot_dir}
