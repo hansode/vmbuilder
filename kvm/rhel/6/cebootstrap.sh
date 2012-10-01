@@ -134,7 +134,7 @@ function umount_proc() {
 }
 
 function mkrepofile() {
-  local repofile=$1
+  local repofile=$1 reponame=$2 baseurl=$3 gpgkey=$4 keepcache=$5
   cat <<-EOS > ${repofile}
 	[main]
 	cachedir=/var/cache/yum
@@ -150,8 +150,8 @@ function mkrepofile() {
 	
 	# PUT YOUR REPOS HERE OR IN separate files named file.repo
 	# in /etc/yum.repos.d
-	[${distro_short}]
-	name=${distro_short}
+	[${reponame}]
+	name=${reponame}
 	failovermethod=priority
 	baseurl=${baseurl}
 	enabled=1
@@ -167,19 +167,19 @@ function rmrepofile() {
 }
 
 function installdistro() {
-  local chroot_dir=$1
+  local chroot_dir=$1 reponame=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
 
   local yum_opts="
      -c ${repofile} \
      --disablerepo="\*" \
-     --enablerepo="${distro_short}" \
+     --enablerepo="${reponame}" \
      --installroot=${chroot_dir} \
      -y
   "
   local yum_cmd="yum ${yum_opts}"
 
-  mkrepofile ${repofile}
+  mkrepofile ${repofile} ${reponame} ${baseurl} ${gpgkey} ${keepcache}
 
   ${yum_cmd} groupinstall Core
   ${yum_cmd} install \
@@ -280,7 +280,7 @@ function task_setup() {
 function task_install() {
   mount_proc ${chroot_dir}
 
-  installdistro        ${chroot_dir}
+  installdistro        ${chroot_dir} ${distro_short}
   configure_mounting   ${chroot_dir}
   configure_networking ${chroot_dir}
   configure_passwd     ${chroot_dir}
