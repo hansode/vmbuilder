@@ -1,0 +1,163 @@
+# -*-Shell-script-*-
+#
+# requires:
+#  bash
+#  MAKEDEV, mount, umount, yum, chkconfig, pwconv, chroot
+#  mkdir, cp, rm, rsync, find
+#  egrep, xargs
+#
+
+function mkdevdir() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  mkdir ${chroot_dir}/dev
+  for i in console null tty1 tty2 tty3 tty4 zero; do
+    MAKEDEV -d ${chroot_dir}/dev -x $i
+  done
+}
+
+function mkprocdir() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  mkdir ${chroot_dir}/proc
+}
+
+function mount_proc() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  mount --bind /proc ${chroot_dir}/proc
+}
+
+function umount_proc() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  while read mountpoint; do
+    printf "[DEBUG] Unmounting %s\n" ${mountpoint}
+    umount ${mountpoint}
+  done < <(egrep ${chroot_dir}/ /etc/mtab | awk '{print $2}')
+}
+
+function genrepofile() {
+  local reponame=$1 baseurl=$2 gpgkey=$3 keepcache=$4
+  cat <<-EOS
+	[main]
+	cachedir=/var/cache/yum
+	keepcache=${keepcache}
+	debuglevel=2
+	logfile=/var/log/yum.log
+	exactarch=1
+	obsoletes=1
+	gpgcheck=0
+	plugins=1
+	metadata_expire=1800
+	installonly_limit=2
+	
+	# PUT YOUR REPOS HERE OR IN separate files named file.repo
+	# in /etc/yum.repos.d
+	[${reponame}]
+	name=${reponame}
+	failovermethod=priority
+	baseurl=${baseurl}
+	enabled=1
+	gpgcheck=1
+	gpgkey=${gpgkey}
+	EOS
+}
+
+function installdistro() {
+  local chroot_dir=$1 reponame=$2
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+
+  local tmpdir=${chroot_dir}/tmp
+  mkdir ${tmpdir}
+  local repofile=${tmpdir}/yum-${reponame}.repo
+
+  genrepofile ${reponame} ${baseurl} ${gpgkey} ${keepcache} > ${repofile}
+
+  local yum_opts="
+     -c ${repofile} \
+     --disablerepo="\*" \
+     --enablerepo="${reponame}" \
+     --installroot=${chroot_dir} \
+     -y
+  "
+  local yum_cmd="yum ${yum_opts}"
+
+  ${yum_cmd} groupinstall Core
+  ${yum_cmd} install \
+             kernel dracut openssh openssh-clients openssh-server rpm yum curl dhclient \
+             passwd grub \
+             vim-minimal
+  ${yum_cmd} erase selinux*
+}
+
+function configure_mounting() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  cat <<-EOS > ${chroot_dir}/etc/fstab
+	${root_dev}             /                       ext4    defaults        1 1
+	tmpfs                   /dev/shm                tmpfs   defaults        0 0
+	devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
+	sysfs                   /sys                    sysfs   defaults        0 0
+	proc                    /proc                   proc    defaults        0 0
+	EOS
+}
+
+function configure_networking() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  cat <<-EOS > ${chroot_dir}/etc/hosts
+	127.0.0.1       localhost
+	EOS
+
+  cat <<-EOS > ${chroot_dir}/etc/resolv.conf
+	nameserver 8.8.8.8
+	EOS
+
+  cat <<-EOS > ${chroot_dir}/etc/sysconfig/network
+	NETWORKING=yes
+	EOS
+
+  cat <<-EOS > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
+	DEVICE=eth0
+	BOOTPROTO=dhcp
+	ONBOOT=yes
+	EOS
+}
+
+function configure_passwd() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  chroot ${chroot_dir} pwconv
+}
+
+function configure_tz() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
+}
+
+function configure_service() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  while read svc dummy; do
+    chroot ${chroot_dir} chkconfig --del ${svc}
+  done < <(chroot ${chroot_dir} chkconfig --list | egrep -v :on)
+}
+
+function installgrub() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  for grub_distro_name in redhat unknown; do
+    grub_src_dir=${chroot_dir}/usr/share/grub/${basearch}-${grub_distro_name}
+    [ -d ${grub_src_dir} ] || continue
+    rsync -a ${grub_src_dir}/ ${chroot_dir}/boot/grub/
+  done
+}
+
+function cleanup() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  find   ${chroot_dir}/var/log/ -type f | xargs rm
+  rm -rf ${chroot_dir}/tmp/*
+}
