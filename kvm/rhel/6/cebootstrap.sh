@@ -132,9 +132,9 @@ function umount_proc() {
   done < <(egrep ${chroot_dir}/ /etc/mtab | awk '{print $2}')
 }
 
-function mkrepofile() {
-  local repofile=$1 reponame=$2 baseurl=$3 gpgkey=$4 keepcache=$5
-  cat <<-EOS > ${repofile}
+function genrepofile() {
+  local reponame=$1 baseurl=$2 gpgkey=$3 keepcache=$4
+  cat <<-EOS
 	[main]
 	cachedir=/var/cache/yum
 	keepcache=${keepcache}
@@ -176,7 +176,7 @@ function installdistro() {
   "
   local yum_cmd="yum ${yum_opts}"
 
-  mkrepofile ${repofile} ${reponame} ${baseurl} ${gpgkey} ${keepcache}
+  genrepofile ${reponame} ${baseurl} ${gpgkey} ${keepcache} > ${repofile}
 
   ${yum_cmd} groupinstall Core
   ${yum_cmd} install \
