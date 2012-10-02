@@ -301,17 +301,6 @@ function mountvm_nonroot() {
 EOS
 }
 
-function mountvm_devel() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-
-  local vfs_paths="/proc /dev"
-  for mountpoint in ${vfs_paths}; do
-    printf "[DEBUG] Mounting %s\n" ${chroot_dir}${mountpoint}
-    mount --bind ${mountpoint} ${chroot_dir}${mountpoint}
-  done
-}
-
 function mountvm() {
   local disk_filename=$1 chroot_dir=$2
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
@@ -526,7 +515,8 @@ function run_execscript() {
   [[ -f "${execscript}" ]] || return 0
   [[ -x "${execscript}" ]] || return 0
 
-  mountvm_devel  ${chroot_dir}
+  mount_proc ${chroot_dir}
+  mount_dev  ${chroot_dir}
 
   printf "[INFO] Excecuting script: %s\n" ${execscript}
   setarch ${distro_arch} ${execscript} ${chroot_dir}
