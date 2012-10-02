@@ -124,7 +124,7 @@ function task_install() {
   installgrub          ${chroot_dir}
   cleanup              ${chroot_dir}
 
-  umount_proc ${chroot_dir}
+  umount_nonroot ${chroot_dir}
 }
 
 function task_clean() {
@@ -140,7 +140,7 @@ function task_finish() {
 function task_trap() {
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   printf "[DEBUG] Caught signal\n"
-  umount_proc ${chroot_dir}
+  umount_nonroot ${chroot_dir}
   [ -d ${chroot_dir} ] && rm -rf ${chroot_dir}
   printf "[DEBUG] Cleaned up\n"
 }
