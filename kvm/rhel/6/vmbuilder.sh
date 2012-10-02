@@ -328,19 +328,10 @@ function umountvm_root() {
   umount ${chroot_dir}
 }
 
-function umountvm_nonroot() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  while read mountpoint; do
-    printf "[DEBUG] Unmounting %s\n" ${mountpoint}
-    umount ${mountpoint}
-  done < <(egrep ${chroot_dir}/ /etc/mtab | awk '{print $2}')
-}
-
 function umountvm() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  umountvm_nonroot ${chroot_dir}
+  umount_nonroot   ${chroot_dir}
   umountvm_root    ${chroot_dir}
   rmdir ${chroot_dir}
 }
