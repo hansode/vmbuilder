@@ -51,6 +51,13 @@ function mount_dev() {
   mount --bind /dev ${chroot_dir}/dev
 }
 
+function umount_root() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  printf "[DEBUG] Unmounting %s\n" ${chroot_dir}
+  umount ${chroot_dir}
+}
+
 function umount_nonroot() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
