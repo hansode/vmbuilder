@@ -6,7 +6,7 @@
 #  sed, head
 #  build_rootfs_tree.sh
 #  cat, udevadm, blkid
-#  mkfs, tune2fs, mkswap
+#  mkfs.ext4, tune2fs, mkswap
 #  mount, umount, mkdir, rmdir
 #  rsync, sync, touch, ln, rm
 #  chroot, grub, setarch
@@ -253,7 +253,7 @@ function mkfs2vm() {
       mkswap -f ${part_filename}
       ;;
     *)
-      mkfs -F -E lazy_itable_init=1 -L ${mountpoint} ${part_filename}
+      mkfs.ext4 -F -E lazy_itable_init=1 -L ${mountpoint} ${part_filename}
 
       # > This filesystem will be automatically checked every 37 mounts or 180 days, whichever comes first.
       # > Use tune2fs -c or -i to override.
