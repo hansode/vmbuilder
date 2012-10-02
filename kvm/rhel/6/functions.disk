@@ -45,6 +45,12 @@ function mount_proc() {
   mount --bind /proc ${chroot_dir}/proc
 }
 
+function mount_dev() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  mount --bind /dev ${chroot_dir}/dev
+}
+
 function umount_nonroot() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
