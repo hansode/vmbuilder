@@ -2,40 +2,10 @@
 #
 # requires:
 #  bash
-#  MAKEDEV, mount, umount, yum, chkconfig, pwconv, chroot
+#  yum, chkconfig, pwconv, chroot
 #  mkdir, cp, rm, rsync, find
 #  egrep, xargs
 #
-
-function mkdevdir() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  mkdir ${chroot_dir}/dev
-  for i in console null tty1 tty2 tty3 tty4 zero; do
-    MAKEDEV -d ${chroot_dir}/dev -x $i
-  done
-}
-
-function mkprocdir() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  mkdir ${chroot_dir}/proc
-}
-
-function mount_proc() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  mount --bind /proc ${chroot_dir}/proc
-}
-
-function umount_nonroot() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  while read mountpoint; do
-    printf "[DEBUG] Unmounting %s\n" ${mountpoint}
-    umount ${mountpoint}
-  done < <(egrep ${chroot_dir}/ /etc/mtab | awk '{print $2}')
-}
 
 function genrepofile() {
   local reponame=$1 baseurl=$2 gpgkey=$3 keepcache=$4
