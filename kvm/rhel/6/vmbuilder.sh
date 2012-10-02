@@ -185,39 +185,7 @@ function build_vers() {
   hostname=${hostname:-}
 }
 
-## private functions for partition map
-
-function pmapindex() {
-  local name=$1
-  [[ -n ${name} ]] || return 1
-  local part_index=$(xptabinfo | cat -n | egrep -w ${name} | awk '{print $1}')
-  case "${part_index}" in
-  [1-3])
-    echo ${part_index}
-    ;;
-  *)
-    # part_index 4's part-type is "extended".
-    # if part_index is more than 4, need to adjust part_index adding 1.
-    echo $((${part_index} + 1))
-    ;;
-  esac
-}
-
-function ppartpath() {
-  local disk_filename=$1 mountpoint=$2
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  [[ -n ${mountpoint} ]] || return 1
-  lsdevmap ${disk_filename} | devmap2path | egrep "$(pmapindex "${mountpoint}")\$"
-}
-
-function ppartuuid() {
-  local disk_filename=$1 mountpoint=$2
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  local part_filename=$(ppartpath ${disk_filename} ${mountpoint})
-  blkid -c /dev/null -sUUID -ovalue ${part_filename}
-}
-
-## rootfs tree
+## private functions
 
 function mkrootfs() {
   local distro_dir=$1
