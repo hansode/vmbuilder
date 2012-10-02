@@ -31,7 +31,6 @@ function build_vers() {
 
   distro_ver=${distro_ver:-6.3}
   distro_name=${distro_name:-centos}
-  root_dev=${root_dev:-/dev/sda1}
 
   case "${distro_name}" in
   centos)
