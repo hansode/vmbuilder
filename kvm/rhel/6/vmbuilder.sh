@@ -25,18 +25,6 @@
 # OPTIONS
 #
 #    Guest partitioning options
-#        --part=PATH
-#               Allows to specify a partition table in PATH each line of partfile should specify (root first):
-#                       mountpoint size (device) (filename)
-#               one  per  line, separated by space, where size is in megabytes. The third and fourth options allow you to specify a device for the filesystem, and a name for the filesystem image, both of which
-#               are optional. You can have up to 4 virtual disks, a new disk starts on a line containing only '---'. ie:
-#                       root 2000 a1 rootfs
-#                       /boot 512 a2 boot
-#                       swap 1000 a3 swapfs
-#                       ---
-#                       /var 8000 b1 var
-#                       /var/log 2000 b2 varlog
-#
 #        The following three options are not used if --part is specified:
 #
 #               --rootsize=SIZE
@@ -154,9 +142,6 @@ function build_vers() {
   *)    keepcache=0 ;;
   esac
 
-  # * tune2fs
-  # > This filesystem will be automatically checked every 37 mounts or 180 days, whichever comes first.
-  # > Use tune2fs -c or -i to override.
   max_mount_count=${max_mount_count:-37}
   interval_between_check=${interval_between_check:-180}
 
@@ -183,11 +168,8 @@ function build_vers() {
   hostname=${hostname:-}
 }
 
-## private functions
-
 function mkrootfs() {
   local distro_dir=$1
-
   [[ -d "${distro_dir}" ]] && {
     printf "[INFO] already exists: %s\n" ${distro_dir}
   } || {
@@ -220,7 +202,6 @@ function mkfs2vm() {
       ;;
     *)
       mkfs.ext4 -F -E lazy_itable_init=1 -L ${mountpoint} ${part_filename}
-
       # > This filesystem will be automatically checked every 37 mounts or 180 days, whichever comes first.
       # > Use tune2fs -c or -i to override.
       [ ! "${max_mount_count}" -eq 37 -o ! "${interval_between_check}" -eq 180 ] && {
@@ -253,7 +234,6 @@ function mountvm_nonroot() {
   local disk_filename=$1 chroot_dir=$2
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-
   xptabproc <<'EOS'
     part_filename=$(ppartpath ${disk_filename} ${mountpoint})
     case "${mountpoint}" in
@@ -272,7 +252,7 @@ function mountvm() {
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   [[ -d "${chroot_dir}" ]] && { echo "already exists: ${chroot_dir}" >&2; return 1; }
   mkdir -p ${chroot_dir}
-  mountvm_root ${disk_filename} ${chroot_dir}
+  mountvm_root    ${disk_filename} ${chroot_dir}
   mountvm_nonroot ${disk_filename} ${chroot_dir}
 }
 
@@ -288,9 +268,7 @@ function installos() {
   local distro_dir=$1 disk_filename=$2
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-
   local chroot_dir=${chroot_dir_path}
-
   installdistro2vm     ${distro_dir} ${chroot_dir}
   installgrub2vm       ${chroot_dir} ${disk_filename}
   configure_networking ${chroot_dir}
@@ -301,11 +279,9 @@ function installdistro2vm() {
   local distro_dir=$1 chroot_dir=$2
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-
   printf "[DEBUG] Installing OS to %s\n" ${chroot_dir}
   rsync -aHA ${distro_dir}/ ${chroot_dir}
   sync
-
   printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
   sed -i s,^keepcache=.*,keepcache=${keepcache}, ${chroot_dir}/etc/yum.conf
 }
@@ -314,11 +290,8 @@ function installgrub2vm() {
   local chroot_dir=$1 disk_filename=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-
   local tmpdir=/tmp/vmbuilder-grub
   mkdir -p ${chroot_dir}/${tmpdir}
-
-  local grub_id=0
 
   is_dev ${disk_filename} || {
     local new_filename=${tmpdir}/$(basename ${disk_filename})
@@ -326,6 +299,7 @@ function installgrub2vm() {
     mount --bind ${disk_filename} ${chroot_dir}/${new_filename}
   }
 
+  local grub_id=0
   local devmapfile=${tmpdir}/device.map
   touch ${chroot_dir}/${devmapfile}
   printf "[INFO] Generating %s\n" ${devmapfile}
@@ -339,9 +313,7 @@ function installgrub2vm() {
   cat ${chroot_dir}/${devmapfile}
 
   printf "[INFO] Installing grub\n"
-  # install grub
   local grub_cmd=
-
   is_dev ${disk_filename} && {
     grub_cmd="grub --device-map=${chroot_dir}/${devmapfile} --batch"
   } || {
@@ -402,7 +374,6 @@ function configure_networking() {
   cat ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
 
   printf "[INFO] Generating /etc/resolv.conf\n"
-  # /etc/resolv.conf
   [[ -z "${dns}" ]] || {
     printf "[INFO] Unsetting /etc/resolv.conf\n"
     cat <<-_EOS_ > ${chroot_dir}/etc/resolv.conf
@@ -411,7 +382,6 @@ function configure_networking() {
   }
   cat ${chroot_dir}/etc/resolv.conf
 
-  # hostname
   [[ -z "${hostname}" ]] || {
     printf "[INFO] Setting hostname: %s\n" ${hostname}
     egrep ^HOSTNAME= ${chroot_dir}/etc/sysconfig/network -q && {
@@ -425,7 +395,6 @@ function configure_networking() {
     cat ${chroot_dir}/etc/hosts
   }
 
-  # disable mac address caching
   printf "[INFO] Unsetting udev 70-persistent-net.rules\n"
   rm -f ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
   ln -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
