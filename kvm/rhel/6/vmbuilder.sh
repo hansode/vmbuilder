@@ -4,7 +4,6 @@
 #  bash
 #  tr, dirname, pwd
 #  sed, head
-#  cebootstrap.sh
 #  cat
 #  mkdir, rmdir
 #  rsync, sync, touch, ln, rm
@@ -165,22 +164,6 @@ function register_options() {
   gw=${gw:-}
   dns=${dns:-}
   hostname=${hostname:-}
-}
-
-function bootstrap() {
-  local distro_dir=$1
-  [[ -d "${distro_dir}" ]] && {
-    printf "[INFO] already exists: %s\n" ${distro_dir}
-  } || {
-    printf "[INFO] Building OS tree: %s\n" ${distro_dir}
-    ${abs_dirname}/cebootstrap.sh \
-     --distro-name=${distro_name} \
-     --distro-ver=${distro_ver}   \
-     --distro-arch=${distro_arch} \
-     --chroot-dir=${distro_dir}   \
-     --keepcache=${keepcache}     \
-     --batch=1
-  }
 }
 
 ## vmdisk
