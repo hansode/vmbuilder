@@ -4,7 +4,7 @@
 #  bash
 #  tr, dirname, pwd
 #  sed, head
-#  build_rootfs_tree.sh
+#  cebootstrap.sh
 #  cat, udevadm, blkid
 #  mkfs.ext4, tune2fs, mkswap
 #  mount, umount, mkdir, rmdir
@@ -168,7 +168,7 @@ function build_vers() {
   hostname=${hostname:-}
 }
 
-function mkrootfs() {
+function bootstrap() {
   local distro_dir=$1
   [[ -d "${distro_dir}" ]] && {
     printf "[INFO] already exists: %s\n" ${distro_dir}
@@ -462,8 +462,8 @@ function is_dev() {
 
 ## task
 
-function task_mkrootfs() {
-  mkrootfs ${distro_dir}
+function task_bootstrap() {
+  bootstrap ${distro_dir}
 }
 
 function task_mkdisk() {
@@ -571,8 +571,8 @@ case "${cmd}" in
 debug|dump)
   dump_vers
   ;;
-rootfs)
-  task_mkrootfs
+bootstrap)
+  task_bootstrap
   ;;
 prep|prepare)
   task_mkdisk
@@ -617,8 +617,8 @@ soft-test)
   task_clean
   ;;
 *)
-  # %rootfs
-  task_mkrootfs
+  # %bootstrap
+  task_bootstrap
   # %prep
   task_mkdisk
   # %setup
