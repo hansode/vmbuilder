@@ -274,7 +274,6 @@ function configure_mounting() {
     /home) fstype=ext4 dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
     *)     fstype=ext4 dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
     esac
-
     uuid=$(ppartuuid ${disk_filename} ${mountpoint})
     printf "UUID=%s %s\t%s\tdefaults\t%s %s\n" ${uuid} ${mountpath} ${fstype} ${dumpopt} ${fsckopt}
 EOS
