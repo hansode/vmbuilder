@@ -6,6 +6,7 @@
 #  MAKEDEV, mount, umount
 #  cat, egrep, awk
 #  parted, kpartx, udevadm
+#  mkfs.ext4, tune2fs, mkswap
 #
 
 ## disk

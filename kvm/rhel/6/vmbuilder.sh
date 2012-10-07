@@ -6,7 +6,6 @@
 #  sed, head
 #  cebootstrap.sh
 #  cat, udevadm, blkid
-#  mkfs.ext4, tune2fs, mkswap
 #  mount, umount, mkdir, rmdir
 #  rsync, sync, touch, ln, rm
 #  chroot, grub, setarch
