@@ -122,7 +122,7 @@ function register_options() {
   execscript=${execscript:-}
   raw=${raw:-./${distro}.raw}
 
-  chroot_dir_path=${chroot_dir_path:-/tmp/tmp$(date +%s)}
+  chroot_dir=${chroot_dir:-/tmp/tmp$(date +%s)}
 
   #domain=${domain:-}
   ip=${ip:-}
@@ -180,19 +180,19 @@ function task_mkfs() {
 }
 
 function task_mount() {
-  mount_ptab ${raw} ${chroot_dir_path}
+  mount_ptab ${raw} ${chroot_dir}
 }
 
 function task_install() {
-  install_os ${distro_dir} ${raw} ${keepcache}
+  install_os ${chroot_dir} ${distro_dir} ${raw} ${keepcache}
 }
 
 function task_postinstall() {
-  run_execscript ${chroot_dir_path}
+  run_execscript ${chroot_dir}
 }
 
 function task_umount() {
-  umount_ptab ${chroot_dir_path}
+  umount_ptab ${chroot_dir}
 }
 
 function task_unmapptab() {
@@ -226,7 +226,7 @@ function task_status() {
 }
 
 function task_trap() {
-  [[ -d ${chroot_dir_path} ]] && umount_ptab ${chroot_dir_path} || :
+  [[ -d ${chroot_dir} ]] && umount_ptab ${chroot_dir} || :
   is_dev ${raw} || {
     unmapptab_r ${raw}
   }
