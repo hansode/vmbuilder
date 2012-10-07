@@ -190,13 +190,13 @@ function install_os() {
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   local chroot_dir=${chroot_dir_path}
-  installdistro2vm     ${distro_dir} ${chroot_dir}
+  install_distro       ${distro_dir} ${chroot_dir}
   install_bootloader   ${chroot_dir} ${disk_filename}
   configure_networking ${chroot_dir}
   configure_mounting   ${chroot_dir} ${disk_filename}
 }
 
-function installdistro2vm() {
+function install_distro() {
   local distro_dir=$1 chroot_dir=$2
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
