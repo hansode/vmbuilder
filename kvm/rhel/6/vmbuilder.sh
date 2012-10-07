@@ -183,56 +183,7 @@ function bootstrap() {
   }
 }
 
-## vmimage
-
-function mountvm_root() {
-  local disk_filename=$1 chroot_dir=$2
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  xptabproc <<'EOS'
-    part_filename=$(ppartpath ${disk_filename} ${mountpoint})
-    case "${mountpoint}" in
-    root)
-      printf "[DEBUG] Mounting %s\n" ${chroot_dir}
-      mount ${part_filename} ${chroot_dir}
-      ;;
-    esac
-EOS
-}
-
-function mountvm_nonroot() {
-  local disk_filename=$1 chroot_dir=$2
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  xptabproc <<'EOS'
-    part_filename=$(ppartpath ${disk_filename} ${mountpoint})
-    case "${mountpoint}" in
-    root|swap) ;;
-    *)
-      printf "[DEBUG] Mounting %s\n" ${chroot_dir}${mountpoint}
-      [[ -d ${chroot_dir}${mountpoint} ]] || mkdir -p ${chroot_dir}${mountpoint}
-      mount ${part_filename} ${chroot_dir}${mountpoint}
-      ;;
-    esac
-EOS
-}
-
-function mountvm() {
-  local disk_filename=$1 chroot_dir=$2
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  [[ -d "${chroot_dir}" ]] && { echo "already exists: ${chroot_dir}" >&2; return 1; }
-  mkdir -p ${chroot_dir}
-  mountvm_root    ${disk_filename} ${chroot_dir}
-  mountvm_nonroot ${disk_filename} ${chroot_dir}
-}
-
-function umountvm() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  umount_nonroot ${chroot_dir}
-  umount_root    ${chroot_dir}
-  rmdir ${chroot_dir}
-}
+## vmdisk
 
 function installos() {
   local distro_dir=$1 disk_filename=$2
