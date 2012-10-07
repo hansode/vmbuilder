@@ -38,7 +38,6 @@ function repofile() {
 	plugins=1
 	metadata_expire=1800
 	installonly_limit=2
-	
 	# PUT YOUR REPOS HERE OR IN separate files named file.repo
 	# in /etc/yum.repos.d
 	[${reponame}]
@@ -264,7 +263,6 @@ function configure_mounting() {
   local chroot_dir=$1 disk_filename=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-
   printf "[INFO] Overwriting /etc/fstab\n"
   {
   xptabproc <<'EOS'
@@ -280,7 +278,6 @@ function configure_mounting() {
     uuid=$(ppartuuid ${disk_filename} ${mountpoint})
     printf "UUID=%s %s\t%s\tdefaults\t%s %s\n" ${uuid} ${mountpath} ${fstype} ${dumpopt} ${fsckopt}
 EOS
-
   cat <<-_EOS_
 	tmpfs                   /dev/shm                tmpfs   defaults        0 0
 	devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
