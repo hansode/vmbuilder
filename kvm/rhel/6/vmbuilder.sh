@@ -454,7 +454,7 @@ function task_mapptab() {
 }
 
 function task_mkfs() {
-  mkfs2vm ${raw}
+  mkfs ${raw}
 }
 
 function task_mount() {
