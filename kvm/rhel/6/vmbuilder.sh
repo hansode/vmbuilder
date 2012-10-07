@@ -137,7 +137,7 @@ function register_options() {
 ## vmdisk
 
 function run_execscript() {
-  local chroot_dir=$1
+  local chroot_dir=$1 execscript=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   [[ -f "${execscript}" ]] || return 0
   [[ -x "${execscript}" ]] || return 0
@@ -188,7 +188,7 @@ function task_install() {
 }
 
 function task_postinstall() {
-  run_execscript ${chroot_dir}
+  run_execscript ${chroot_dir} ${execscript}
 }
 
 function task_umount() {
