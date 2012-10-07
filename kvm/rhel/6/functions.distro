@@ -96,10 +96,11 @@ function configure_networking() {
 	EOS
 }
 
-function configure_passwd() {
+function update_passwords() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   chroot ${chroot_dir} pwconv
+  chroot ${chroot_dir} bash -c "echo root:root | chpasswd"
 }
 
 function set_timezone() {

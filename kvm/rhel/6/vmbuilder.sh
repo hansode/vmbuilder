@@ -435,11 +435,6 @@ function run_execscript() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
 
-  [[ -n "${execscript}" ]] || {
-    chroot ${chroot_dir} bash -c "echo root:root | chpasswd"
-    return 0
-  }
-
   [[ -f "${execscript}" ]] || return 0
   [[ -x "${execscript}" ]] || return 0
 
