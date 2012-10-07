@@ -116,7 +116,7 @@ function prevent_daemons_starting() {
   done < <(chroot ${chroot_dir} chkconfig --list | egrep -v :on)
 }
 
-function installgrub() {
+function install_grub() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   for grub_distro_name in redhat unknown; do

@@ -120,7 +120,7 @@ function task_install() {
   configure_passwd     ${chroot_dir}
   set_timezone         ${chroot_dir}
   prevent_daemons_starting ${chroot_dir}
-  installgrub          ${chroot_dir}
+  install_grub         ${chroot_dir}
   cleanup              ${chroot_dir}
 
   umount_nonroot ${chroot_dir}
