@@ -76,9 +76,6 @@ function xptabinfo() {
       cat ${xpart}
     } || {
       cat <<-EOS
-	#
-	# totalsize:${totalsize}
-	#
 	/boot ${bootsize}
 	root  ${rootsize}
 	swap  ${swapsize}

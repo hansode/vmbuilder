@@ -148,7 +148,6 @@ function register_options() {
   optsize=${optsize:-0}
   swapsize=${swapsize:-1024}
   homesize=${homesize:-0}
-  totalsize=$((${rootsize} + ${optsize} + ${swapsize} + ${homesize}))
 
   xpart=${xpart:-}
   execscript=${execscript:-}
@@ -190,6 +189,7 @@ function task_mkdisk() {
     rmmbr ${raw}
   } || {
     [[ -f ${raw} ]] && rmdisk ${raw}
+    local totalsize=$((${rootsize} + ${optsize} + ${swapsize} + ${homesize}))
     printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${raw} ${totalsize}
     mkdisk  ${raw} ${totalsize}
   }
