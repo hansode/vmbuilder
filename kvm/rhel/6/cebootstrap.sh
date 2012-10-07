@@ -118,7 +118,7 @@ function task_install() {
   configure_mounting   ${chroot_dir}
   configure_networking ${chroot_dir}
   configure_passwd     ${chroot_dir}
-  configure_tz         ${chroot_dir}
+  set_timezone         ${chroot_dir}
   configure_service    ${chroot_dir}
   installgrub          ${chroot_dir}
   cleanup              ${chroot_dir}

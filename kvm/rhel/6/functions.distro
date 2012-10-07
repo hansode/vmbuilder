@@ -102,7 +102,7 @@ function configure_passwd() {
   chroot ${chroot_dir} pwconv
 }
 
-function configure_tz() {
+function set_timezone() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
