@@ -185,27 +185,6 @@ function bootstrap() {
 
 ## vmdisk
 
-function install_os() {
-  local distro_dir=$1 disk_filename=$2 keepcache=$3
-  [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  local chroot_dir=${chroot_dir_path}
-  install_distro       ${distro_dir} ${chroot_dir}
-  install_bootloader   ${chroot_dir} ${disk_filename}
-  configure_networking ${chroot_dir}
-  configure_mounting   ${chroot_dir} ${disk_filename}
-  configure_keepcache  ${chroot_dir} ${keepcache}
-}
-
-function install_distro() {
-  local distro_dir=$1 chroot_dir=$2
-  [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  printf "[DEBUG] Installing OS to %s\n" ${chroot_dir}
-  rsync -aHA ${distro_dir}/ ${chroot_dir}
-  sync
-}
-
 function run_execscript() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
