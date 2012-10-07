@@ -203,3 +203,80 @@ function is_dev() {
        *) return 1 ;;
   esac
 }
+
+function configure_networking() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+
+  printf "[INFO] Generating /etc/sysconfig/network-scripts/ifcfg-eth0\n"
+  [[ -z "${ip}" ]] || {
+    printf "[INFO] Unsetting /etc/sysconfig/network-scripts/ifcfg-eth0\n"
+    cat <<-_EOS_ > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
+	DEVICE=eth0
+	BOOTPROTO=static
+	ONBOOT=yes
+	IPADDR=${ip}
+	$([[ -z "${net}"   ]] || echo "NETMASK=${net}")
+	$([[ -z "${bcast}" ]] || echo "BROADCAST=${bcast}")
+	$([[ -z "${gw}"    ]] || echo "GATEWAY=${gw}")
+	_EOS_
+  }
+  cat ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
+
+  printf "[INFO] Generating /etc/resolv.conf\n"
+  [[ -z "${dns}" ]] || {
+    printf "[INFO] Unsetting /etc/resolv.conf\n"
+    cat <<-_EOS_ > ${chroot_dir}/etc/resolv.conf
+	nameserver ${dns}
+	_EOS_
+  }
+  cat ${chroot_dir}/etc/resolv.conf
+
+  [[ -z "${hostname}" ]] || {
+    printf "[INFO] Setting hostname: %s\n" ${hostname}
+    egrep ^HOSTNAME= ${chroot_dir}/etc/sysconfig/network -q && {
+      sed -i "s,^HOSTNAME=.*,HOSTNAME=${hostname}," ${chroot_dir}/etc/sysconfig/network
+    } || {
+      echo HOSTNAME=${hostname} >> ${chroot_dir}/etc/sysconfig/network
+    }
+    cat ${chroot_dir}/etc/sysconfig/network
+
+    echo 127.0.0.1 ${hostname} >> ${chroot_dir}/etc/hosts
+    cat ${chroot_dir}/etc/hosts
+  }
+
+  printf "[INFO] Unsetting udev 70-persistent-net.rules\n"
+  rm -f ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
+  ln -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
+}
+
+function configure_mounting() {
+  local chroot_dir=$1 disk_filename=$2
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+
+  printf "[INFO] Overwriting /etc/fstab\n"
+  {
+  xptabproc <<'EOS'
+    case "${mountpoint}" in
+    /boot) fstype=ext4 dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
+    root)  fstype=ext4 dumpopt=1 fsckopt=1 mountpath=/             ;;
+    swap)  fstype=swap dumpopt=0 fsckopt=0 mountpath=${mountpoint} ;;
+    /opt)  fstype=ext4 dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
+    /home) fstype=ext4 dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
+    *)     fstype=ext4 dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
+    esac
+
+    uuid=$(ppartuuid ${disk_filename} ${mountpoint})
+    printf "UUID=%s %s\t%s\tdefaults\t%s %s\n" ${uuid} ${mountpath} ${fstype} ${dumpopt} ${fsckopt}
+EOS
+
+  cat <<-_EOS_
+	tmpfs                   /dev/shm                tmpfs   defaults        0 0
+	devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
+	sysfs                   /sys                    sysfs   defaults        0 0
+	proc                    /proc                   proc    defaults        0 0
+	_EOS_
+  } > ${chroot_dir}/etc/fstab
+  cat ${chroot_dir}/etc/fstab
+}
