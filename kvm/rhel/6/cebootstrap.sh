@@ -107,7 +107,7 @@ function task_prep() {
 }
 
 function task_setup() {
-  mkdevdir  ${chroot_dir}
+  mkdevice  ${chroot_dir}
   mkprocdir ${chroot_dir}
 }
 

@@ -24,7 +24,7 @@ function rmdisk() {
 
 ## filesystem
 
-function mkdevdir() {
+function mkdevice() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   mkdir ${chroot_dir}/dev
