@@ -270,7 +270,7 @@ function installos() {
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   local chroot_dir=${chroot_dir_path}
   installdistro2vm     ${distro_dir} ${chroot_dir}
-  installgrub2vm       ${chroot_dir} ${disk_filename}
+  install_bootloader   ${chroot_dir} ${disk_filename}
   configure_networking ${chroot_dir}
   configure_mounting   ${chroot_dir} ${disk_filename}
 }
@@ -286,7 +286,7 @@ function installdistro2vm() {
   sed -i s,^keepcache=.*,keepcache=${keepcache}, ${chroot_dir}/etc/yum.conf
 }
 
-function installgrub2vm() {
+function install_bootloader() {
   local chroot_dir=$1 disk_filename=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
