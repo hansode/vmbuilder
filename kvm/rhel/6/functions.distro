@@ -136,13 +136,6 @@ function install_grub() {
   done
 }
 
-function cleanup() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  find   ${chroot_dir}/var/log/ -type f | xargs rm
-  rm -rf ${chroot_dir}/tmp/*
-}
-
 function install_bootloader() {
   local chroot_dir=$1 disk_filename=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
@@ -302,4 +295,11 @@ function configure_keepcache() {
   local chroot_dir=$1 keepcache=$2
   printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
   sed -i s,^keepcache=.*,keepcache=${keepcache}, ${chroot_dir}/etc/yum.conf
+}
+
+function cleanup() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  find   ${chroot_dir}/var/log/ -type f | xargs rm
+  rm -rf ${chroot_dir}/tmp/*
 }
