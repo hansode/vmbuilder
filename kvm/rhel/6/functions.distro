@@ -36,24 +36,19 @@ function repofile() {
 
 function yum_install() {
   local chroot_dir=$1 reponame=$2 baseurl=$3 gpgkey=$4 keepcache=$5
-
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-
   local tmpdir=${chroot_dir}/tmp
-  mkdir ${tmpdir}
   local repofile=${tmpdir}/yum-${reponame}.repo
-
-  repofile ${reponame} ${baseurl} ${gpgkey} ${keepcache} > ${repofile}
-
-  local yum_opts="
+  local yum_cmd="
+     yum
      -c ${repofile} \
      --disablerepo="\*" \
      --enablerepo="${reponame}" \
      --installroot=${chroot_dir} \
      -y
   "
-  local yum_cmd="yum ${yum_opts}"
-
+  mkdir ${tmpdir}
+  repofile ${reponame} ${baseurl} ${gpgkey} ${keepcache} > ${repofile}
   ${yum_cmd} groupinstall Core
   ${yum_cmd} install \
              kernel dracut openssh openssh-clients openssh-server rpm yum curl dhclient \
@@ -80,15 +75,12 @@ function install_networking() {
   cat <<-EOS > ${chroot_dir}/etc/hosts
 	127.0.0.1       localhost
 	EOS
-
   cat <<-EOS > ${chroot_dir}/etc/resolv.conf
 	nameserver 8.8.8.8
 	EOS
-
   cat <<-EOS > ${chroot_dir}/etc/sysconfig/network
 	NETWORKING=yes
 	EOS
-
   cat <<-EOS > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
 	DEVICE=eth0
 	BOOTPROTO=dhcp
