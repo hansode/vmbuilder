@@ -108,7 +108,7 @@ function set_timezone() {
   cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
 }
 
-function configure_service() {
+function prevent_daemons_starting() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   while read svc dummy; do
