@@ -19,7 +19,7 @@ set -e
 
 ## private functions
 
-function build_vers() {
+function register_options() {
   debug=${debug:-}
   [ -z ${debug} ] || set -x
 
@@ -160,7 +160,7 @@ extract_args $*
 
 ## main
 
-build_vers
+register_options
 checkroot
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
