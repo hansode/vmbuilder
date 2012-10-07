@@ -74,7 +74,7 @@ function install_fstab() {
 	EOS
 }
 
-function configure_networking() {
+function install_networking() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   cat <<-EOS > ${chroot_dir}/etc/hosts

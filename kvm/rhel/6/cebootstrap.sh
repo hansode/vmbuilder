@@ -116,7 +116,7 @@ function task_install() {
 
   installdistro        ${chroot_dir} ${distro_short} ${baseurl} ${gpgkey} ${keepcache}
   install_fstab        ${chroot_dir}
-  configure_networking ${chroot_dir}
+  install_networking   ${chroot_dir}
   update_passwords     ${chroot_dir}
   set_timezone         ${chroot_dir}
   prevent_daemons_starting ${chroot_dir}
