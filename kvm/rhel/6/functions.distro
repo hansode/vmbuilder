@@ -280,3 +280,9 @@ EOS
   } > ${chroot_dir}/etc/fstab
   cat ${chroot_dir}/etc/fstab
 }
+
+function configure_keepcache() {
+  local chroot_dir=$1 keepcache=$2
+  printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
+  sed -i s,^keepcache=.*,keepcache=${keepcache}, ${chroot_dir}/etc/yum.conf
+}

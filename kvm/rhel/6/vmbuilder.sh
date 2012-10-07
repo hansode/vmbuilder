@@ -186,7 +186,7 @@ function bootstrap() {
 ## vmdisk
 
 function install_os() {
-  local distro_dir=$1 disk_filename=$2
+  local distro_dir=$1 disk_filename=$2 keepcache=$3
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   local chroot_dir=${chroot_dir_path}
@@ -194,6 +194,7 @@ function install_os() {
   install_bootloader   ${chroot_dir} ${disk_filename}
   configure_networking ${chroot_dir}
   configure_mounting   ${chroot_dir} ${disk_filename}
+  configure_keepcache  ${chroot_dir} ${keepcache}
 }
 
 function install_distro() {
@@ -203,8 +204,6 @@ function install_distro() {
   printf "[DEBUG] Installing OS to %s\n" ${chroot_dir}
   rsync -aHA ${distro_dir}/ ${chroot_dir}
   sync
-  printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
-  sed -i s,^keepcache=.*,keepcache=${keepcache}, ${chroot_dir}/etc/yum.conf
 }
 
 function run_execscript() {
@@ -254,7 +253,7 @@ function task_mount() {
 }
 
 function task_install() {
-  install_os ${distro_dir} ${raw}
+  install_os ${distro_dir} ${raw} ${keepcache}
 }
 
 function task_postinstall() {
