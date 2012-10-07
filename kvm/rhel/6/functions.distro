@@ -62,7 +62,7 @@ function installdistro() {
   ${yum_cmd} erase selinux*
 }
 
-function configure_mounting() {
+function install_fstab() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   cat <<-EOS > ${chroot_dir}/etc/fstab
