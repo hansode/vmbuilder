@@ -32,6 +32,12 @@ function register_options() {
   distro_ver=${distro_ver:-6.3}
   distro_name=${distro_name:-centos}
 
+  keepcache=${keepcache:-0}
+  case "${keepcache}" in
+  [01]) ;;
+  *)    keepcache=0 ;;
+  esac
+
   case "${distro_name}" in
   centos)
     distro_short=centos
@@ -60,13 +66,6 @@ function register_options() {
   esac
 
   chroot_dir=${chroot_dir:-${abs_dirname}/${distro_short}-${distro_ver}_${distro_arch}}
-
-  keepcache=${keepcache:-0}
-  # keepcache should be [ 0 | 1 ]
-  case "${keepcache}" in
-  [01]) ;;
-  *)    keepcache=0 ;;
-  esac
 }
 
 function banner() {
