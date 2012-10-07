@@ -311,6 +311,7 @@ readonly abs_dirname=$(cd $(dirname $0) && pwd)
 . ${abs_dirname}/functions.disk
 . ${abs_dirname}/functions.mbr
 . ${abs_dirname}/functions.distro
+. ${abs_dirname}/functions.hypervisor
 
 ### prepare
 
