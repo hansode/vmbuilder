@@ -408,7 +408,7 @@ function task_mkfs() {
 }
 
 function task_mount() {
-  mountvm ${raw} ${chroot_dir_path}
+  mount_ptab ${raw} ${chroot_dir_path}
 }
 
 function task_install() {
@@ -420,7 +420,7 @@ function task_postinstall() {
 }
 
 function task_umount() {
-  umountvm ${chroot_dir_path}
+  umount_ptab ${chroot_dir_path}
 }
 
 function task_unmapptab() {
@@ -454,7 +454,7 @@ function task_status() {
 }
 
 function task_trap() {
-  [[ -d ${chroot_dir_path} ]] && umountvm ${chroot_dir_path} || :
+  [[ -d ${chroot_dir_path} ]] && umount_ptab ${chroot_dir_path} || :
   is_dev ${raw} || {
     unmapptab_r ${raw}
   }
