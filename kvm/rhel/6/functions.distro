@@ -7,7 +7,7 @@
 #  egrep, xargs
 #
 
-function genrepofile() {
+function repofile() {
   local reponame=$1 baseurl=$2 gpgkey=$3 keepcache=$4
   cat <<-EOS
 	[main]
@@ -43,7 +43,7 @@ function installdistro() {
   mkdir ${tmpdir}
   local repofile=${tmpdir}/yum-${reponame}.repo
 
-  genrepofile ${reponame} ${baseurl} ${gpgkey} ${keepcache} > ${repofile}
+  repofile ${reponame} ${baseurl} ${gpgkey} ${keepcache} > ${repofile}
 
   local yum_opts="
      -c ${repofile} \
