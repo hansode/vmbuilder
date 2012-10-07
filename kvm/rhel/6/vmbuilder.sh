@@ -207,74 +207,6 @@ function install_distro() {
   sed -i s,^keepcache=.*,keepcache=${keepcache}, ${chroot_dir}/etc/yum.conf
 }
 
-function install_bootloader() {
-  local chroot_dir=$1 disk_filename=$2
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  local tmpdir=/tmp/vmbuilder-grub
-  mkdir -p ${chroot_dir}/${tmpdir}
-
-  is_dev ${disk_filename} || {
-    local new_filename=${tmpdir}/$(basename ${disk_filename})
-    touch ${chroot_dir}/${new_filename}
-    mount --bind ${disk_filename} ${chroot_dir}/${new_filename}
-  }
-
-  local grub_id=0
-  local devmapfile=${tmpdir}/device.map
-  touch ${chroot_dir}/${devmapfile}
-  printf "[INFO] Generating %s\n" ${devmapfile}
-  {
-    is_dev ${disk_filename} && {
-      printf "(hd%d) %s\n" ${grub_id} ${disk_filename}
-    } || {
-      printf "(hd%d) %s\n" ${grub_id} ${new_filename}
-    }
-  } >> ${chroot_dir}/${devmapfile}
-  cat ${chroot_dir}/${devmapfile}
-
-  printf "[INFO] Installing grub\n"
-  local grub_cmd=
-  is_dev ${disk_filename} && {
-    grub_cmd="grub --device-map=${chroot_dir}/${devmapfile} --batch"
-  } || {
-    grub_cmd="chroot ${chroot_dir} grub --device-map=${devmapfile} --batch"
-  }
-  cat <<-_EOS_ | ${grub_cmd}
-	root (hd${grub_id},0)
-	setup (hd0)
-	quit
-	_EOS_
-
-  printf "[INFO] Generating /boot/grub/grub.conf\n"
-  local bootdir_path=/boot
-  xptabinfo | egrep -q /boot && {
-    bootdir_path=
-  }
-  cat <<-_EOS_ > ${chroot_dir}/boot/grub/grub.conf
-	default=0
-	timeout=5
-	splashimage=(hd${grub_id},0)${bootdir_path}/grub/splash.xpm.gz
-	hiddenmenu
-	title ${distro} ($(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1 | sed 's,^vmlinuz-,,'))
-	        root (hd${grub_id},0)
-	        kernel ${bootdir_path}/$(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1) ro root=UUID=$(ppartuuid ${disk_filename} root) rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto  KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM
-	        initrd ${bootdir_path}/$(cd ${chroot_dir}/boot && ls initramfs-*| tail -1)
-	_EOS_
-  cat ${chroot_dir}/boot/grub/grub.conf
-  cd ${chroot_dir}/boot/grub
-  ln -fs grub.conf menu.lst
-  cd -
-
-  is_dev ${disk_filename} || {
-    printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
-    umount ${chroot_dir}/${new_filename}
-  }
-
-  printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
-  rm -rf ${chroot_dir}/${tmpdir}
-}
-
 function configure_networking() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
@@ -364,16 +296,6 @@ function run_execscript() {
 
   printf "[INFO] Excecuting script: %s\n" ${execscript}
   setarch ${distro_arch} ${execscript} ${chroot_dir}
-}
-
-function is_dev() {
-  local disk_filename=$1 mountpoint=$2
-  # do not use "-a" in this case.
-  [[ -n ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  case "${disk_filename}" in
-  /dev/*) return 0 ;;
-       *) return 1 ;;
-  esac
 }
 
 ## task
@@ -469,6 +391,7 @@ readonly abs_dirname=$(cd $(dirname $0) && pwd)
 . ${abs_dirname}/functions.utils
 . ${abs_dirname}/functions.disk
 . ${abs_dirname}/functions.mbr
+. ${abs_dirname}/functions.distro
 
 ### prepare
 
