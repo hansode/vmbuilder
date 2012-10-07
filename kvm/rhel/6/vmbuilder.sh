@@ -87,36 +87,6 @@ set -e
 
 ## private functions
 
-function dump_vers() {
-  cat <<-EOS
-	# debug
-	debug="${debug}"
-	# options
-	distro_name="${distro_name}"
-	distro_ver="${distro_ver}"
-	distro_arch="${distro_arch}"
-	distro="${distro}"
-	distro_dir="${distro_dir}"
-	keepcache="${keepcache}"
-	max_mount_count="${max_mount_count}"
-	interval_between_check="${interval_between_check}"
-	rootsize="${rootsize}"
-	bootsize="${bootsize}"
-	optsize="${optsize}"
-	swapsize="${swapsize}"
-	homesize="${homesize}"
-	xpart="${xpart}"
-	execscript="${execscript}"
-	raw="${raw}"
-	ip="${ip}"
-	mask="${mask}"
-	bcast="${bcast}"
-	gw="${gw}"
-	dns="${dns}"
-	hostname="${hostname}"
-	EOS
-}
-
 function register_options() {
   debug=${debug:-}
   [[ -z "${debug}" ]] || set -x
@@ -288,9 +258,6 @@ trap 'exit 1'  HUP INT PIPE QUIT TERM
 trap task_trap EXIT
 
 case "${cmd}" in
-debug|dump)
-  dump_vers
-  ;;
 bootstrap)
   task_bootstrap
   ;;
