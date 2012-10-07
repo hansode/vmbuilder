@@ -1,15 +1,19 @@
 #!/bin/bash
-
+#
+# requires:
+#  bash
+#  chroot
+#
 set -x
 set -e
 
 echo "doing execscript.sh: $1"
 
 cat <<'EOS' | chroot $1 bash -c "cat | bash"
-# change root passwd
+## change root passwd
 echo root:root | chpasswd
 
-# instlall package
+## instlall package
 distro_pkgs="
  vim-minimal
  screen
