@@ -5,8 +5,8 @@
 #  tr, dirname, pwd
 #  sed, head
 #  cebootstrap.sh
-#  cat, udevadm, blkid
-#  mount, umount, mkdir, rmdir
+#  cat
+#  mkdir, rmdir
 #  rsync, sync, touch, ln, rm
 #  chroot, grub, setarch
 #  losetup, dmsetup
@@ -210,13 +210,10 @@ function install_distro() {
 function run_execscript() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-
   [[ -f "${execscript}" ]] || return 0
   [[ -x "${execscript}" ]] || return 0
-
   mount_proc ${chroot_dir}
   mount_dev  ${chroot_dir}
-
   printf "[INFO] Excecuting script: %s\n" ${execscript}
   setarch ${distro_arch} ${execscript} ${chroot_dir}
 }

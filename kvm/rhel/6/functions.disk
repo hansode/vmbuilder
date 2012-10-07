@@ -5,7 +5,7 @@
 #  truncate, rm
 #  MAKEDEV, mount, umount
 #  cat, egrep, awk
-#  parted, kpartx, udevadm
+#  parted, kpartx, udevadm, blkid
 #  mkfs.ext4, tune2fs, mkswap
 #
 
