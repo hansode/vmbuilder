@@ -1,5 +1,5 @@
 DISTRO_NAMES=centos sl
-DISTRO_VERS=6 6.0 6.1 6.2
+DISTRO_VERS=6 6.0 6.1 6.2 6.3
 VMBUILDER=./vmbuilder.sh
 
 all: build
