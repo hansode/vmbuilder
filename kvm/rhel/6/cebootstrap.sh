@@ -83,27 +83,6 @@ function banner() {
 
 ## task
 
-function task_cebootstrap() {
-  [ -d ${chroot_dir} ] && { echo "${chroot_dir} already exists." >&2; return 1; } || :
-  # %prep
-  banner
-  mkdir -p  ${chroot_dir}
-  # %setup
-  mkdevice  ${chroot_dir}
-  mkprocdir ${chroot_dir}
-  # %install
-  mount_proc               ${chroot_dir}
-  yum_install              ${chroot_dir} ${distro_short} "${baseurl}" "${gpgkey}" ${keepcache}
-  install_fstab            ${chroot_dir}
-  install_networking       ${chroot_dir}
-  update_passwords         ${chroot_dir}
-  set_timezone             ${chroot_dir}
-  prevent_daemons_starting ${chroot_dir}
-  install_grub             ${chroot_dir}
-  cleanup                  ${chroot_dir}
-  umount_nonroot           ${chroot_dir}
-}
-
 function task_trap() {
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   printf "[DEBUG] Caught signal\n"
@@ -136,6 +115,7 @@ trap task_trap 1 2 3 15
 
 case "${cmd}" in
 *)
-  task_cebootstrap
+  banner
+  build_chroot ${chroot_dir}
   ;;
 esac
