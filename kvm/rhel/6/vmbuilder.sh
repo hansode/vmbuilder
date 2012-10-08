@@ -6,7 +6,6 @@
 #  sed, head
 #  cat
 #  printf, setarch
-#  losetup, dmsetup
 #
 # memo:
 #
@@ -216,11 +215,6 @@ function task_clean() {
   }
 }
 
-function task_status() {
-  losetup -a
-  dmsetup ls
-}
-
 function task_trap() {
   [[ -d ${chroot_dir} ]] && umount_ptab ${chroot_dir} || :
   is_dev ${raw} || {
@@ -279,9 +273,6 @@ post|postinstall)
   ;;
 clean)
   task_clean
-  ;;
-status)
-  task_status
   ;;
 test::execscript)
   task_mapptab
