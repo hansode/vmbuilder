@@ -147,7 +147,7 @@ function run_execscript() {
 ## task
 
 function task_bootstrap() {
-  bootstrap ${distro_dir}
+  cebootstrap ${distro_dir}
 }
 
 function task_mkdisk() {

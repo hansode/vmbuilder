@@ -11,7 +11,7 @@
 #  mount, umount
 #
 
-function bootstrap() {
+function cebootstrap() {
   local distro_dir=$1
   [[ -d "${distro_dir}" ]] && {
     printf "[INFO] already exists: %s\n" ${distro_dir}
