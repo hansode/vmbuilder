@@ -20,7 +20,6 @@ function bootstrap() {
      --distro-arch=${distro_arch} \
      --chroot-dir=${distro_dir}   \
      --keepcache=${keepcache}     \
-     --batch=1
   }
 }
 

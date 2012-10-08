@@ -10,7 +10,6 @@
 #        --distro-arch=[x86_64 | i686]
 #        --distro-name=[centos | sl]
 #        --distro-ver=[6 | 6.0 | 6.2 | ... ]
-#        --batch=1
 #        --chroot-dir=/path/to/rootfs
 #        --keepcache=1
 #        --debug=1
@@ -82,26 +81,11 @@ function banner() {
 	EOS
 }
 
-function yorn() {
-  [ -n "${batch}" ] && {
-    yorn=y
-  } || {
-    echo -n "OK? [y/n] "
-    read yorn
-    echo ${yorn}
-  }
-  case "${yorn}" in
-  ""|n|N|no|NO) return 1 ;;
-  esac
-}
-
 ## task
 
 function task_prep() {
   [ -d ${chroot_dir} ] && { echo "${chroot_dir} already exists." >&2; return 1; } || :
   banner
-  yorn
-
   mkdir -p ${chroot_dir}
 }
 
