@@ -2,6 +2,7 @@
 #
 # requires:
 #  bash
+#
 
 function extract_args() {
   CMD_ARGS=
