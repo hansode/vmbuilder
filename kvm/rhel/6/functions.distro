@@ -22,7 +22,7 @@ function bootstrap() {
      --distro-ver=${distro_ver}   \
      --distro-arch=${distro_arch} \
      --chroot-dir=${distro_dir}   \
-     --keepcache=${keepcache}     \
+     --keepcache=${keepcache}
   }
 }
 
