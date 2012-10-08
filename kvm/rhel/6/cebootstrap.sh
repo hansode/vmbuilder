@@ -97,7 +97,7 @@ function task_setup() {
 function task_install() {
   mount_proc ${chroot_dir}
 
-  yum_install          ${chroot_dir} ${distro_short} ${baseurl} ${gpgkey} ${keepcache}
+  yum_install          ${chroot_dir} ${distro_short} "${baseurl}" "${gpgkey}" ${keepcache}
   install_fstab        ${chroot_dir}
   install_networking   ${chroot_dir}
   update_passwords     ${chroot_dir}

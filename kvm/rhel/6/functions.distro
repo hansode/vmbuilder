@@ -27,7 +27,7 @@ function bootstrap() {
 }
 
 function repofile() {
-  local reponame=$1 baseurl=$2 gpgkey=$3 keepcache=$4
+  local reponame=$1 baseurl="$2" gpgkey="$3" keepcache=$4
   cat <<-EOS
 	[main]
 	cachedir=/var/cache/yum
@@ -53,7 +53,7 @@ function repofile() {
 }
 
 function yum_install() {
-  local chroot_dir=$1 reponame=$2 baseurl=$3 gpgkey=$4 keepcache=$5
+  local chroot_dir=$1 reponame=$2 baseurl="$3" gpgkey="$4" keepcache=$5
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   local tmpdir=${chroot_dir}/tmp
   local repofile=${tmpdir}/yum-${reponame}.repo
@@ -66,7 +66,7 @@ function yum_install() {
      -y
   "
   mkdir ${tmpdir}
-  repofile ${reponame} ${baseurl} ${gpgkey} ${keepcache} > ${repofile}
+  repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache} > ${repofile}
   ${yum_cmd} groupinstall Core
   ${yum_cmd} install \
              kernel dracut openssh openssh-clients openssh-server rpm yum curl dhclient \
