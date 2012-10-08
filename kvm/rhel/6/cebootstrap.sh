@@ -4,7 +4,7 @@
 #  bash
 #  tr, dirname, pwd
 #  sed, head
-#  arch, cat, mkdir, printf
+#  arch, cat, mkdir, rm, printf
 #
 # OPTIONS
 #        --distro-arch=[x86_64 | i686]

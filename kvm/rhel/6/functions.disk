@@ -3,7 +3,7 @@
 # requires:
 #  bash
 #  truncate, rm
-#  MAKEDEV, mount, umount
+#  mkdir, MAKEDEV, mount, umount
 #  cat, egrep, awk
 #  parted, kpartx, udevadm, blkid
 #  mkfs.ext4, tune2fs, mkswap

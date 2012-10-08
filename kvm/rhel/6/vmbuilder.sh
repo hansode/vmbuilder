@@ -5,9 +5,7 @@
 #  tr, dirname, pwd
 #  sed, head
 #  cat
-#  mkdir, rmdir
-#  rsync, sync, touch, ln, rm
-#  chroot, grub, setarch
+#  printf, setarch
 #  losetup, dmsetup
 #
 # memo:
@@ -216,8 +214,6 @@ function task_clean() {
       rmdisk ${raw}
     }
   }
-  # don't need to clean at least in this task.
-  # [[ -d ${distro_dir} ]] && rm -rf ${distro_dir}
 }
 
 function task_status() {

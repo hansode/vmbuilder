@@ -4,6 +4,7 @@
 #  bash
 #  mount, umount
 #  mkdir, rmdir
+#  rsync, sync
 #
 
 ## vmdisk

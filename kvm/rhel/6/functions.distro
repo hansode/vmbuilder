@@ -2,10 +2,13 @@
 #
 # requires:
 #  bash
-#  yum, chkconfig, pwconv, chroot
-#  mkdir, cp, rm, rsync, find
-#  egrep, xargs
 #  cebootstrap.sh
+#  cat
+#  yum, mkdir
+#  chroot, pwconv, chroot, chkconfig, grub
+#  cp, rm, ln, touch, rsync
+#  find, egrep, sed, xargs
+#  mount, umount
 #
 
 function bootstrap() {
