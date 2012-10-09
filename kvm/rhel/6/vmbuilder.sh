@@ -146,11 +146,11 @@ function run_execscript() {
 
 ## task
 
-function task_bootstrap() {
+function build_vmimage() {
+  # %bootstrap
   cebootstrap ${distro_dir}
-}
 
-function task_mkdisk() {
+  # %prep
   is_dev ${raw} && {
     rmmbr ${raw}
   } || {
@@ -159,47 +159,26 @@ function task_mkdisk() {
     printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${raw} ${totalsize}
     mkdisk  ${raw} ${totalsize}
   }
-}
-
-function task_mkptab() {
   mkptab  ${raw}
-}
-
-function task_mapptab() {
   is_dev ${raw} || {
     printf "[INFO] Creating loop devices corresponding to the created partitions\n"
     mapptab ${raw}
   }
-}
 
-function task_mkfs() {
+  # %build
   mkfs ${raw}
-}
 
-function task_mount() {
+  # %install
   mount_ptab ${raw} ${chroot_dir}
-}
-
-function task_install() {
   install_os ${chroot_dir} ${distro_dir} ${raw} ${keepcache}
-}
-
-function task_postinstall() {
   run_execscript ${chroot_dir} ${execscript}
-}
-
-function task_umount() {
   umount_ptab ${chroot_dir}
-}
 
-function task_unmapptab() {
+  # %post
   is_dev ${raw} || {
     printf "[INFO] Deleting loop devices\n"
     unmapptab_r ${raw}
   }
-}
-
-function task_finish() {
   printf "[INFO] Generated => %s\n" ${raw}
   printf "[INFO] Complete!\n"
 }
@@ -238,22 +217,6 @@ trap task_trap EXIT
 
 case "${cmd}" in
 *)
-  # %bootstrap
-  task_bootstrap
-  # %prep
-  task_mkdisk
-  # %setup
-  task_mkptab
-  task_mapptab
-  # %build
-  task_mkfs
-  # %install
-  task_mount
-  task_install
-  task_postinstall
-  task_umount
-  # %post
-  task_unmapptab
-  task_finish
+  build_vmimage
   ;;
 esac
