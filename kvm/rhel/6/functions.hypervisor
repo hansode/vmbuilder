@@ -69,8 +69,6 @@ function run_execscript() {
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   [[ -f "${execscript}" ]] || return 0
   [[ -x "${execscript}" ]] || return 0
-  mount_proc ${chroot_dir}
-  mount_dev  ${chroot_dir}
   printf "[INFO] Excecuting script: %s\n" ${execscript}
   setarch ${distro_arch} ${execscript} ${chroot_dir}
 }
@@ -87,6 +85,8 @@ function install_os() {
   configure_networking ${chroot_dir}
   configure_mounting   ${chroot_dir} ${disk_filename}
   configure_keepcache  ${chroot_dir} ${keepcache}
+  mount_proc           ${chroot_dir}
+  mount_dev            ${chroot_dir}
   run_execscript       ${chroot_dir} ${execscript}
   umount_ptab ${chroot_dir}
 }
