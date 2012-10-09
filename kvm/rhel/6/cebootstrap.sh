@@ -21,9 +21,7 @@ set -e
 function register_options() {
   debug=${debug:-}
   [ -z ${debug} ] || set -x
-
   set_distro_options
-
   chroot_dir=${chroot_dir:-${abs_dirname}/${distro_short}-${distro_ver}_${distro_arch}}
 }
 
