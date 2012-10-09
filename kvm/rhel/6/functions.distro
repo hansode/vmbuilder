@@ -59,6 +59,25 @@ function preflight_check_distro() {
     return 1
     ;;
   esac
+
+  check_repository_availability "${baseurl}"
+}
+
+function check_repository_availability() {
+  local baseurl=$1
+  case "${baseurl}" in
+  http://*)  ;;
+  https://*) ;;
+  ftp://*)   ;;
+  *)
+    return 0 ;;
+  esac
+  printf "[DEBUG] Testing access to %s\n" ${baseurl}
+  curl -f -s ${baseurl} >/dev/null || {
+    ret=$?
+    printf "[ERROR] Could not connect to %s. Please check your connectivity and try again.\n" ${baseurl}
+    return ${ret}
+  }
 }
 
 function distroinfo() {
