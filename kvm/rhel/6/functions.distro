@@ -76,6 +76,7 @@ function distroinfo() {
 }
 
 function build_chroot() {
+  local chroot_dir=$1
   [ -d ${chroot_dir} ] && { echo "${chroot_dir} already exists." >&2; return 1; } || :
   distroinfo
   # preflight_check
