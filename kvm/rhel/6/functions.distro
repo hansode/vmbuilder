@@ -9,6 +9,10 @@
 #  cp, rm, ln, touch, rsync
 #  find, egrep, sed, xargs
 #  mount, umount
+#  ls, tail
+#
+# imports:
+#  disk: mkdevice, mkprocdir, mount_proc, umount_nonroot, xptabinfo, ppartuuid
 #
 
 ## depending on global variables

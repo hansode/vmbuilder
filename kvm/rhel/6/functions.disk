@@ -8,6 +8,8 @@
 #  parted, kpartx, udevadm, blkid
 #  mkfs.ext4, tune2fs, mkswap
 #
+# imports:
+#
 
 ## disk
 

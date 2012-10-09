@@ -6,6 +6,10 @@
 #  mkdir, rmdir
 #  rsync, sync
 #
+# imports:
+#  disk:   xptabproc, ppartpath
+#  distro: install_bootloader, configure_networking, configure_mounting, configure_keepcache
+#
 
 ## vmdisk
 
