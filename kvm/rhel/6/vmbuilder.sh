@@ -94,7 +94,7 @@ function register_options() {
 ## task
 
 function build_vmimage() {
-  build_chroot ${distro_dir}
+  [[ -d ${distro_dir} ]] || build_chroot ${distro_dir}
   is_dev ${raw} && {
     rmmbr ${raw}
   } || {
