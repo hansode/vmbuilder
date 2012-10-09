@@ -25,7 +25,7 @@ function register_options() {
   chroot_dir=${chroot_dir:-${abs_dirname}/${distro_short}-${distro_ver}_${distro_arch}}
 }
 
-function banner() {
+function distroinfo() {
   cat <<-EOS
 	--------------------
 	distro_arch: ${distro_arch}
@@ -73,7 +73,7 @@ trap task_trap 1 2 3 15
 
 case "${cmd}" in
 *)
-  banner
+  distroinfo
   build_chroot ${chroot_dir}
   ;;
 esac
