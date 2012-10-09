@@ -204,17 +204,6 @@ function task_finish() {
   printf "[INFO] Complete!\n"
 }
 
-function task_clean() {
-  is_dev ${raw} && {
-    rmmbr ${raw}
-  } || {
-    [[ -f ${raw} ]] && {
-      printf "[INFO] Deleting disk image: \"%s\"\n" ${raw}
-      rmdisk ${raw}
-    }
-  }
-}
-
 function task_trap() {
   [[ -d ${chroot_dir} ]] && umount_ptab ${chroot_dir} || :
   is_dev ${raw} || {
@@ -248,48 +237,6 @@ trap 'exit 1'  HUP INT PIPE QUIT TERM
 trap task_trap EXIT
 
 case "${cmd}" in
-bootstrap)
-  task_bootstrap
-  ;;
-prep|prepare)
-  task_mkdisk
-  ;;
-setup)
-  task_mkptab
-  task_mapptab
-  ;;
-build)
-  task_mkfs
-  ;;
-install)
-  task_mount
-  task_install
-  task_postinstall
-  task_umount
-  ;;
-post|postinstall)
-  task_unmapptab
-  task_finish
-  ;;
-clean)
-  task_clean
-  ;;
-test::execscript)
-  task_mapptab
-  task_mount
-  task_postinstall
-  task_umount
-  task_unmapptab
-  ;;
-soft-test)
-  task_mkdisk
-  task_mkptab
-  task_mapptab
-  task_mkfs
-  task_unmapptab
-  task_finish
-  task_clean
-  ;;
 *)
   # %bootstrap
   task_bootstrap
