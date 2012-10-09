@@ -122,7 +122,7 @@ function register_options() {
 
 function build_vmimage() {
   # %bootstrap
-  cebootstrap ${distro_dir}
+  build_chroot ${distro_dir}
 
   # %prep
   is_dev ${raw} && {
