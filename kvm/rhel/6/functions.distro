@@ -61,8 +61,23 @@ function set_distro_options() {
   esac
 }
 
+function distroinfo() {
+  cat <<-EOS
+	--------------------
+	distro_arch: ${distro_arch}
+	distro_name: ${distro_name} ${distro_snake}
+	distro_ver:  ${distro_ver}
+	chroot_dir:  ${chroot_dir}
+	keepcache:   ${keepcache}
+	baseurl:     ${baseurl}
+	gpgkey:      ${gpgkey}
+	--------------------
+	EOS
+}
+
 function build_chroot() {
   [ -d ${chroot_dir} ] && { echo "${chroot_dir} already exists." >&2; return 1; } || :
+  distroinfo
   # preflight_check
   # set_defaults
   bootstrap ${chroot_dir}

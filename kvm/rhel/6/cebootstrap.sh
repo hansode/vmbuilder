@@ -25,20 +25,6 @@ function register_options() {
   chroot_dir=${chroot_dir:-${abs_dirname}/${distro_short}-${distro_ver}_${distro_arch}}
 }
 
-function distroinfo() {
-  cat <<-EOS
-	--------------------
-	distro_arch: ${distro_arch}
-	distro_name: ${distro_name} ${distro_snake}
-	distro_ver:  ${distro_ver}
-	chroot_dir:  ${chroot_dir}
-	keepcache:   ${keepcache}
-	baseurl:     ${baseurl}
-	gpgkey:      ${gpgkey}
-	--------------------
-	EOS
-}
-
 ## task
 
 function task_trap() {
@@ -73,7 +59,6 @@ trap task_trap 1 2 3 15
 
 case "${cmd}" in
 *)
-  distroinfo
   build_chroot ${chroot_dir}
   ;;
 esac
