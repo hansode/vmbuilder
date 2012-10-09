@@ -87,35 +87,8 @@ set -e
 function register_options() {
   debug=${debug:-}
   [[ -z "${debug}" ]] || set -x
-
   set_distro_options
-
-  distro=${distro_name}-${distro_ver}_${distro_arch}
-  distro_dir=${distro_dir:-${abs_dirname}/${distro}}
-
-  max_mount_count=${max_mount_count:-37}
-  interval_between_check=${interval_between_check:-180}
-
-  rootsize=${rootsize:-4096}
-  bootsize=${bootsize:-0}
-  optsize=${optsize:-0}
-  swapsize=${swapsize:-1024}
-  homesize=${homesize:-0}
-
-  xpart=${xpart:-}
-  execscript=${execscript:-}
-  raw=${raw:-./${distro}.raw}
-
-  chroot_dir=${chroot_dir:-/tmp/tmp$(date +%s)}
-
-  #domain=${domain:-}
-  ip=${ip:-}
-  mask=${mask:-}
-  net=${net:-}
-  bcast=${bcast:-}
-  gw=${gw:-}
-  dns=${dns:-}
-  hostname=${hostname:-}
+  set_hypervisor_options
 }
 
 ## task
