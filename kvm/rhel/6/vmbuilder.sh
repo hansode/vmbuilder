@@ -156,10 +156,7 @@ function build_vmimage() {
   mkfs ${raw}
 
   # %install
-  mount_ptab ${raw} ${chroot_dir}
-  install_os ${chroot_dir} ${distro_dir} ${raw} ${keepcache}
-  run_execscript ${chroot_dir} ${execscript}
-  umount_ptab ${chroot_dir}
+  install_os ${chroot_dir} ${distro_dir} ${raw} ${keepcache} ${execscript}
 
   # %post
   is_dev ${raw} || {
