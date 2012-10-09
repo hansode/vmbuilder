@@ -4,7 +4,7 @@
 #  bash
 #  tr, dirname, pwd
 #  sed, head
-#  arch, cat, mkdir, rm, printf
+#  cat, mkdir, rm, printf
 #
 # OPTIONS
 #        --distro-arch=[x86_64 | i686]
@@ -22,47 +22,7 @@ function register_options() {
   debug=${debug:-}
   [ -z ${debug} ] || set -x
 
-  distro_arch=${distro_arch:-$(arch)}
-  case "${distro_arch}" in
-  i*86)   basearch=i386; distro_arch=i686 ;;
-  x86_64) basearch=${distro_arch} ;;
-  esac
-
-  distro_ver=${distro_ver:-6.3}
-  distro_name=${distro_name:-centos}
-
-  keepcache=${keepcache:-0}
-  case "${keepcache}" in
-  [01]) ;;
-  *)    keepcache=0 ;;
-  esac
-
-  case "${distro_name}" in
-  centos)
-    distro_short=centos
-    distro_snake=CentOS
-    baseurl=${baseurl:-http://ftp.riken.go.jp/pub/Linux/centos/${distro_ver}/os/${basearch}}
-    case "${distro_ver}" in
-    6|6.*)
-      gpgkey="${gpgkey:-${baseurl}/RPM-GPG-KEY-${distro_snake}-6}"
-      ;;
-    esac
-    ;;
-  sl|scientific|scientificlinux)
-    distro_short=sl
-    distro_snake="Scientific Linux"
-    baseurl=${baseurl:-http://ftp.riken.go.jp/pub/Linux/scientific/${distro_ver}/${basearch}/os}
-    case "${distro_ver}" in
-    6|6.*)
-      gpgkey="${gpgkey:-${baseurl}/RPM-GPG-KEY-sl ${baseurl}/RPM-GPG-KEY-sl6}"
-      ;;
-    esac
-    ;;
-  *)
-    echo "no mutch distro" >&2
-    return 1
-    ;;
-  esac
+  set_distro_options
 
   chroot_dir=${chroot_dir:-${abs_dirname}/${distro_short}-${distro_ver}_${distro_arch}}
 }

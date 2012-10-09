@@ -88,20 +88,7 @@ function register_options() {
   debug=${debug:-}
   [[ -z "${debug}" ]] || set -x
 
-  distro_arch=${distro_arch:-$(arch)}
-  case "${distro_arch}" in
-  i*86)   basearch=i386; distro_arch=i686 ;;
-  x86_64) basearch=${distro_arch} ;;
-  esac
-
-  distro_ver=${distro_ver:-6.3}
-  distro_name=${distro_name:-centos}
-
-  keepcache=${keepcache:-0}
-  case "${keepcache}" in
-  [01]) ;;
-  *)    keepcache=0 ;;
-  esac
+  set_distro_options
 
   distro=${distro_name}-${distro_ver}_${distro_arch}
   distro_dir=${distro_dir:-${abs_dirname}/${distro}}
