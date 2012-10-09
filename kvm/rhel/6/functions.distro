@@ -17,7 +17,7 @@
 
 ## depending on global variables
 
-function set_distro_options() {
+function preflight_check_distro() {
   distro_arch=${distro_arch:-$(arch)}
   case "${distro_arch}" in
   i*86)   basearch=i386; distro_arch=i686 ;;

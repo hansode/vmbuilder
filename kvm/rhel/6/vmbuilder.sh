@@ -87,8 +87,8 @@ set -e
 function register_options() {
   debug=${debug:-}
   [[ -z "${debug}" ]] || set -x
-  set_distro_options
-  set_hypervisor_options
+  preflight_check_distro
+  preflight_check_hypervisor
 }
 
 ## task
