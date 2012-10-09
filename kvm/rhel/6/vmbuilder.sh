@@ -131,19 +131,6 @@ function register_options() {
   hostname=${hostname:-}
 }
 
-## vmdisk
-
-function run_execscript() {
-  local chroot_dir=$1 execscript=$2
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  [[ -f "${execscript}" ]] || return 0
-  [[ -x "${execscript}" ]] || return 0
-  mount_proc ${chroot_dir}
-  mount_dev  ${chroot_dir}
-  printf "[INFO] Excecuting script: %s\n" ${execscript}
-  setarch ${distro_arch} ${execscript} ${chroot_dir}
-}
-
 ## task
 
 function build_vmimage() {
