@@ -94,31 +94,22 @@ function register_options() {
 ## task
 
 function build_vmimage() {
-  # %bootstrap
   build_chroot ${distro_dir}
-
-  # %prep
   is_dev ${raw} && {
     rmmbr ${raw}
   } || {
     [[ -f ${raw} ]] && rmdisk ${raw}
     local totalsize=$((${rootsize} + ${optsize} + ${swapsize} + ${homesize}))
     printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${raw} ${totalsize}
-    mkdisk  ${raw} ${totalsize}
+    mkdisk ${raw} ${totalsize}
   }
   mkptab  ${raw}
   is_dev ${raw} || {
     printf "[INFO] Creating loop devices corresponding to the created partitions\n"
     mapptab ${raw}
   }
-
-  # %build
   mkfs ${raw}
-
-  # %install
   install_os ${chroot_dir} ${distro_dir} ${raw} ${keepcache} ${execscript}
-
-  # %post
   is_dev ${raw} || {
     printf "[INFO] Deleting loop devices\n"
     unmapptab_r ${raw}
