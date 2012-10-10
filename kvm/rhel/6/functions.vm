@@ -16,6 +16,10 @@ function trap_vm() {
   [[ -d ${chroot_dir} ]] && umount_ptab ${chroot_dir} || :
   is_dev ${disk_filename} || {
     unmapptab_r ${disk_filename}
-    rmdisk ${disk_filename}
+    # TODO
+    # * don't delete raw file in this implement.
+    # * need to improve trap/signals
+    #
+    # rmdisk ${disk_filename}
   }
 }
