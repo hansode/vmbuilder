@@ -226,6 +226,11 @@ function update_passwords() {
   chroot ${chroot_dir} bash -c "echo root:root | chpasswd"
 }
 
+function create_initial_user() {
+  local chroot_dir=$1
+  update_passwords ${chroot_dir}
+}
+
 function set_timezone() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
@@ -332,7 +337,7 @@ function is_dev() {
 function configure_os() {
   local chroot_dir=$1
   mount_proc               ${chroot_dir}
-  update_passwords         ${chroot_dir}
+  create_initial_user      ${chroot_dir}
   set_timezone             ${chroot_dir}
   prevent_daemons_starting ${chroot_dir}
   umount_nonroot           ${chroot_dir}
