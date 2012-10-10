@@ -25,16 +25,6 @@ function register_options() {
   chroot_dir=${chroot_dir:-${abs_dirname}/${distro_short}-${distro_ver}_${distro_arch}}
 }
 
-## task
-
-function task_trap() {
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  printf "[DEBUG] Caught signal\n"
-  umount_nonroot ${chroot_dir}
-  [ -d ${chroot_dir} ] && rm -rf ${chroot_dir}
-  printf "[DEBUG] Cleaned up\n"
-}
-
 ### read-only variables
 
 readonly abs_dirname=$(cd $(dirname $0) && pwd)
@@ -55,7 +45,7 @@ register_options
 checkroot
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
-trap task_trap 1 2 3 15
+trap "trap_distro ${chroot_dir}" 1 2 3 15
 
 case "${cmd}" in
 *)

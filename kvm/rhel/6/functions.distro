@@ -417,3 +417,12 @@ function cleanup() {
   find   ${chroot_dir}/var/log/ -type f | xargs rm
   rm -rf ${chroot_dir}/tmp/*
 }
+
+##
+
+function trap_distro() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  umount_nonroot ${chroot_dir}
+  [ -d ${chroot_dir} ] && rm -rf ${chroot_dir}
+}
