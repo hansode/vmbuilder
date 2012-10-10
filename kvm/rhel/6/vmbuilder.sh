@@ -118,13 +118,6 @@ function build_vmimage() {
   printf "[INFO] Complete!\n"
 }
 
-function task_trap() {
-  [[ -d ${chroot_dir} ]] && umount_ptab ${chroot_dir} || :
-  is_dev ${raw} || {
-    unmapptab_r ${raw}
-  }
-}
-
 ### read-only variables
 
 readonly abs_dirname=$(cd $(dirname $0) && pwd)
@@ -136,6 +129,7 @@ readonly abs_dirname=$(cd $(dirname $0) && pwd)
 . ${abs_dirname}/functions.mbr
 . ${abs_dirname}/functions.distro
 . ${abs_dirname}/functions.hypervisor
+. ${abs_dirname}/functions.vm
 
 ### prepare
 
@@ -148,7 +142,7 @@ checkroot
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
 trap 'exit 1'  HUP INT PIPE QUIT TERM
-trap task_trap EXIT
+trap "trap_vm ${raw} ${chroot_dir}" EXIT
 
 case "${cmd}" in
 *)
