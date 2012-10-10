@@ -336,6 +336,7 @@ function is_dev() {
 
 function configure_os() {
   local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   mount_proc               ${chroot_dir}
   create_initial_user      ${chroot_dir}
   set_timezone             ${chroot_dir}
