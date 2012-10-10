@@ -102,7 +102,7 @@ function build_chroot() {
   # set_defaults
   bootstrap ${chroot_dir}
   configure_os ${chroot_dir}
-  # cleanup()
+  cleanup ${chroot_dir}
 }
 
 function bootstrap() {
@@ -118,7 +118,6 @@ function bootstrap() {
   yum_install              ${chroot_dir} ${distro_short} "${baseurl}" "${gpgkey}" ${keepcache}
   install_fstab            ${chroot_dir}
   install_networking       ${chroot_dir}
-  cleanup                  ${chroot_dir}
   umount_nonroot           ${chroot_dir}
 }
 
