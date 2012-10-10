@@ -4,7 +4,7 @@
 #  bash
 #
 # imports:
-#  disk:       rmdisk, unmapptab_r
+#  disk:       unmapptab_r
 #  distro:     is_dev
 #  hypervisor: umount_ptab
 #
@@ -20,6 +20,6 @@ function trap_vm() {
     # * don't delete raw file in this implement.
     # * need to improve trap/signals
     #
-    # rmdisk ${disk_filename}
+    # rm -f ${disk_filename}
   }
 }

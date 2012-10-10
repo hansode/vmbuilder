@@ -98,7 +98,7 @@ function build_vmimage() {
   is_dev ${raw} && {
     rmmbr ${raw}
   } || {
-    [[ -f ${raw} ]] && rmdisk ${raw}
+    [[ -f ${raw} ]] && rm -f ${raw}
     local totalsize=$((${rootsize} + ${optsize} + ${swapsize} + ${homesize}))
     printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${raw} ${totalsize}
     mkdisk ${raw} ${totalsize}
