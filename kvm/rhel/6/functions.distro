@@ -101,7 +101,7 @@ function build_chroot() {
   # preflight_check
   # set_defaults
   bootstrap ${chroot_dir}
-  # configure_os
+  configure_os ${chroot_dir}
   # cleanup()
 }
 
@@ -118,9 +118,6 @@ function bootstrap() {
   yum_install              ${chroot_dir} ${distro_short} "${baseurl}" "${gpgkey}" ${keepcache}
   install_fstab            ${chroot_dir}
   install_networking       ${chroot_dir}
-  update_passwords         ${chroot_dir}
-  set_timezone             ${chroot_dir}
-  prevent_daemons_starting ${chroot_dir}
   cleanup                  ${chroot_dir}
   umount_nonroot           ${chroot_dir}
 }
@@ -330,6 +327,15 @@ function is_dev() {
   /dev/*) return 0 ;;
        *) return 1 ;;
   esac
+}
+
+function configure_os() {
+  local chroot_dir=$1
+  mount_proc               ${chroot_dir}
+  update_passwords         ${chroot_dir}
+  set_timezone             ${chroot_dir}
+  prevent_daemons_starting ${chroot_dir}
+  umount_nonroot           ${chroot_dir}
 }
 
 function configure_networking() {
