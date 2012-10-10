@@ -106,6 +106,7 @@ function build_chroot() {
 }
 
 function bootstrap() {
+  local chroot_dir=$1
   [ -d ${chroot_dir} ] && { echo "${chroot_dir} already exists." >&2; return 1; } || :
   # %prep
   mkdir -p  ${chroot_dir}
