@@ -1,5 +1,8 @@
 # -*-Shell-script-*-
 #
+# description:
+#  Various utility functions
+#
 # requires:
 #  bash
 #

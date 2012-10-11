@@ -1,5 +1,8 @@
 # -*-Shell-script-*-
 #
+# description:
+#  Virtual disk management
+#
 # requires:
 #  bash
 #  truncate, rm

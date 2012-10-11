@@ -1,5 +1,8 @@
 # -*-Shell-script-*-
 #
+# description:
+#  Master Boot Recorder
+#
 # requires:
 #  bash
 #  dd

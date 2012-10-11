@@ -1,5 +1,8 @@
 # -*-Shell-script-*-
 #
+# description:
+#  Linux Distribution
+#
 # requires:
 #  bash
 #  cebootstrap.sh
