@@ -1,10 +1,15 @@
 #!/bin/bash
 #
+# description:
+#  Bootstrap a basic CentOS system
+#
 # requires:
 #  bash
 #  tr, dirname, pwd
 #  sed, head
-#  cat, mkdir, rm, printf
+#
+# import:
+#   distro: build_chroot
 #
 # OPTIONS
 #        --distro-arch=[x86_64 | i686]
