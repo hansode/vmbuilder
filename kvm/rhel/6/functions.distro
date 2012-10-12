@@ -341,21 +341,7 @@ function configure_networking() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
 
-  printf "[INFO] Generating /etc/sysconfig/network-scripts/ifcfg-eth0\n"
-  [[ -z "${ip}" ]] || {
-    printf "[INFO] Unsetting /etc/sysconfig/network-scripts/ifcfg-eth0\n"
-    cat <<-_EOS_ > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
-	DEVICE=eth0
-	BOOTPROTO=static
-	ONBOOT=yes
-	IPADDR=${ip}
-	$([[ -z "${net}"   ]] || echo "NETMASK=${net}")
-	$([[ -z "${bcast}" ]] || echo "BROADCAST=${bcast}")
-	$([[ -z "${gw}"    ]] || echo "GATEWAY=${gw}")
-	_EOS_
-  }
-  cat ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
-
+  config_interfaces ${chroot_dir}
   printf "[INFO] Generating /etc/resolv.conf\n"
   [[ -z "${dns}" ]] || {
     printf "[INFO] Unsetting /etc/resolv.conf\n"
@@ -381,6 +367,26 @@ function configure_networking() {
   printf "[INFO] Unsetting udev 70-persistent-net.rules\n"
   rm -f ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
   ln -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
+}
+
+function config_interfaces() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  printf "[INFO] Generating /etc/sysconfig/network-scripts/ifcfg-eth0\n"
+  [[ -z "${ip}" ]] || {
+    printf "[INFO] Unsetting /etc/sysconfig/network-scripts/ifcfg-eth0\n"
+    cat <<-_EOS_ > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
+	DEVICE=eth0
+	BOOTPROTO=static
+	ONBOOT=yes
+	IPADDR=${ip}
+	$([[ -z "${net}"   ]] || echo "NETMASK=${net}")
+	$([[ -z "${bcast}" ]] || echo "BROADCAST=${bcast}")
+	$([[ -z "${gw}"    ]] || echo "GATEWAY=${gw}")
+	_EOS_
+  }
+  cat ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
+
 }
 
 function install_fstab() {
