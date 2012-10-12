@@ -189,17 +189,9 @@ function yum_install() {
   ${yum_cmd} erase selinux*
 }
 
-function install_fstab() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  local root_dev=${root_dev:-/dev/sda1}
-  cat <<-EOS > ${chroot_dir}/etc/fstab
-	${root_dev}             /                       ext4    defaults        1 1
-	tmpfs                   /dev/shm                tmpfs   defaults        0 0
-	devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
-	sysfs                   /sys                    sysfs   defaults        0 0
-	proc                    /proc                   proc    defaults        0 0
-	EOS
+function configure_mounting() {
+  local chroot_dir=$1 disk_filename=$2
+  install_fstab ${chroot_dir} ${disk_filename}
 }
 
 function install_networking() {
@@ -392,7 +384,7 @@ function configure_networking() {
   ln -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
 }
 
-function configure_mounting() {
+function install_fstab() {
   local chroot_dir=$1 disk_filename=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
