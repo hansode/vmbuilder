@@ -1,11 +1,21 @@
 #!/bin/bash
 #
+# description:
+#  VM builder
+#
 # requires:
 #  bash
 #  tr, dirname, pwd
 #  sed, head
-#  cat
-#  printf, setarch
+#  printf, awk, rm
+#
+# import:
+#   utils: checkroot
+#   mbr: rmmbr
+#   disk: mkdisk, xptabinfo, mkptab, mapptab, mkfs, unmapptab
+#   distro: preflight_check_distro, build_chroot, is_dev
+#   hypervisor: preflight_check_hypervisor, install_os
+#   vm: trap_vm
 #
 # memo:
 #
