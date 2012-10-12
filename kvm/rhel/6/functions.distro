@@ -340,17 +340,16 @@ function configure_os() {
 function configure_networking() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  config_host_and_domainname ${chroot_dir}
+  config_interfaces          ${chroot_dir}
+  printf "[INFO] Unsetting udev 70-persistent-net.rules\n"
+  rm -f ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
+  ln -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
+}
 
-  config_interfaces ${chroot_dir}
-  printf "[INFO] Generating /etc/resolv.conf\n"
-  [[ -z "${dns}" ]] || {
-    printf "[INFO] Unsetting /etc/resolv.conf\n"
-    cat <<-_EOS_ > ${chroot_dir}/etc/resolv.conf
-	nameserver ${dns}
-	_EOS_
-  }
-  cat ${chroot_dir}/etc/resolv.conf
-
+function config_host_and_domainname() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   [[ -z "${hostname}" ]] || {
     printf "[INFO] Setting hostname: %s\n" ${hostname}
     egrep ^HOSTNAME= ${chroot_dir}/etc/sysconfig/network -q && {
@@ -359,14 +358,17 @@ function configure_networking() {
       echo HOSTNAME=${hostname} >> ${chroot_dir}/etc/sysconfig/network
     }
     cat ${chroot_dir}/etc/sysconfig/network
-
     echo 127.0.0.1 ${hostname} >> ${chroot_dir}/etc/hosts
     cat ${chroot_dir}/etc/hosts
   }
-
-  printf "[INFO] Unsetting udev 70-persistent-net.rules\n"
-  rm -f ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
-  ln -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
+  printf "[INFO] Generating /etc/resolv.conf\n"
+  [[ -z "${dns}" ]] || {
+    printf "[INFO] Unsetting /etc/resolv.conf\n"
+    cat <<-_EOS_ > ${chroot_dir}/etc/resolv.conf
+	nameserver ${dns}
+	_EOS_
+  }
+  cat ${chroot_dir}/etc/resolv.conf
 }
 
 function config_interfaces() {
