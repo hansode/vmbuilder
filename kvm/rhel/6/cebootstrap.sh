@@ -9,7 +9,8 @@
 #  sed, head
 #
 # import:
-#   distro: build_chroot
+#   utils: checkroot
+#   distro: preflight_check_distro, trap_distro, build_chroot
 #
 # OPTIONS
 #        --distro-arch=[x86_64 | i686]
