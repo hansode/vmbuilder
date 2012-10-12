@@ -112,7 +112,7 @@ function build_vmimage() {
   install_os ${chroot_dir} ${distro_dir} ${raw} ${keepcache} ${execscript}
   is_dev ${raw} || {
     printf "[INFO] Deleting loop devices\n"
-    unmapptab_r ${raw}
+    unmapptab ${raw}
   }
   printf "[INFO] Generated => %s\n" ${raw}
   printf "[INFO] Complete!\n"

@@ -7,7 +7,7 @@
 #  bash
 #
 # imports:
-#  disk:       unmapptab_r
+#  disk:       unmapptab
 #  distro:     is_dev
 #  hypervisor: umount_ptab
 #
@@ -18,7 +18,7 @@ function trap_vm() {
   local disk_filename=$1 chroot_dir=$2
   [[ -d ${chroot_dir} ]] && umount_ptab ${chroot_dir} || :
   is_dev ${disk_filename} || {
-    unmapptab_r ${disk_filename}
+    unmapptab ${disk_filename}
     # TODO
     # * don't delete raw file in this implement.
     # * need to improve trap/signals
