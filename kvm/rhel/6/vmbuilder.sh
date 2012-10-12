@@ -99,7 +99,7 @@ function build_vmimage() {
     rmmbr ${raw}
   } || {
     [[ -f ${raw} ]] && rm -f ${raw}
-    local totalsize=$((${rootsize} + ${optsize} + ${swapsize} + ${homesize}))
+    local totalsize=$(xptabinfo | awk 'BEGIN {sum = 0} {sum += $2} END {print sum}')
     printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${raw} ${totalsize}
     mkdisk ${raw} ${totalsize}
   }
