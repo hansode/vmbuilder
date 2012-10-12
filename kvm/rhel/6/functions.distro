@@ -119,7 +119,6 @@ function bootstrap() {
   # %install
   mount_proc               ${chroot_dir}
   yum_install              ${chroot_dir} ${distro_short} "${baseurl}" "${gpgkey}" ${keepcache}
-  install_networking       ${chroot_dir}
   umount_nonroot           ${chroot_dir}
 }
 
