@@ -103,6 +103,22 @@ function mkpart() {
 
   local partition_start=${offset}
   local partition_end=$((${offset} + ${size} - 1))
+
+  # # parted --script -- ${disk_filename} unit s print
+  # Model:  (file)
+  # Disk ${disk_filename} 10485760s
+  # Sector size (logical/physical): 512B/512B
+  # Partition Table: msdos
+  # 
+  # Number  Start     End        Size      Type      File system  Flags
+  #  1      63s       60546s     60484s    primary                boot
+  #  2      61440s    497663s    436224s   primary
+  #  3      499712s   505855s    6144s     primary
+  #  4      507904s   10485759s  9977856s  extended
+  #  5      507967s   1255859s   747893s   logical
+  #  6      1257472s  1380351s   122880s   logical
+  #  7      1382400s  1388543s   6144s     logical
+  #  8      1390592s  1396735s   6144s     logical
   local previous_partition=$(parted --script -- ${disk_filename} unit s print | egrep -v '^$' | awk '$1 ~ "^[1-9]+"' | tail -1)
 
   case "${previous_partition}" in
