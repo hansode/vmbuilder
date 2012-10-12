@@ -193,25 +193,6 @@ function configure_mounting() {
   install_fstab ${chroot_dir} ${disk_filename}
 }
 
-function install_networking() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  cat <<-EOS > ${chroot_dir}/etc/hosts
-	127.0.0.1       localhost
-	EOS
-  cat <<-EOS > ${chroot_dir}/etc/resolv.conf
-	nameserver 8.8.8.8
-	EOS
-  cat <<-EOS > ${chroot_dir}/etc/sysconfig/network
-	NETWORKING=yes
-	EOS
-  cat <<-EOS > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
-	DEVICE=eth0
-	BOOTPROTO=dhcp
-	ONBOOT=yes
-	EOS
-}
-
 function update_passwords() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
@@ -340,6 +321,9 @@ function configure_os() {
 function configure_networking() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  cat <<-EOS > ${chroot_dir}/etc/sysconfig/network
+	NETWORKING=yes
+	EOS
   config_host_and_domainname ${chroot_dir}
   config_interfaces          ${chroot_dir}
   printf "[INFO] Unsetting udev 70-persistent-net.rules\n"
@@ -350,6 +334,9 @@ function configure_networking() {
 function config_host_and_domainname() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  cat <<-EOS > ${chroot_dir}/etc/hosts
+	127.0.0.1       localhost
+	EOS
   [[ -z "${hostname}" ]] || {
     printf "[INFO] Setting hostname: %s\n" ${hostname}
     egrep ^HOSTNAME= ${chroot_dir}/etc/sysconfig/network -q && {
@@ -362,6 +349,9 @@ function config_host_and_domainname() {
     cat ${chroot_dir}/etc/hosts
   }
   printf "[INFO] Generating /etc/resolv.conf\n"
+  cat <<-EOS > ${chroot_dir}/etc/resolv.conf
+	nameserver 8.8.8.8
+	EOS
   [[ -z "${dns}" ]] || {
     printf "[INFO] Unsetting /etc/resolv.conf\n"
     cat <<-_EOS_ > ${chroot_dir}/etc/resolv.conf
@@ -375,6 +365,11 @@ function config_interfaces() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   printf "[INFO] Generating /etc/sysconfig/network-scripts/ifcfg-eth0\n"
+  cat <<-EOS > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
+	DEVICE=eth0
+	BOOTPROTO=dhcp
+	ONBOOT=yes
+	EOS
   [[ -z "${ip}" ]] || {
     printf "[INFO] Unsetting /etc/sysconfig/network-scripts/ifcfg-eth0\n"
     cat <<-_EOS_ > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
