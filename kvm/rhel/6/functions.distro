@@ -193,6 +193,7 @@ function yum_install() {
 function install_fstab() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  local root_dev=${root_dev:-/dev/sda1}
   cat <<-EOS > ${chroot_dir}/etc/fstab
 	${root_dev}             /                       ext4    defaults        1 1
 	tmpfs                   /dev/shm                tmpfs   defaults        0 0
