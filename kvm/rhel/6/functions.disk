@@ -201,6 +201,17 @@ function unmapptab() {
     sleep 1
   done
   kpartx -vd ${disk_filename}
+  # # kpartx -vd ./centos-6.3_x86_64.raw
+  # del devmap : loop0p9
+  # del devmap : loop0p8
+  # del devmap : loop0p7
+  # del devmap : loop0p6
+  # del devmap : loop0p5
+  # del devmap : loop0p4
+  # del devmap : loop0p3
+  # del devmap : loop0p2
+  # del devmap : loop0p1
+  # loop deleted : /dev/loop0
 }
 
 function lsdevmap() {
