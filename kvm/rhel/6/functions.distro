@@ -227,6 +227,20 @@ function install_grub() {
   done
 }
 
+function install_bootloader_cleanup() {
+  local chroot_dir=$1 disk_filename=$2
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  local tmpdir=/tmp/vmbuilder-grub
+  is_dev ${disk_filename} || {
+    local new_filename=${tmpdir}/$(basename ${disk_filename})
+    printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
+    umount ${chroot_dir}/${new_filename}
+  }
+  printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
+  rm -rf ${chroot_dir}/${tmpdir}
+}
+
 function install_bootloader() {
   local chroot_dir=$1 disk_filename=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
@@ -268,13 +282,7 @@ function install_bootloader() {
 	_EOS_
 
   install_menu_lst ${chroot_dir} ${disk_filename}
-  is_dev ${disk_filename} || {
-    printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
-    umount ${chroot_dir}/${new_filename}
-  }
-
-  printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
-  rm -rf ${chroot_dir}/${tmpdir}
+  install_bootloader_cleanup ${chroot_dir} ${disk_filename}
 }
 
 function install_menu_lst() {
