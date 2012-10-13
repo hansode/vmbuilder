@@ -15,6 +15,7 @@
 #  ls, tail
 #
 # imports:
+#  utils: is_dev
 #  disk: mkdevice, mkprocdir, mount_proc, umount_nonroot, xptabinfo, mntpntuuid
 #
 
