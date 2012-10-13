@@ -111,15 +111,12 @@ function build_chroot() {
 function bootstrap() {
   local chroot_dir=$1
   [ -d ${chroot_dir} ] && { echo "${chroot_dir} already exists." >&2; return 1; } || :
-  # %prep
-  mkdir -p  ${chroot_dir}
-  # %setup
-  mkdevice  ${chroot_dir}
-  mkprocdir ${chroot_dir}
-  # %install
-  mount_proc               ${chroot_dir}
-  yum_install              ${chroot_dir} ${distro_short} "${baseurl}" "${gpgkey}" ${keepcache}
-  umount_nonroot           ${chroot_dir}
+  mkdir -p       ${chroot_dir}
+  mkdevice       ${chroot_dir}
+  mkprocdir      ${chroot_dir}
+  mount_proc     ${chroot_dir}
+  yum_install    ${chroot_dir} ${distro_short} "${baseurl}" "${gpgkey}" ${keepcache}
+  umount_nonroot ${chroot_dir}
 }
 
 ## unit functions
