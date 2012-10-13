@@ -226,13 +226,13 @@ function install_grub() {
 
 function install_kernel() {
   local chroot_dir=$1
-  chroot ${chroot_dir} yum install -y kernel dracut grub
+  run_yum ${chroot_dir} install kernel dracut grub
 }
 
 function install_extras() {
   local chroot_dir=$1
-  chroot ${chroot_dir} yum -y install openssh openssh-clients openssh-server rpm yum curl dhclient passwd vim-minimal
-  chroot ${chroot_dir} yum -y erase   selinux*
+  run_yum ${chroot_dir} install openssh openssh-clients openssh-server rpm yum curl dhclient passwd vim-minimal
+  run_yum ${chroot_dir} erase   selinux*
 }
 
 function install_bootloader_cleanup() {
