@@ -98,7 +98,6 @@ function umount_ptab() {
 function run_execscript() {
   local chroot_dir=$1 execscript=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  [[ -f "${execscript}" ]] || return 0
   [[ -x "${execscript}" ]] || return 0
   printf "[INFO] Excecuting script: %s\n" ${execscript}
   setarch ${distro_arch} ${execscript} ${chroot_dir}
@@ -121,6 +120,6 @@ function install_os() {
   mount_proc           ${chroot_dir}
   mount_dev            ${chroot_dir}
   run_execscript       ${chroot_dir} ${execscript}
-  umount_ptab ${chroot_dir}
-  rmdir ${chroot_dir}
+  umount_ptab          ${chroot_dir}
+  rmdir                ${chroot_dir}
 }
