@@ -11,12 +11,14 @@
 #
 # imports:
 #  disk:   xptabproc, mntpnt2path
-#  distro: install_kernel, install_bootloader, configure_networking, configure_mounting, configure_keepcache
+#  distro: preflight_check_distro, install_kernel, install_bootloader, configure_networking, configure_mounting, configure_keepcache
 #
 
 ## depending on global variables
 
 function preflight_check_hypervisor() {
+  preflight_check_distro
+
   distro=${distro_name}-${distro_ver}_${distro_arch}
   distro_dir=${distro_dir:-${abs_dirname}/${distro}}
 

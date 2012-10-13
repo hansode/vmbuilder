@@ -102,8 +102,12 @@ function register_options() {
 ## task
 
 function build_vmimage() {
-  [[ -d ${distro_dir} ]] || build_chroot ${distro_dir}
   preflight_check_hypervisor
+  [[ -d ${distro_dir} ]] || build_chroot ${distro_dir}
+
+  trap 'exit 1'  HUP INT PIPE QUIT TERM
+  trap "trap_vm ${raw} ${chroot_dir}" EXIT
+
   is_dev ${raw} && {
     rmmbr ${raw}
   } || {
@@ -149,9 +153,6 @@ extract_args $*
 register_options
 checkroot
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
-
-trap 'exit 1'  HUP INT PIPE QUIT TERM
-trap "trap_vm ${raw} ${chroot_dir}" EXIT
 
 case "${cmd}" in
 *)
