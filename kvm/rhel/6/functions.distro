@@ -116,7 +116,7 @@ function bootstrap() {
   mkdevice       ${chroot_dir}
   mkprocdir      ${chroot_dir}
   mount_proc     ${chroot_dir}
-  yum_install    ${chroot_dir} groupinstall Core
+  run_yum        ${chroot_dir} groupinstall Core
   umount_nonroot ${chroot_dir}
 }
 
@@ -163,7 +163,7 @@ function repofile() {
 	EOS
 }
 
-function yum_install() {
+function run_yum() {
   local chroot_dir=$1
   shift
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
