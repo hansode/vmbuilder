@@ -5,7 +5,6 @@
 #
 # requires:
 #  bash
-#  cebootstrap.sh
 #  cat
 #  yum, mkdir, arch
 #  chroot, pwconv, chroot, chkconfig, grub
@@ -121,21 +120,6 @@ function bootstrap() {
 }
 
 ## unit functions
-
-function cebootstrap() {
-  local distro_dir=$1
-  [[ -d "${distro_dir}" ]] && {
-    printf "[INFO] already exists: %s\n" ${distro_dir}
-  } || {
-    printf "[INFO] Building OS tree: %s\n" ${distro_dir}
-    ${abs_dirname}/cebootstrap.sh \
-     --distro-name=${distro_name} \
-     --distro-ver=${distro_ver}   \
-     --distro-arch=${distro_arch} \
-     --chroot-dir=${distro_dir}   \
-     --keepcache=${keepcache}
-  }
-}
 
 function repofile() {
   local reponame=$1 baseurl="$2" gpgkey="$3" keepcache=$4
