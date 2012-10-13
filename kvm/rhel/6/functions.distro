@@ -101,6 +101,7 @@ function build_chroot() {
   local chroot_dir=$1
   [ -d ${chroot_dir} ] && { echo "${chroot_dir} already exists." >&2; return 1; } || :
   distroinfo
+  trap "trap_distro ${chroot_dir}" 1 2 3 15
   # preflight_check
   # set_defaults
   bootstrap ${chroot_dir}

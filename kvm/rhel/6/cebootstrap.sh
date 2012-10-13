@@ -51,8 +51,6 @@ register_options
 checkroot
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
-trap "trap_distro ${chroot_dir}" 1 2 3 15
-
 case "${cmd}" in
 *)
   build_chroot ${chroot_dir}
