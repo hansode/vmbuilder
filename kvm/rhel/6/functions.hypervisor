@@ -113,13 +113,13 @@ function install_os() {
   printf "[DEBUG] Installing OS to %s\n" ${chroot_dir}
   rsync -aHA ${distro_dir}/ ${chroot_dir}
   sync
-  install_kernel       ${chroot_dir}
-  install_bootloader   ${chroot_dir} ${disk_filename}
+  mount_proc           ${chroot_dir}
+  mount_dev            ${chroot_dir}
   configure_networking ${chroot_dir}
   configure_mounting   ${chroot_dir} ${disk_filename}
   configure_keepcache  ${chroot_dir} ${keepcache}
-  mount_proc           ${chroot_dir}
-  mount_dev            ${chroot_dir}
+  install_kernel       ${chroot_dir}
+  install_bootloader   ${chroot_dir} ${disk_filename}
   run_execscript       ${chroot_dir} ${execscript}
   umount_ptab          ${chroot_dir}
   rmdir                ${chroot_dir}
