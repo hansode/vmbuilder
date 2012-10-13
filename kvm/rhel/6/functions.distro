@@ -308,7 +308,7 @@ function install_menu_lst() {
   cat ${chroot_dir}/boot/grub/grub.conf
   cd ${chroot_dir}/boot/grub
   ln -fs grub.conf menu.lst
-  cd -
+  cd - >/dev/null
 }
 
 function configure_os() {
