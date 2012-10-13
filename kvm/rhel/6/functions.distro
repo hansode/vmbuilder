@@ -356,10 +356,9 @@ function config_host_and_domainname() {
   }
   printf "[INFO] Generating /etc/resolv.conf\n"
   [[ -z "${dns}" ]] || {
-    printf "[INFO] Unsetting /etc/resolv.conf\n"
-    cat <<-_EOS_ > ${chroot_dir}/etc/resolv.conf
+    cat <<-EOS > ${chroot_dir}/etc/resolv.conf
 	nameserver ${dns}
-	_EOS_
+	EOS
   }
   cat ${chroot_dir}/etc/resolv.conf
 }
