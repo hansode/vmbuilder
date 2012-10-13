@@ -193,7 +193,6 @@ EOS
 function mapptab() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  kpartx -va ${disk_filename}
   # # kpartx -va ${disk_filename}
   # add map loop0p1 (253:3): 0 60484 linear /dev/loop0 63
   # add map loop0p2 (253:4): 0 436224 linear /dev/loop0 61440
@@ -204,6 +203,7 @@ function mapptab() {
   # add map loop0p7 (253:9): 0 6144 linear /dev/loop0 1382400
   # add map loop0p8 (253:10): 0 6144 linear /dev/loop0 1390592
   # add map loop0p9 (253:11): 0 6144 linear /dev/loop0 1398784
+  kpartx -va ${disk_filename}
   udevadm settle
 }
 
@@ -216,7 +216,6 @@ function unmapptab() {
     let tries++
     sleep 1
   done
-  kpartx -vd ${disk_filename}
   # # kpartx -vd ./centos-6.3_x86_64.raw
   # del devmap : loop0p9
   # del devmap : loop0p8
@@ -228,12 +227,12 @@ function unmapptab() {
   # del devmap : loop0p2
   # del devmap : loop0p1
   # loop deleted : /dev/loop0
+  kpartx -vd ${disk_filename}
 }
 
 function lsdevmap() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  #
   # # kpartx -l ${disk_filename}
   # loop0p1 : 0 60484 /dev/loop0 63
   # loop0p2 : 0 436224 /dev/loop0 61440
@@ -244,7 +243,6 @@ function lsdevmap() {
   # loop0p7 : 0 6144 /dev/loop0 1382400
   # loop0p8 : 0 6144 /dev/loop0 1390592
   # loop0p9 : 0 6144 /dev/loop0 1398784
-  #
   # # kpartx -l ${disk_filename} | egrep -v "^(gpt|dos):" | awk '{print $1}'
   # loop0p1
   # loop0p2
@@ -306,7 +304,6 @@ function mntpntuuid() {
 function mkfs() {
   local disk_filename=$1
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-
   printf "[INFO] Creating file systems\n"
   xptabproc <<'EOS'
     printf "[DEBUG] Creating file system: \"%s\" of size: %dMB\n" ${mountpoint} ${partsize}
