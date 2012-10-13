@@ -295,16 +295,6 @@ function install_bootloader() {
   rm -rf ${chroot_dir}/${tmpdir}
 }
 
-function is_dev() {
-  local disk_filename=$1 mountpoint=$2
-  # do not use "-a" in this case.
-  [[ -n ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  case "${disk_filename}" in
-  /dev/*) return 0 ;;
-       *) return 1 ;;
-  esac
-}
-
 function configure_os() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }

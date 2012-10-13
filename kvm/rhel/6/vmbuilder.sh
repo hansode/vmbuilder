@@ -10,10 +10,10 @@
 #  printf, awk, rm
 #
 # import:
-#   utils: checkroot
+#   utils: checkroot, is_dev
 #   mbr: rmmbr
 #   disk: mkdisk, xptabinfo, mkptab, mapptab, mkfs, unmapptab
-#   distro: preflight_check_distro, build_chroot, is_dev
+#   distro: preflight_check_distro, build_chroot
 #   hypervisor: preflight_check_hypervisor, install_os
 #   vm: trap_vm
 #

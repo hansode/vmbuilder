@@ -8,7 +8,7 @@
 #
 # imports:
 #  disk:       unmapptab
-#  distro:     is_dev
+#  utils:      is_dev
 #  hypervisor: umount_ptab
 #
 
