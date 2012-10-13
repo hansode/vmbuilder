@@ -226,9 +226,12 @@ function install_bootloader_cleanup() {
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   local tmpdir=/tmp/vmbuilder-grub
   is_dev ${disk_filename} || {
-    local new_filename=${tmpdir}/$(basename ${disk_filename})
-    printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
-    umount ${chroot_dir}/${new_filename}
+    # # ls -1 ${chroot_dir}/${tmpdir}/
+    # centos-6.3_x86_64.raw
+    # device.map
+    while read disk; do
+      [[ "${disk}" == "device.map" ]] || umount ${chroot_dir}/${tmpdir}/${disk}
+    done < <(ls -1 ${chroot_dir}/${tmpdir}/)
   }
   printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
   rm -rf ${chroot_dir}/${tmpdir}
