@@ -367,26 +367,28 @@ function config_host_and_domainname() {
 function config_interfaces() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  printf "[INFO] Generating /etc/sysconfig/network-scripts/ifcfg-eth0\n"
-  cat <<-EOS > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
-	DEVICE=eth0
+  local ifindex=0
+  local ifname=eth${ifindex}
+  local ifcfg_path=/etc/sysconfig/network-scripts/ifcfg-${ifname}
+  printf "[INFO] Generating %s\n" ${ifcfg_path}
+  [[ -z "${ip}" ]] && {
+    cat <<-EOS > ${chroot_dir}${ifcfg_path}
+	DEVICE=${ifname}
 	BOOTPROTO=dhcp
 	ONBOOT=yes
 	EOS
-  [[ -z "${ip}" ]] || {
-    printf "[INFO] Unsetting /etc/sysconfig/network-scripts/ifcfg-eth0\n"
-    cat <<-_EOS_ > ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
-	DEVICE=eth0
+  } || {
+    cat <<-EOS > ${chroot_dir}${ifcfg_path}
+	DEVICE=${ifname}
 	BOOTPROTO=static
 	ONBOOT=yes
 	IPADDR=${ip}
 	$([[ -z "${net}"   ]] || echo "NETMASK=${net}")
 	$([[ -z "${bcast}" ]] || echo "BROADCAST=${bcast}")
 	$([[ -z "${gw}"    ]] || echo "GATEWAY=${gw}")
-	_EOS_
+	EOS
   }
-  cat ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
-
+  cat ${chroot_dir}${ifcfg_path}
 }
 
 function install_resolv_conf() {
