@@ -8,6 +8,7 @@
 #  mount, umount
 #  mkdir, rmdir
 #  rsync, sync
+#  setarch
 #
 # imports:
 #  disk:   xptabproc, mntpnt2path
