@@ -325,6 +325,7 @@ function configure_os() {
   create_initial_user      ${chroot_dir}
   prevent_daemons_starting ${chroot_dir}
   set_timezone             ${chroot_dir}
+  install_resolv_conf      ${chroot_dir}
   install_extras           ${chroot_dir}
   umount_nonroot           ${chroot_dir}
 }
