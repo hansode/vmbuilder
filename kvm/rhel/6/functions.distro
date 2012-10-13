@@ -179,10 +179,7 @@ function yum_install() {
   mkdir ${tmpdir}
   repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache} > ${repofile}
   ${yum_cmd} groupinstall Core
-  ${yum_cmd} install \
-             kernel dracut openssh openssh-clients openssh-server rpm yum curl dhclient \
-             passwd grub \
-             vim-minimal
+  ${yum_cmd} install openssh openssh-clients openssh-server rpm yum curl dhclient passwd vim-minimal
   ${yum_cmd} erase selinux*
 }
 
@@ -229,6 +226,7 @@ function install_grub() {
 
 function install_kernel() {
   local chroot_dir=$1
+  chroot ${chroot_dir} yum install -y kernel dracut grub
 }
 
 function install_bootloader_cleanup() {
