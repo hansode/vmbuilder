@@ -245,6 +245,8 @@ function install_bootloader() {
   local chroot_dir=$1 disk_filename=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  local root_dev="hd$(get_grub_id)"
+
   local tmpdir=/tmp/vmbuilder-grub
   mkdir -p ${chroot_dir}/${tmpdir}
 
@@ -253,16 +255,15 @@ function install_bootloader() {
     touch ${chroot_dir}/${new_filename}
     mount --bind ${disk_filename} ${chroot_dir}/${new_filename}
   }
-
-  local grub_id=$(get_grub_id)
   local devmapfile=${tmpdir}/device.map
   touch ${chroot_dir}/${devmapfile}
   printf "[INFO] Generating %s\n" ${devmapfile}
   {
+    local disk_id=0
     is_dev ${disk_filename} && {
-      printf "(hd%d) %s\n" ${grub_id} ${disk_filename}
+      printf "(hd%d) %s\n" ${disk_id} ${disk_filename}
     } || {
-      printf "(hd%d) %s\n" ${grub_id} ${new_filename}
+      printf "(hd%d) %s\n" ${disk_id} ${new_filename}
     }
   } >> ${chroot_dir}/${devmapfile}
   cat ${chroot_dir}/${devmapfile}
@@ -276,11 +277,10 @@ function install_bootloader() {
   }
   install_grub ${chroot_dir}
   cat <<-_EOS_ | ${grub_cmd}
-	root (hd${grub_id},0)
+	root (${root_dev},0)
 	setup (hd0)
 	quit
 	_EOS_
-
   install_menu_lst ${chroot_dir} ${disk_filename}
   install_bootloader_cleanup ${chroot_dir} ${disk_filename}
 }
