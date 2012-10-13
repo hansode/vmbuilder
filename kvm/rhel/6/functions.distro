@@ -227,6 +227,10 @@ function install_grub() {
   done
 }
 
+function install_kernel() {
+  local chroot_dir=$1
+}
+
 function install_bootloader_cleanup() {
   local chroot_dir=$1 disk_filename=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }

@@ -11,7 +11,7 @@
 #
 # imports:
 #  disk:   xptabproc, mntpnt2path
-#  distro: install_bootloader, configure_networking, configure_mounting, configure_keepcache
+#  distro: install_kernel, install_bootloader, configure_networking, configure_mounting, configure_keepcache
 #
 
 ## depending on global variables
@@ -113,6 +113,7 @@ function install_os() {
   printf "[DEBUG] Installing OS to %s\n" ${chroot_dir}
   rsync -aHA ${distro_dir}/ ${chroot_dir}
   sync
+  install_kernel       ${chroot_dir}
   install_bootloader   ${chroot_dir} ${disk_filename}
   configure_networking ${chroot_dir}
   configure_mounting   ${chroot_dir} ${disk_filename}
