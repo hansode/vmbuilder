@@ -10,7 +10,7 @@
 #
 # import:
 #   utils: checkroot
-#   distro: preflight_check_distro, trap_distro, build_chroot
+#   distro: build_chroot
 #
 # OPTIONS
 #        --distro-arch=[x86_64 | i686]
@@ -27,8 +27,7 @@ set -e
 function register_options() {
   debug=${debug:-}
   [ -z ${debug} ] || set -x
-  preflight_check_distro
-  chroot_dir=${chroot_dir:-${abs_dirname}/${distro_short}-${distro_ver}_${distro_arch}}
+  chroot_dir=${chroot_dir:-}
 }
 
 ### read-only variables

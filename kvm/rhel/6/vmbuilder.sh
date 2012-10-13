@@ -13,7 +13,7 @@
 #   utils: checkroot, is_dev
 #   mbr: rmmbr
 #   disk: mkdisk, xptabinfo, mkptab, mapptab, mkfs, unmapptab
-#   distro: preflight_check_distro, build_chroot
+#   distro: build_chroot
 #   hypervisor: preflight_check_hypervisor, install_os
 #   vm: trap_vm
 #
@@ -97,14 +97,13 @@ set -e
 function register_options() {
   debug=${debug:-}
   [[ -z "${debug}" ]] || set -x
-  preflight_check_distro
-  preflight_check_hypervisor
 }
 
 ## task
 
 function build_vmimage() {
   [[ -d ${distro_dir} ]] || build_chroot ${distro_dir}
+  preflight_check_hypervisor
   is_dev ${raw} && {
     rmmbr ${raw}
   } || {
