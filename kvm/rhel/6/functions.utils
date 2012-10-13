@@ -29,6 +29,7 @@ function extract_args() {
 }
 
 function run_cmd() {
+  #
   # Runs a command.
   #
   # Locale is reset to C to make parsing error messages possible.
