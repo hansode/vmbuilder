@@ -360,9 +360,6 @@ function config_host_and_domainname() {
     cat ${chroot_dir}/etc/hosts
   }
   printf "[INFO] Generating /etc/resolv.conf\n"
-  cat <<-EOS > ${chroot_dir}/etc/resolv.conf
-	nameserver 8.8.8.8
-	EOS
   [[ -z "${dns}" ]] || {
     printf "[INFO] Unsetting /etc/resolv.conf\n"
     cat <<-_EOS_ > ${chroot_dir}/etc/resolv.conf
@@ -395,6 +392,13 @@ function config_interfaces() {
   }
   cat ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-eth0
 
+}
+
+function install_resolv_conf() {
+  local chroot_dir=$1
+  cat <<-EOS > ${chroot_dir}/etc/resolv.conf
+	nameserver 8.8.8.8
+	EOS
 }
 
 function install_fstab() {
