@@ -212,7 +212,7 @@ function install_grub() {
 
 function install_kernel() {
   local chroot_dir=$1
-  run_yum ${chroot_dir} install kernel dracut grub
+  run_yum ${chroot_dir} install dracut kernel
 }
 
 function install_extras() {
