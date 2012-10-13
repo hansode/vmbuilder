@@ -12,7 +12,7 @@
 # import:
 #   utils: checkroot, is_dev
 #   mbr: rmmbr
-#   disk: mkdisk, xptabinfo, mkptab, mapptab, mkfs, unmapptab
+#   disk: mkdisk, xptabinfo, mkptab, mapptab, mkfsdisk, unmapptab
 #   distro: build_chroot
 #   hypervisor: preflight_check_hypervisor, install_os
 #   vm: trap_vm
@@ -117,7 +117,7 @@ function build_vmimage() {
     printf "[INFO] Creating loop devices corresponding to the created partitions\n"
     mapptab ${raw}
   }
-  mkfs ${raw}
+  mkfsdisk ${raw}
   install_os ${chroot_dir} ${distro_dir} ${raw} ${keepcache} ${execscript}
   is_dev ${raw} || {
     printf "[INFO] Deleting loop devices\n"
