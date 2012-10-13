@@ -116,7 +116,7 @@ function bootstrap() {
   mkdevice       ${chroot_dir}
   mkprocdir      ${chroot_dir}
   mount_proc     ${chroot_dir}
-  yum_install    ${chroot_dir}
+  yum_install    ${chroot_dir} groupinstall Core
   umount_nonroot ${chroot_dir}
 }
 
@@ -165,6 +165,7 @@ function repofile() {
 
 function yum_install() {
   local chroot_dir=$1
+  shift
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   local reponame=${distro_short}
   local tmpdir=${chroot_dir}/tmp
@@ -179,7 +180,7 @@ function yum_install() {
   "
   [[ -d ${tmpdir} ]] || mkdir ${tmpdir}
   repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache} > ${repofile}
-  ${yum_cmd} groupinstall Core
+  ${yum_cmd} $*
 }
 
 function configure_mounting() {
