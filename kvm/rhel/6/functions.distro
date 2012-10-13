@@ -181,6 +181,7 @@ function run_yum() {
   [[ -d ${tmpdir} ]] || mkdir ${tmpdir}
   repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache} > ${repofile}
   ${yum_cmd} $*
+  rm -f ${repofile}
 }
 
 function configure_mounting() {
