@@ -267,6 +267,21 @@ function install_bootloader() {
 	quit
 	_EOS_
 
+  install_menu_lst ${chroot_dir} ${disk_filename}
+  is_dev ${disk_filename} || {
+    printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
+    umount ${chroot_dir}/${new_filename}
+  }
+
+  printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
+  rm -rf ${chroot_dir}/${tmpdir}
+}
+
+function install_menu_lst() {
+  local chroot_dir=$1 disk_filename=$2
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  local grub_id=0
   printf "[INFO] Generating /boot/grub/grub.conf\n"
   local bootdir_path=/boot
   xptabinfo | egrep -q /boot && {
@@ -286,14 +301,6 @@ function install_bootloader() {
   cd ${chroot_dir}/boot/grub
   ln -fs grub.conf menu.lst
   cd -
-
-  is_dev ${disk_filename} || {
-    printf "[DEBUG] Unmounting %s\n" ${chroot_dir}/${new_filename}
-    umount ${chroot_dir}/${new_filename}
-  }
-
-  printf "[DEBUG] Deleting %s\n" ${chroot_dir}/${tmpdir}
-  rm -rf ${chroot_dir}/${tmpdir}
 }
 
 function configure_os() {
