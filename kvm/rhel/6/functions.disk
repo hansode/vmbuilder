@@ -328,3 +328,7 @@ function mkfs() {
     udevadm settle
 EOS
 }
+
+function get_grub_id() {
+  echo 0
+}
