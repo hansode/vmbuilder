@@ -28,6 +28,16 @@ function extract_args() {
   CMD_ARGS=${CMD_ARGS## }
 }
 
+function run_cmd() {
+  # Runs a command.
+  #
+  # Locale is reset to C to make parsing error messages possible.
+  #
+  export LANG=C
+  export LC_ALL=C
+  eval $*
+}
+
 function checkroot() {
   [[ $UID -ne 0 ]] && {
     echo "[ERROR] Must run as root." >&2
