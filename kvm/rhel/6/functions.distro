@@ -179,8 +179,6 @@ function yum_install() {
   mkdir ${tmpdir}
   repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache} > ${repofile}
   ${yum_cmd} groupinstall Core
-  ${yum_cmd} install openssh openssh-clients openssh-server rpm yum curl dhclient passwd vim-minimal
-  ${yum_cmd} erase selinux*
 }
 
 function configure_mounting() {
@@ -227,6 +225,12 @@ function install_grub() {
 function install_kernel() {
   local chroot_dir=$1
   chroot ${chroot_dir} yum install -y kernel dracut grub
+}
+
+function install_extras() {
+  local chroot_dir=$1
+  chroot ${chroot_dir} yum -y install openssh openssh-clients openssh-server rpm yum curl dhclient passwd vim-minimal
+  chroot ${chroot_dir} yum -y erase   selinux*
 }
 
 function install_bootloader_cleanup() {
@@ -318,8 +322,9 @@ function configure_os() {
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   mount_proc               ${chroot_dir}
   create_initial_user      ${chroot_dir}
-  set_timezone             ${chroot_dir}
   prevent_daemons_starting ${chroot_dir}
+  set_timezone             ${chroot_dir}
+  install_extras           ${chroot_dir}
   umount_nonroot           ${chroot_dir}
 }
 
