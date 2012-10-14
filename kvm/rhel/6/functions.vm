@@ -30,7 +30,7 @@ function trap_vm() {
   }
 }
 
-function build_vmimage() {
+function create_vm() {
   preflight_check_hypervisor
   [[ -d ${distro_dir} ]] || build_chroot ${distro_dir}
 

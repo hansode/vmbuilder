@@ -11,7 +11,7 @@
 #
 # import:
 #  utils: checkroot
-#  vm: build_vmimage
+#  vm: create_vm
 #
 # memo:
 #
@@ -120,6 +120,6 @@ cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
 case "${cmd}" in
 *)
-  build_vmimage
+  create_vm
   ;;
 esac
