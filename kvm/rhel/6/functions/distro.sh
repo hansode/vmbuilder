@@ -236,6 +236,7 @@ function install_bootloader_cleanup() {
     # # ls -1 ${chroot_dir}/${tmpdir}/
     # centos-6.3_x86_64.raw
     # device.map
+    local disk=
     while read disk; do
       [[ "${disk}" == "device.map" ]] || umount ${chroot_dir}/${tmpdir}/${disk}
     done < <(ls -1 ${chroot_dir}/${tmpdir}/)
