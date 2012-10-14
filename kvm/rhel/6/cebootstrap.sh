@@ -35,9 +35,9 @@ readonly abs_dirname=$(cd $(dirname $0) && pwd)
 
 ### include files
 
-. ${abs_dirname}/functions.utils
-. ${abs_dirname}/functions.disk
-. ${abs_dirname}/functions.distro
+. ${abs_dirname}/functions/utils.sh
+. ${abs_dirname}/functions/disk.sh
+. ${abs_dirname}/functions/distro.sh
 
 ### prepare
 

@@ -100,12 +100,12 @@ readonly abs_dirname=$(cd $(dirname $0) && pwd)
 
 ### include files
 
-. ${abs_dirname}/functions.utils
-. ${abs_dirname}/functions.disk
-. ${abs_dirname}/functions.mbr
-. ${abs_dirname}/functions.distro
-. ${abs_dirname}/functions.hypervisor
-. ${abs_dirname}/functions.vm
+. ${abs_dirname}/functions/utils.sh
+. ${abs_dirname}/functions/disk.sh
+. ${abs_dirname}/functions/mbr.sh
+. ${abs_dirname}/functions/distro.sh
+. ${abs_dirname}/functions/hypervisor.sh
+. ${abs_dirname}/functions/vm.sh
 
 ### prepare
 
