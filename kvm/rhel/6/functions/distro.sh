@@ -208,6 +208,7 @@ function prevent_daemons_starting() {
 function install_grub() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  local grub_distro_name=
   for grub_distro_name in redhat unknown; do
     grub_src_dir=${chroot_dir}/usr/share/grub/${basearch}-${grub_distro_name}
     [[ -d "${grub_src_dir}" ]] || continue
