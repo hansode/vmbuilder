@@ -9,7 +9,6 @@
 #  sed, head
 #
 # import:
-#   utils: checkroot
 #   distro: build_chroot
 #
 # OPTIONS
@@ -47,7 +46,6 @@ extract_args $*
 ## main
 
 register_options
-checkroot
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
 case "${cmd}" in

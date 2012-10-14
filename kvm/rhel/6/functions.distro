@@ -14,7 +14,7 @@
 #  ls, tail
 #
 # imports:
-#  utils: is_dev
+#  utils: is_dev, checkroot
 #  disk: mkdevice, mkprocdir, mount_proc, umount_nonroot, xptabinfo, mntpntuuid, get_grub_id
 #
 
@@ -98,6 +98,7 @@ function distroinfo() {
 }
 
 function build_chroot() {
+  checkroot
   preflight_check_distro
   local chroot_dir=${1:-${abs_dirname}/${distro_short}-${distro_ver}_${distro_arch}}
   [ -d ${chroot_dir} ] && { echo "${chroot_dir} already exists." >&2; return 1; } || :
