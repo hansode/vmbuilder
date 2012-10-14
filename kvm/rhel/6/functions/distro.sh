@@ -101,7 +101,7 @@ function build_chroot() {
   checkroot
   preflight_check_distro
   local chroot_dir=${1:-${abs_dirname}/${distro_short}-${distro_ver}_${distro_arch}}
-  [ -d ${chroot_dir} ] && { echo "${chroot_dir} already exists." >&2; return 1; } || :
+  [[ -d "${chroot_dir}" ]] && { echo "${chroot_dir} already exists." >&2; return 1; } || :
   distroinfo
   trap "trap_distro ${chroot_dir}" 1 2 3 15
   # set_defaults
@@ -115,7 +115,7 @@ function build_chroot() {
 
 function bootstrap() {
   local chroot_dir=$1
-  [ -d ${chroot_dir} ] && { echo "${chroot_dir} already exists." >&2; return 1; } || :
+  [[ -d "${chroot_dir}" ]] && { echo "${chroot_dir} already exists." >&2; return 1; } || :
   mkdir -p       ${chroot_dir}
   mkdevice       ${chroot_dir}
   mkprocdir      ${chroot_dir}
@@ -167,7 +167,7 @@ function run_yum() {
      --installroot=${chroot_dir} \
      -y
   "
-  [[ -d ${tmpdir} ]] || mkdir ${tmpdir}
+  [[ -d "${tmpdir}" ]] || mkdir ${tmpdir}
   repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache} > ${repofile}
   ${yum_cmd} $*
   rm -f ${repofile}
@@ -209,7 +209,7 @@ function install_grub() {
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   for grub_distro_name in redhat unknown; do
     grub_src_dir=${chroot_dir}/usr/share/grub/${basearch}-${grub_distro_name}
-    [ -d ${grub_src_dir} ] || continue
+    [[ -d "${grub_src_dir}" ]] || continue
     rsync -a ${grub_src_dir}/ ${chroot_dir}/boot/grub/
   done
 }
@@ -228,7 +228,7 @@ function install_extras() {
 function install_bootloader_cleanup() {
   local chroot_dir=$1 disk_filename=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   local tmpdir=/tmp/vmbuilder-grub
   is_dev ${disk_filename} || {
     # # ls -1 ${chroot_dir}/${tmpdir}/
@@ -245,7 +245,7 @@ function install_bootloader_cleanup() {
 function install_bootloader() {
   local chroot_dir=$1 disk_filename=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   local root_dev="hd$(get_grub_id)"
 
   local tmpdir=/tmp/vmbuilder-grub
@@ -289,7 +289,7 @@ function install_bootloader() {
 function install_menu_lst() {
   local chroot_dir=$1 disk_filename=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   local grub_id=$(get_grub_id)
   printf "[INFO] Generating /boot/grub/grub.conf\n"
   local bootdir_path=/boot
@@ -401,7 +401,7 @@ function install_resolv_conf() {
 function install_fstab() {
   local chroot_dir=$1 disk_filename=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   printf "[INFO] Overwriting /etc/fstab\n"
   {
   xptabproc <<'EOS'
@@ -445,5 +445,5 @@ function trap_distro() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   umount_nonroot ${chroot_dir}
-  [ -d ${chroot_dir} ] && rm -rf ${chroot_dir}
+  [[ -d "${chroot_dir}" ]] && rm -rf ${chroot_dir}
 }

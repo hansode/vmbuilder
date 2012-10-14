@@ -25,7 +25,7 @@ set -e
 
 function register_options() {
   debug=${debug:-}
-  [ -z ${debug} ] || set -x
+  [[ -z "${debug}" ]] || set -x
   chroot_dir=${chroot_dir:-}
 }
 

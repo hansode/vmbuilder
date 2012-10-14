@@ -19,7 +19,7 @@
 
 function trap_vm() {
   local disk_filename=$1 chroot_dir=$2
-  [[ -d ${chroot_dir} ]] && umount_ptab ${chroot_dir} || :
+  [[ -d "${chroot_dir}" ]] && umount_ptab ${chroot_dir} || :
   is_dev ${disk_filename} || {
     unmapptab ${disk_filename}
     # TODO
@@ -33,7 +33,7 @@ function trap_vm() {
 function create_vm() {
   checkroot
   preflight_check_hypervisor
-  [[ -d ${distro_dir} ]] || build_chroot ${distro_dir}
+  [[ -d "${distro_dir}" ]] || build_chroot ${distro_dir}
 
   trap 'exit 1'  HUP INT PIPE QUIT TERM
   trap "trap_vm ${raw} ${chroot_dir}" EXIT
@@ -41,7 +41,7 @@ function create_vm() {
   is_dev ${raw} && {
     rmmbr ${raw}
   } || {
-    [[ -f ${raw} ]] && rm -f ${raw}
+    [[ -f "${raw}" ]] && rm -f ${raw}
     local totalsize=$(xptabinfo | awk 'BEGIN {sum = 0} {sum += $2} END {print sum}')
     printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${raw} ${totalsize}
     mkdisk ${raw} ${totalsize}

@@ -18,7 +18,7 @@
 
 function mkdisk() {
   local disk_filename=$1 size=$2 unit=${3:-m}
-  [[ -a ${disk_filename} ]] && { echo "already exists: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] && { echo "already exists: ${disk_filename}" >&2; return 1; }
   truncate -s ${size}${unit} ${disk_filename}
 }
 
@@ -94,7 +94,7 @@ function xptabproc() {
 
 function mkpart() {
   local disk_filename=$1 parttype=$2 offset=$3 size=$4 fstype=$5
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
 
   case "${fstype}" in
   ext2) ;;
@@ -134,7 +134,7 @@ function mkpart() {
   } || :
 
   # whole disk
-  [[ ${size} == -1 ]] && {
+  [[ "${size}" == -1 ]] && {
     partition_end=-1
   }
 
@@ -146,7 +146,7 @@ function mkpart() {
 
 function mkptab() {
   local disk_filename=$1
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
 
   printf "[INFO] Adding partition table to disk image: %s\n" ${disk_filename}
   parted --script ${disk_filename} mklabel msdos
@@ -192,7 +192,7 @@ EOS
 
 function mapptab() {
   local disk_filename=$1
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   # # kpartx -va ${disk_filename}
   # add map loop0p1 (253:3): 0 60484 linear /dev/loop0 63
   # add map loop0p2 (253:4): 0 436224 linear /dev/loop0 61440
@@ -209,9 +209,9 @@ function mapptab() {
 
 function unmapptab() {
   local disk_filename=$1
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   local tries=0 max_tries=3
-  while [[ ${tries} -lt ${max_tries} ]]; do
+  while [[ "${tries}" -lt "${max_tries}" ]]; do
     kpartx -vd ${disk_filename} && break || :
     let tries++
     sleep 1
@@ -232,7 +232,7 @@ function unmapptab() {
 
 function lsdevmap() {
   local disk_filename=$1
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   # # kpartx -l ${disk_filename}
   # loop0p1 : 0 60484 /dev/loop0 63
   # loop0p2 : 0 436224 /dev/loop0 61440
@@ -273,7 +273,7 @@ function devmap2path() {
 
 function devname2index() {
   local name=$1
-  [[ -n ${name} ]] || return 1
+  [[ -n "${name}" ]] || return 1
   local part_index=$(xptabinfo | cat -n | egrep -w ${name} | awk '{print $1}')
   case "${part_index}" in
   [1-3])
@@ -289,21 +289,21 @@ function devname2index() {
 
 function mntpnt2path() {
   local disk_filename=$1 mountpoint=$2
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  [[ -n ${mountpoint} ]] || return 1
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -n "${mountpoint}" ]] || return 1
   lsdevmap ${disk_filename} | devmap2path | egrep "$(devname2index "${mountpoint}")\$"
 }
 
 function mntpntuuid() {
   local disk_filename=$1 mountpoint=$2
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   local part_filename=$(mntpnt2path ${disk_filename} ${mountpoint})
   blkid -c /dev/null -sUUID -ovalue ${part_filename}
 }
 
 function mkfsdisk() {
   local disk_filename=$1
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   printf "[INFO] Creating file systems\n"
   xptabproc <<'EOS'
     printf "[DEBUG] Creating file system: \"%s\" of size: %dMB\n" ${mountpoint} ${partsize}

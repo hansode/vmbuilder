@@ -52,7 +52,7 @@ function preflight_check_hypervisor() {
 
 function mount_ptab_root() {
   local disk_filename=$1 chroot_dir=$2
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   xptabproc <<'EOS'
     part_filename=$(mntpnt2path ${disk_filename} ${mountpoint})
@@ -67,7 +67,7 @@ EOS
 
 function mount_ptab_nonroot() {
   local disk_filename=$1 chroot_dir=$2
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   xptabproc <<'EOS'
     part_filename=$(mntpnt2path ${disk_filename} ${mountpoint})
@@ -75,7 +75,7 @@ function mount_ptab_nonroot() {
     root|swap) ;;
     *)
       printf "[DEBUG] Mounting %s\n" ${chroot_dir}${mountpoint}
-      [[ -d ${chroot_dir}${mountpoint} ]] || mkdir -p ${chroot_dir}${mountpoint}
+      [[ -d "${chroot_dir}${mountpoint}" ]] || mkdir -p ${chroot_dir}${mountpoint}
       mount ${part_filename} ${chroot_dir}${mountpoint}
       ;;
     esac
@@ -84,7 +84,7 @@ EOS
 
 function mount_ptab() {
   local disk_filename=$1 chroot_dir=$2
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   mount_ptab_root    ${disk_filename} ${chroot_dir}
   mount_ptab_nonroot ${disk_filename} ${chroot_dir}
 }
@@ -110,7 +110,7 @@ function install_os() {
   local chroot_dir=$1 distro_dir=$2 disk_filename=$3 keepcache=$4 execscript=$5
   [[ -d "${chroot_dir}" ]] && { echo "already exists: ${chroot_dir}" >&2; return 1; }
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
-  [[ -a ${disk_filename} ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   mkdir -p ${chroot_dir}
   mount_ptab ${disk_filename} ${chroot_dir}
   printf "[DEBUG] Installing OS to %s\n" ${chroot_dir}
