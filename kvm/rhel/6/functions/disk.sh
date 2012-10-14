@@ -28,8 +28,9 @@ function mkdevice() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   mkdir ${chroot_dir}/dev
+  local i=
   for i in console null tty1 tty2 tty3 tty4 zero; do
-    MAKEDEV -d ${chroot_dir}/dev -x $i
+    MAKEDEV -d ${chroot_dir}/dev -x ${i}
   done
 }
 
