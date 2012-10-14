@@ -8,7 +8,7 @@
 #  rm
 #
 # imports:
-#  utils: is_dev
+#  utils: is_dev, checkroot
 #  mbr: rmmbr
 #  disk: xptabinfo, mkdisk, mkptab, mapptab, mkfsdisk, unmapptab
 #  distro: build_chroot
@@ -31,6 +31,7 @@ function trap_vm() {
 }
 
 function create_vm() {
+  checkroot
   preflight_check_hypervisor
   [[ -d ${distro_dir} ]] || build_chroot ${distro_dir}
 
