@@ -89,6 +89,7 @@ function xptabinfo() {
 
 function xptabproc() {
   local blk="$(cat)"
+  local mountpoint= partsize=
   while read mountpoint partsize; do
     eval "${blk}"
   done < <(xptabinfo)
