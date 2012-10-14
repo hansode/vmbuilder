@@ -62,6 +62,7 @@ function umount_root() {
 function umount_nonroot() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  local mountpoint=
   while read mountpoint; do
     printf "[DEBUG] Unmounting %s\n" ${mountpoint}
     umount ${mountpoint}
