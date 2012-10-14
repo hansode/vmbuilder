@@ -77,11 +77,11 @@ function xptabinfo() {
       cat ${xpart}
     } || {
       cat <<-EOS
-	/boot ${bootsize}
-	root  ${rootsize}
-	swap  ${swapsize}
-	/opt  ${optsize}
-	/home ${homesize}
+	/boot ${bootsize:-0}
+	root  ${rootsize:-0}
+	swap  ${swapsize:-0}
+	/opt  ${optsize:-0}
+	/home ${homesize:-0}
 	EOS
     }
   } | egrep -v '^$|^#' | awk '$2 != 0 {print $1, $2}'
