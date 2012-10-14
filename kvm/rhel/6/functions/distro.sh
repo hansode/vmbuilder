@@ -199,6 +199,7 @@ function set_timezone() {
 function prevent_daemons_starting() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  local svc= dummy=
   while read svc dummy; do
     chroot ${chroot_dir} chkconfig --del ${svc}
   done < <(chroot ${chroot_dir} chkconfig --list | egrep -v :on)
