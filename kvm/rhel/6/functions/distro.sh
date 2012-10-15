@@ -20,7 +20,7 @@
 
 ## depending on global variables
 
-function preflight_check_distro() {
+function add_option_distro() {
   distro_arch=${distro_arch:-$(arch)}
   case "${distro_arch}" in
   i*86)   basearch=i386; distro_arch=i686 ;;
@@ -62,12 +62,9 @@ function preflight_check_distro() {
     return 1
     ;;
   esac
-
-  check_repository_availability "${baseurl}"
 }
 
-function check_repository_availability() {
-  local baseurl=$1
+function preflight_check_distro() {
   case "${baseurl}" in
   http://*)  ;;
   https://*) ;;
@@ -99,6 +96,7 @@ function distroinfo() {
 
 function build_chroot() {
   checkroot
+  add_option_distro
   preflight_check_distro
   local chroot_dir=${1:-${abs_dirname}/${distro_short}-${distro_ver}_${distro_arch}}
   [[ -d "${chroot_dir}" ]] && { echo "${chroot_dir} already exists." >&2; return 1; } || :
