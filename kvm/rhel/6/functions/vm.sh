@@ -32,6 +32,7 @@ function trap_vm() {
 
 function create_vm() {
   checkroot
+  add_option_hypervisor
   preflight_check_hypervisor
   [[ -d "${distro_dir}" ]] || build_chroot ${distro_dir}
 

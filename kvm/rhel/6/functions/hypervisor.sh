@@ -12,13 +12,13 @@
 #
 # imports:
 #  disk:   xptabproc, mntpnt2path
-#  distro: preflight_check_distro, install_kernel, install_bootloader, configure_networking, configure_mounting, configure_keepcache
+#  distro: add_option_distro, preflight_check_distro, install_kernel, install_bootloader, configure_networking, configure_mounting, configure_keepcache
 #
 
 ## depending on global variables
 
-function preflight_check_hypervisor() {
-  preflight_check_distro
+function add_option_hypervisor() {
+  add_option_distro
 
   distro=${distro_name}-${distro_ver}_${distro_arch}
   distro_dir=${distro_dir:-${abs_dirname}/${distro}}
@@ -47,6 +47,11 @@ function preflight_check_hypervisor() {
   dns=${dns:-}
   hostname=${hostname:-}
 }
+
+function preflight_check_hypervisor() {
+  :
+}
+
 
 ## vmdisk
 
