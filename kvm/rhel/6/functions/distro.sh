@@ -70,7 +70,9 @@ function preflight_check_distro() {
   https://*) ;;
   ftp://*)   ;;
   *)
-    return 0 ;;
+    echo "unknown scheme: ${baseurl}" >&2
+    return 1
+    ;;
   esac
   printf "[DEBUG] Testing access to %s\n" ${baseurl}
   curl -f -s ${baseurl} >/dev/null || {
