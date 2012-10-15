@@ -36,28 +36,30 @@ function create_vm() {
   preflight_check_hypervisor
   [[ -d "${distro_dir}" ]] || build_chroot ${distro_dir}
 
-  trap 'exit 1'  HUP INT PIPE QUIT TERM
-  trap "trap_vm ${raw} ${chroot_dir}" EXIT
+  local disk_filename=${raw}
 
-  is_dev ${raw} && {
-    rmmbr ${raw}
+  trap 'exit 1'  HUP INT PIPE QUIT TERM
+  trap "trap_vm ${disk_filename} ${chroot_dir}" EXIT
+
+  is_dev ${disk_filename} && {
+    rmmbr ${disk_filename}
   } || {
-    [[ -f "${raw}" ]] && rm -f ${raw}
+    [[ -f "${disk_filename}" ]] && rm -f ${disk_filename}
     local totalsize=$(xptabinfo | awk 'BEGIN {sum = 0} {sum += $2} END {print sum}')
-    printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${raw} ${totalsize}
-    mkdisk ${raw} ${totalsize}
+    printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${disk_filename} ${totalsize}
+    mkdisk ${disk_filename} ${totalsize}
   }
-  mkptab  ${raw}
-  is_dev ${raw} || {
+  mkptab ${disk_filename}
+  is_dev ${disk_filename} || {
     printf "[INFO] Creating loop devices corresponding to the created partitions\n"
-    mapptab ${raw}
+    mapptab ${disk_filename}
   }
-  mkfsdisk ${raw}
-  install_os ${chroot_dir} ${distro_dir} ${raw} ${keepcache} ${execscript}
-  is_dev ${raw} || {
+  mkfsdisk ${disk_filename}
+  install_os ${chroot_dir} ${distro_dir} ${disk_filename} ${keepcache} ${execscript}
+  is_dev ${disk_filename} || {
     printf "[INFO] Deleting loop devices\n"
-    unmapptab ${raw}
+    unmapptab ${disk_filename}
   }
-  printf "[INFO] Generated => %s\n" ${raw}
+  printf "[INFO] Generated => %s\n" ${disk_filename}
   printf "[INFO] Complete!\n"
 }
