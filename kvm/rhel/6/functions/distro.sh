@@ -364,7 +364,7 @@ function config_host_and_domainname() {
 	nameserver ${dns}
 	EOS
   }
-  cat ${chroot_dir}/etc/resolv.conf
+  [[ -f ${chroot_dir}/etc/resolv.conf ]] && cat ${chroot_dir}/etc/resolv.conf || :
 }
 
 function config_interfaces() {
