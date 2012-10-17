@@ -189,6 +189,7 @@ function create_initial_user() {
 function set_timezone() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  printf "[INFO] Setting /etc/localtime\n"
   cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
 }
 
