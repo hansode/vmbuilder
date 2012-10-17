@@ -10,7 +10,7 @@
 
 ## functions
 
-test_checkroot_failed() {
+function test_checkroot_failed() {
   checkroot
   assertNotEquals "${?}" "0"
 }
