@@ -103,7 +103,6 @@ function build_chroot() {
   local chroot_dir=${1:-${abs_dirname}/${distro_short}-${distro_ver}_${distro_arch}}
   [[ -d "${chroot_dir}" ]] && { echo "${chroot_dir} already exists." >&2; return 1; } || :
   distroinfo
-  trap "trap_distro ${chroot_dir}" 1 2 3 15
   # set_defaults
   bootstrap ${chroot_dir}
   # TODO
@@ -116,6 +115,7 @@ function build_chroot() {
 function bootstrap() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] && { echo "${chroot_dir} already exists." >&2; return 1; } || :
+  trap "trap_distro ${chroot_dir}" 1 2 3 15
   mkdir -p       ${chroot_dir}
   mkdevice       ${chroot_dir}
   mkprocdir      ${chroot_dir}
