@@ -11,8 +11,13 @@
 ## functions
 
 function test_checkroot_failed() {
-  checkroot
-  assertNotEquals "${?}" "0"
+  [ $UID == 0 ] && {
+    checkroot
+    assertEquals "$?" "0"
+  } || {
+    checkroot
+    assertNotEquals "$?" "0"
+  }
 }
 
 ## shunit2
