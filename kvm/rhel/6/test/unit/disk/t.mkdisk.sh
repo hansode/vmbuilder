@@ -10,11 +10,6 @@
 
 ## variables
 
-declare rootsize=8
-declare swapsize=8
-declare optsize=8
-declare totalsize=$((${rootsize} + ${swapsize} + ${optsize}))
-
 ## public functions
 
 function tearDown() {
