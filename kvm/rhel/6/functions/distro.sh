@@ -31,10 +31,6 @@ function add_option_distro() {
   distro_name=${distro_name:-centos}
 
   keepcache=${keepcache:-0}
-  case "${keepcache}" in
-  [01]) ;;
-  *)    keepcache=0 ;;
-  esac
 
   case "${distro_name}" in
   centos)
@@ -127,7 +123,7 @@ function bootstrap() {
 ## unit functions
 
 function repofile() {
-  local reponame=$1 baseurl="$2" gpgkey="$3" keepcache=$4
+  local reponame=$1 baseurl="$2" gpgkey="$3" keepcache=${4:-0}
   cat <<-EOS
 	[main]
 	cachedir=/var/cache/yum
@@ -168,7 +164,7 @@ function run_yum() {
      -y
   "
   [[ -d "${tmpdir}" ]] || mkdir ${tmpdir}
-  repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache} > ${repofile}
+  repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache:-0} > ${repofile}
   ${yum_cmd} $*
   rm -f ${repofile}
 }
@@ -430,9 +426,15 @@ EOS
 }
 
 function configure_keepcache() {
-  local chroot_dir=$1 keepcache=$2
+  local chroot_dir=$1 keepcache=${2:-0}
+  case "${keepcache}" in
+  [01]) ;;
+  *)    keepcache=0 ;;
+  esac
+  [[ -a "${chroot_dir}/etc/yum.conf" ]] || { echo "file not found: ${chroot_dir}/etc/yum.conf" >&2; return 1; }
   printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
   sed -i s,^keepcache=.*,keepcache=${keepcache}, ${chroot_dir}/etc/yum.conf
+  egrep ^keepcache= ${chroot_dir}/etc/yum.conf
 }
 
 function cleanup() {
