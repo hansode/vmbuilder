@@ -10,8 +10,6 @@
 
 ## variables
 
-declare chroot_dir=_chroot.$$
-
 ## public functions
 
 function setUp() {

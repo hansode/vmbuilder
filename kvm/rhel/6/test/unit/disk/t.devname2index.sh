@@ -10,7 +10,6 @@
 
 ## variables
 
-declare disk_filename=_disk.raw.$$
 declare rootsize=8
 declare swapsize=8
 declare optsize=8
