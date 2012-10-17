@@ -10,8 +10,6 @@
 
 ## variables
 
-declare disk_filename=_disk.raw.$$
-
 ## public functions
 
 function setUp() {
