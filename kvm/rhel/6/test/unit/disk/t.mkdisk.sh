@@ -10,6 +10,11 @@
 
 ## variables
 
+declare rootsize=8
+declare swapsize=8
+declare optsize=8
+declare totalsize=$((${rootsize} + ${swapsize} + ${optsize}))
+
 ## public functions
 
 function tearDown() {
@@ -17,7 +22,7 @@ function tearDown() {
 }
 
 function test_mkdisk() {
-  mkdisk ${disk_filename} 2>/dev/null
+  mkdisk ${disk_filename} ${totalsize} 2>/dev/null
   assertEquals $? 0
 }
 

@@ -18,7 +18,7 @@ declare totalsize=$((${rootsize} + ${swapsize} + ${optsize}))
 ## public functions
 
 function setUp() {
-  truncate -s ${totalsize}m ${disk_filename}
+  mkdisk ${disk_filename} ${totalsize} 2>/dev/null
 }
 
 function tearDown() {

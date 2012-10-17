@@ -18,17 +18,16 @@ declare totalsize=$((${rootsize} + ${swapsize} + ${optsize}))
 ## public functions
 
 function setUp() {
-  truncate -s ${totalsize}m ${disk_filename}
-  # TODO: replace mkptab with low level commands
+  mkdisk ${disk_filename} ${totalsize} 2>/dev/null
   mkptab ${disk_filename}
-  kpartx -va ${disk_filename}
+  mapptab ${disk_filename}
   mkfs $(mntpnt2path ${disk_filename} root)
   mkfs $(mntpnt2path ${disk_filename} swap)
   mkfs $(mntpnt2path ${disk_filename} /opt)
 }
 
 function tearDown() {
-  kpartx -vd ${disk_filename}
+  unmapptab ${disk_filename}
   rm -f ${disk_filename}
 }
 
