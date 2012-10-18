@@ -10,6 +10,13 @@
 
 ## variables
 
+### re-initialize variables for this unit test
+
+rootsize=0
+swapsize=0
+optsize=0
+totalsize=$((${rootsize} + ${swapsize} + ${optsize}))
+
 ## public functions
 
 function test_xptabinfo_all_zero() {
