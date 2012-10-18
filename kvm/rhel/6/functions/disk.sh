@@ -12,6 +12,7 @@
 #  mkfs.ext4, tune2fs, mkswap
 #
 # imports:
+#  utils: checkroot
 #
 
 ## disk
@@ -205,6 +206,7 @@ function mapptab() {
   #
   local disk_filename=$1
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  checkroot || return 1
   # # kpartx -va ${disk_filename}
   # add map loop0p1 (253:3): 0 60484 linear /dev/loop0 63
   # add map loop0p2 (253:4): 0 436224 linear /dev/loop0 61440
@@ -229,6 +231,7 @@ function unmapptab() {
   #
   local disk_filename=$1
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  checkroot || return 1
   local tries=0 max_tries=3
   while [[ "${tries}" -lt "${max_tries}" ]]; do
     kpartx -vd ${disk_filename} && break || :
@@ -274,6 +277,7 @@ declare _lsdevmaps=
 function lsdevmap() {
   local disk_filename=$1
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  checkroot || return 1
   # # kpartx -l ${disk_filename}
   # loop0p1 : 0 60484 /dev/loop0 63
   # loop0p2 : 0 436224 /dev/loop0 61440
