@@ -93,7 +93,6 @@ function distroinfo() {
 }
 
 function build_chroot() {
-  checkroot || return 1
   add_option_distro
   preflight_check_distro
   local chroot_dir=${1:-${abs_dirname}/${distro_short}-${distro_ver}_${distro_arch}}
@@ -111,6 +110,7 @@ function build_chroot() {
 function bootstrap() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] && { echo "${chroot_dir} already exists (distro:${LINENO})" >&2; return 1; } || :
+  checkroot || return 1
   trap "trap_distro ${chroot_dir}" 1 2 3 15
   mkdir -p       ${chroot_dir}
   mkdevice       ${chroot_dir}
