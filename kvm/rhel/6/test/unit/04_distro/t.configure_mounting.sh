@@ -13,7 +13,7 @@
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename}
+  mkdisk ${disk_filename} ${totalsize}
   mkdir -p ${chroot_dir}/etc
 }
 
