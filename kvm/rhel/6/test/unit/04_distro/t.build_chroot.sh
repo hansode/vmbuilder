@@ -21,7 +21,7 @@ function setUp() {
 }
 
 function test_build_chroot() {
-  build_chroot
+  build_chroot ${chroot_dir}
   assertEquals $? 0
 }
 
