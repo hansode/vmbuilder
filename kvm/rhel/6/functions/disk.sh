@@ -46,18 +46,21 @@ function mkprocdir() {
 function mount_proc() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
+  checkroot || return 1
   mount --bind /proc ${chroot_dir}/proc
 }
 
 function mount_dev() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
+  checkroot || return 1
   mount --bind /dev ${chroot_dir}/dev
 }
 
 function umount_root() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
+  checkroot || return 1
   printf "[DEBUG] Unmounting %s\n" ${chroot_dir}
   umount ${chroot_dir}
 }
@@ -65,6 +68,7 @@ function umount_root() {
 function umount_nonroot() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
+  checkroot || return 1
   local mountpoint=
   while read mountpoint; do
     printf "[DEBUG] Unmounting %s\n" ${mountpoint}
