@@ -20,8 +20,8 @@ function setUp() {
   mapptab ${disk_filename}
   mkfsdisk ${disk_filename}
   mount_ptab ${disk_filename} ${chroot_dir}
-
-  function is_dev() { echo is_dev $*; }
+  # this test case is for raw file. because "is_dev" should return 1.
+  function is_dev() { echo is_dev $*; return 1; }
 }
 
 function tearDown() {
