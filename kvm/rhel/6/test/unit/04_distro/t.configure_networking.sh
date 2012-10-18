@@ -31,7 +31,7 @@ function test_configure_networking_exists_udev() {
 
 function test_configure_networking_not_exist_udev() {
   configure_networking ${chroot_dir}
-  assertEquals $? 1
+  assertEquals $? 0
 }
 
 ## shunit2
