@@ -194,6 +194,14 @@ EOS
 }
 
 function mapptab() {
+  #
+  # Create loop devices corresponding to the partitions.
+  #
+  # Once this has returned succesfully, each partition's map device
+  # is set as its L{filename<Disk.Partition.filename>} attribute.
+  #
+  # Call this after L{partition}.
+  #
   local disk_filename=$1
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   # # kpartx -va ${disk_filename}
@@ -211,6 +219,11 @@ function mapptab() {
 }
 
 function unmapptab() {
+  #
+  # Destroy all mapping devices
+  #
+  # Unsets L{Partition}s' and L{Filesystem}s' filename attribute
+  #
   local disk_filename=$1
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
   local tries=0 max_tries=3
