@@ -15,9 +15,12 @@
 function setUp() {
   mkdisk ${disk_filename} ${totalsize}
   mkdir -p ${chroot_dir}/etc
+  mkptab ${disk_filename}
+  mapptab ${disk_filename}
 }
 
 function tearDown() {
+  unmapptab ${disk_filename}
   rm ${disk_filename}
   rm -rf ${chroot_dir}
 }
