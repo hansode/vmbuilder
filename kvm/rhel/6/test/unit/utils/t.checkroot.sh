@@ -10,7 +10,7 @@
 
 ## functions
 
-function test_checkroot_failed() {
+function test_checkroot() {
   [ $UID == 0 ] && {
     checkroot
     assertEquals "$?" "0"
