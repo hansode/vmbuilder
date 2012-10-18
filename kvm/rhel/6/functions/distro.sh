@@ -347,6 +347,9 @@ function config_host_and_domainname() {
 	EOS
   [[ -z "${hostname}" ]] || {
     printf "[INFO] Setting hostname: %s\n" ${hostname}
+    [[ -f ${chroot_dir}/etc/sysconfig/network ]] || {
+      echo HOSTNAME=${hostname} > ${chroot_dir}/etc/sysconfig/network
+    }
     egrep ^HOSTNAME= ${chroot_dir}/etc/sysconfig/network -q && {
       sed -i "s,^HOSTNAME=.*,HOSTNAME=${hostname}," ${chroot_dir}/etc/sysconfig/network
     } || {
