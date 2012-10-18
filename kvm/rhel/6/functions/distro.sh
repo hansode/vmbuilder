@@ -228,6 +228,7 @@ function install_bootloader_cleanup() {
   local chroot_dir=$1 disk_filename=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
+  checkroot || return 1
   local tmpdir=/tmp/vmbuilder-grub
   is_dev ${disk_filename} || {
     # # ls -1 ${chroot_dir}/${tmpdir}/
@@ -246,6 +247,7 @@ function install_bootloader() {
   local chroot_dir=$1 disk_filename=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
+  checkroot || return 1
   local root_dev="hd$(get_grub_id)"
 
   local tmpdir=/tmp/vmbuilder-grub
