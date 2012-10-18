@@ -105,7 +105,7 @@ function build_chroot() {
   # install_kernel shoul be run in install_os.
   install_kernel ${chroot_dir}
   configure_os ${chroot_dir}
-  cleanup ${chroot_dir}
+  cleanup_distro ${chroot_dir}
 }
 
 function bootstrap() {
@@ -439,7 +439,7 @@ function configure_keepcache() {
   egrep ^keepcache= ${chroot_dir}/etc/yum.conf
 }
 
-function cleanup() {
+function cleanup_distro() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
   find   ${chroot_dir}/var/log/ -type f | xargs rm

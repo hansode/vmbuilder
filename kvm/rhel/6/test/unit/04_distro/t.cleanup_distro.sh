@@ -23,8 +23,8 @@ function tearDown() {
   rm -rf ${chroot_dir}
 }
 
-function test_cleanup() {
-  cleanup ${chroot_dir}
+function test_cleanup_distro() {
+  cleanup_distro ${chroot_dir}
   assertEquals $? 0
 }
 

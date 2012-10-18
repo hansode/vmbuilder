@@ -17,7 +17,7 @@ function setUp() {
   function bootstrap() { echo bootstrap $*; }
   function install_kernel() { echo install_kernel $*; }
   function configure_os() { echo configure_os $*; }
-  function cleanup() { echo cleanup $*; }
+  function cleanup_distro() { echo cleanup_distro $*; }
 }
 
 function test_build_chroot() {
