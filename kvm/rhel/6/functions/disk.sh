@@ -328,6 +328,7 @@ function mkfsdisk() {
       }
       ;;
     esac
+    # Let udev have a chance to extract the UUID for us
     udevadm settle
 EOS
 }
