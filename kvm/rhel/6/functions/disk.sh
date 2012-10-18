@@ -29,6 +29,7 @@ function mkdisk() {
 function mkdevice() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
+  checkroot || return 1
   mkdir ${chroot_dir}/dev
   local i=
   for i in console null tty1 tty2 tty3 tty4 zero; do
