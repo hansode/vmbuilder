@@ -101,6 +101,7 @@ function xptabproc() {
 function mkpart() {
   local disk_filename=$1 parttype=$2 offset=$3 size=$4 fstype=$5
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  checkroot || return 1
 
   case "${fstype}" in
   ext2) ;;
@@ -347,6 +348,7 @@ function mntpnt2path() {
 function mntpntuuid() {
   local disk_filename=$1 mountpoint=$2
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  checkroot || return 1
   local part_filename=$(mntpnt2path ${disk_filename} ${mountpoint})
   blkid -c /dev/null -sUUID -ovalue ${part_filename}
 }
