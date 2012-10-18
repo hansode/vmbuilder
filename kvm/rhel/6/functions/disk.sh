@@ -246,6 +246,12 @@ function unmapptab() {
   # del devmap : loop0p1
   # loop deleted : /dev/loop0
   kpartx -vd ${disk_filename}
+
+  while read parted_oldmap; do
+    dmsetup info ${parted_oldmap} | egrep ^State: | egrep -w ACTIVE -q || continue
+    printf "[DEBUG] Removing parted old map with 'dmsetup remove %s'\n" ${parted_oldmap}
+    dmsetup remove ${parted_oldmap}
+  done < <(lsdevmap ${disk_filename})
 }
 
 declare _lsdevmaps=
