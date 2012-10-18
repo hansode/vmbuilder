@@ -20,8 +20,13 @@ function tearDown() {
   rm -rf ${chroot_dir}
 }
 
-function test_run_execscript() {
+function test_run_execscript_executable() {
   run_execscript ${chroot_dir} /bin/echo
+  assertEquals $? 0
+}
+
+function test_run_execscript_inexecutable() {
+  run_execscript ${chroot_dir} /dev/null
   assertEquals $? 0
 }
 
