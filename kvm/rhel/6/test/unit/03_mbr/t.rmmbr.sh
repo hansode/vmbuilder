@@ -13,7 +13,7 @@
 ## public functions
 
 function setUp() {
-  truncate -s 10m ${disk_filename}
+  mkdisk ${disk_filename} 10
 }
 
 function tearDown() {
