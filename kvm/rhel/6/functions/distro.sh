@@ -93,7 +93,7 @@ function distroinfo() {
 }
 
 function build_chroot() {
-  checkroot
+  checkroot || return 1
   add_option_distro
   preflight_check_distro
   local chroot_dir=${1:-${abs_dirname}/${distro_short}-${distro_ver}_${distro_arch}}
