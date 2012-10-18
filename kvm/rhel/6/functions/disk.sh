@@ -354,6 +354,7 @@ function mntpntuuid() {
 function mkfsdisk() {
   local disk_filename=$1
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  checkroot || return 1
   printf "[INFO] Creating file systems\n"
   xptabproc <<'EOS'
     printf "[DEBUG] Creating file system: \"%s\" of size: %dMB\n" ${mountpoint} ${partsize}
