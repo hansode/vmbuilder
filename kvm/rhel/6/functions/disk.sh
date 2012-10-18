@@ -17,8 +17,9 @@
 ## disk
 
 function mkdisk() {
-  local disk_filename=$1 size=$2 unit=${3:-m}
+  local disk_filename=$1 size=${2:-0} unit=${3:-m}
   [[ -a "${disk_filename}" ]] && { echo "already exists: ${disk_filename}" >&2; return 1; }
+  [[ ${size} -gt 0 ]] || { echo "[ERROR] Invalid argument: size:${size}" >&2; return 1; }
   truncate -s ${size}${unit} ${disk_filename}
 }
 
