@@ -214,7 +214,9 @@ function mapptab() {
   # add map loop0p7 (253:9): 0 6144 linear /dev/loop0 1382400
   # add map loop0p8 (253:10): 0 6144 linear /dev/loop0 1390592
   # add map loop0p9 (253:11): 0 6144 linear /dev/loop0 1398784
-  kpartx -va ${disk_filename}
+  kpartx_output=$(kpartx -va ${disk_filename})
+  echo "${kpartx_output}"
+  _lsdevmaps=$(echo "${kpartx_output}"| egrep -v 'gpt:|dos:' | egrep -w add | awk '{print $3}')
   udevadm settle
 }
 
@@ -246,6 +248,7 @@ function unmapptab() {
   kpartx -vd ${disk_filename}
 }
 
+declare _lsdevmaps=
 function lsdevmap() {
   local disk_filename=$1
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
@@ -269,9 +272,13 @@ function lsdevmap() {
   # loop0p7
   # loop0p8
   # loop0p9
-  kpartx -l ${disk_filename} \
-   | egrep -v "^(gpt|dos):" \
-   | awk '{print $1}'
+  [ -z "${_lsdevmaps}" ] && {
+    kpartx -l ${disk_filename} \
+     | egrep -v "^(gpt|dos):" \
+     | awk '{print $1}'
+  } || {
+    echo "${_lsdevmaps}"
+  }
 }
 
 function devmap2path() {
