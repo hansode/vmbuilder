@@ -57,8 +57,8 @@ function preflight_check_hypervisor() {
 
 function mount_ptab_root() {
   local disk_filename=$1 chroot_dir=$2
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
   xptabproc <<'EOS'
     part_filename=$(mntpnt2path ${disk_filename} ${mountpoint})
     case "${mountpoint}" in
@@ -72,8 +72,8 @@ EOS
 
 function mount_ptab_nonroot() {
   local disk_filename=$1 chroot_dir=$2
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
   xptabproc <<'EOS'
     part_filename=$(mntpnt2path ${disk_filename} ${mountpoint})
     case "${mountpoint}" in
@@ -89,14 +89,14 @@ EOS
 
 function mount_ptab() {
   local disk_filename=$1 chroot_dir=$2
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
   mount_ptab_root    ${disk_filename} ${chroot_dir}
   mount_ptab_nonroot ${disk_filename} ${chroot_dir}
 }
 
 function umount_ptab() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
   umount_nonroot ${chroot_dir}
   umount_root    ${chroot_dir}
 }
@@ -105,9 +105,9 @@ function umount_ptab() {
 
 function run_execscript() {
   local chroot_dir=$1 execscript=$2
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
   [[ -n "${execscript}" ]] || return 0
-  [[ -x "${execscript}" ]] || { echo "cannot execute script: ${execscript}" >&2; return 0; }
+  [[ -x "${execscript}" ]] || { echo "cannot execute script: ${execscript} (hypervisor:${LINENO})" >&2; return 0; }
   printf "[INFO] Excecuting script: %s\n" ${execscript}
   [[ -n "${distro_arch}" ]] || add_option_distro
   setarch ${distro_arch} ${execscript} ${chroot_dir}
@@ -115,9 +115,9 @@ function run_execscript() {
 
 function install_os() {
   local chroot_dir=$1 distro_dir=$2 disk_filename=$3 keepcache=$4 execscript=$5
-  [[ -d "${chroot_dir}" ]] && { echo "already exists: ${chroot_dir}" >&2; return 1; }
-  [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir}" >&2; exit 1; }
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] && { echo "already exists: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir} (hypervisor:${LINENO})" >&2; exit 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
   mkdir -p ${chroot_dir}
   mount_ptab ${disk_filename} ${chroot_dir}
   printf "[DEBUG] Installing OS to %s\n" ${chroot_dir}

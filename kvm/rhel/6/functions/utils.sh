@@ -54,7 +54,7 @@ function checkroot() {
 function is_dev() {
   local disk_filename=$1
   # do not use "-a" in this case.
-  [[ -n "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -n "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (utils:${LINENO})" >&2; return 1; }
   case "${disk_filename}" in
   /dev/*) return 0 ;;
        *) return 1 ;;

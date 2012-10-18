@@ -18,8 +18,8 @@
 
 function mkdisk() {
   local disk_filename=$1 size=${2:-0} unit=${3:-m}
-  [[ -a "${disk_filename}" ]] && { echo "already exists: ${disk_filename}" >&2; return 1; }
-  [[ ${size} -gt 0 ]] || { echo "[ERROR] Invalid argument: size:${size}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] && { echo "already exists: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  [[ ${size} -gt 0 ]] || { echo "[ERROR] Invalid argument: size:${size} (disk:${LINENO})" >&2; return 1; }
   truncate -s ${size}${unit} ${disk_filename}
 }
 
@@ -27,7 +27,7 @@ function mkdisk() {
 
 function mkdevice() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
   mkdir ${chroot_dir}/dev
   local i=
   for i in console null tty1 tty2 tty3 tty4 zero; do
@@ -37,32 +37,32 @@ function mkdevice() {
 
 function mkprocdir() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
   mkdir ${chroot_dir}/proc
 }
 
 function mount_proc() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
   mount --bind /proc ${chroot_dir}/proc
 }
 
 function mount_dev() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
   mount --bind /dev ${chroot_dir}/dev
 }
 
 function umount_root() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
   printf "[DEBUG] Unmounting %s\n" ${chroot_dir}
   umount ${chroot_dir}
 }
 
 function umount_nonroot() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir}" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
   local mountpoint=
   while read mountpoint; do
     printf "[DEBUG] Unmounting %s\n" ${mountpoint}
@@ -98,7 +98,7 @@ function xptabproc() {
 
 function mkpart() {
   local disk_filename=$1 parttype=$2 offset=$3 size=$4 fstype=$5
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
 
   case "${fstype}" in
   ext2) ;;
@@ -150,7 +150,7 @@ function mkpart() {
 
 function mkptab() {
   local disk_filename=$1
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
 
   printf "[INFO] Adding partition table to disk image: %s\n" ${disk_filename}
   parted --script ${disk_filename} mklabel msdos
@@ -204,7 +204,7 @@ function mapptab() {
   # Call this after L{partition}.
   #
   local disk_filename=$1
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   # # kpartx -va ${disk_filename}
   # add map loop0p1 (253:3): 0 60484 linear /dev/loop0 63
   # add map loop0p2 (253:4): 0 436224 linear /dev/loop0 61440
@@ -228,7 +228,7 @@ function unmapptab() {
   # Unsets L{Partition}s' and L{Filesystem}s' filename attribute
   #
   local disk_filename=$1
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   local tries=0 max_tries=3
   while [[ "${tries}" -lt "${max_tries}" ]]; do
     kpartx -vd ${disk_filename} && break || :
@@ -273,7 +273,7 @@ function unmapptab() {
 declare _lsdevmaps=
 function lsdevmap() {
   local disk_filename=$1
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   # # kpartx -l ${disk_filename}
   # loop0p1 : 0 60484 /dev/loop0 63
   # loop0p2 : 0 436224 /dev/loop0 61440
@@ -334,21 +334,21 @@ function devname2index() {
 
 function mntpnt2path() {
   local disk_filename=$1 mountpoint=$2
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   [[ -n "${mountpoint}" ]] || return 1
   lsdevmap ${disk_filename} | devmap2path | egrep "$(devname2index "${mountpoint}")\$"
 }
 
 function mntpntuuid() {
   local disk_filename=$1 mountpoint=$2
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   local part_filename=$(mntpnt2path ${disk_filename} ${mountpoint})
   blkid -c /dev/null -sUUID -ovalue ${part_filename}
 }
 
 function mkfsdisk() {
   local disk_filename=$1
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename}" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   printf "[INFO] Creating file systems\n"
   xptabproc <<'EOS'
     printf "[DEBUG] Creating file system: \"%s\" of size: %dMB\n" ${mountpoint} ${partsize}
