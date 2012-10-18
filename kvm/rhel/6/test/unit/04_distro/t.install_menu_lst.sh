@@ -13,7 +13,7 @@
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename}
+  mkdisk ${disk_filename} ${totalsize}
   mkdir -p ${chroot_dir}/boot/grub
   touch ${chroot_dir}/boot/vmlinuz-$$
   touch ${chroot_dir}/boot/initramfs-$$
