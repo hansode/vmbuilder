@@ -19,7 +19,13 @@ function tearDown() {
   rm -f ${disk_filename}
 }
 
-function test_create_vm() {
+function test_create_vm_no_options() {
+  create_vm ${disk_filename} ${chroot_dir}
+  assertEquals $? 0
+}
+
+function test_create_vm_xpart_multiple_partitions() {
+  local xpart=${abs_dirname}/../../../xpart.txt.example
   create_vm ${disk_filename} ${chroot_dir}
   assertEquals $? 0
 }
