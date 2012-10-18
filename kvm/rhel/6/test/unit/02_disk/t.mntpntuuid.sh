@@ -16,6 +16,7 @@ function setUp() {
   mkdisk ${disk_filename} ${totalsize} 2>/dev/null
   mkptab ${disk_filename}
   mapptab ${disk_filename}
+  checkroot || return 1
   mkfs $(mntpnt2path ${disk_filename} root)
   mkfs $(mntpnt2path ${disk_filename} swap)
   mkfs $(mntpnt2path ${disk_filename} /opt)
