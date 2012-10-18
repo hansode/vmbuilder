@@ -4,10 +4,13 @@
 #   bash
 #
 
+## system variables
+
+readonly abs_dirname=$(cd $(dirname $0) && pwd)
+readonly shunit2_file=${abs_dirname}/../shunit2
+
 ## include files
 
-. ../../../functions/utils.sh
+. ${abs_dirname}/../../../functions/utils.sh
 
-## variables
-
-shunit2_file=../shunit2
+## group variables
