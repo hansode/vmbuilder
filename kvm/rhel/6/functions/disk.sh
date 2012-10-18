@@ -252,6 +252,13 @@ function unmapptab() {
     printf "[DEBUG] Removing parted old map with 'dmsetup remove %s'\n" ${parted_oldmap}
     dmsetup remove ${parted_oldmap}
   done < <(lsdevmap ${disk_filename})
+
+  while read devname; do
+    local loop_device=/dev/${devname}
+    losetup --show ${loop_device} || continue
+    printf "[DEBUG] Removing mapped loop device with 'losetup -d %s'\n" ${loop_device}
+    losetup -d ${loop_device}
+  done < <(lsdevmap ${disk_filename} | sed 's,p[0-9]*$,,' | sort | uniq)
 }
 
 declare _lsdevmaps=
