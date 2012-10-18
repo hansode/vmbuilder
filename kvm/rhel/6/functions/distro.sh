@@ -406,6 +406,7 @@ function install_fstab() {
   local chroot_dir=$1 disk_filename=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
+  checkroot || return 1
   printf "[INFO] Overwriting /etc/fstab\n"
   {
   xptabproc <<'EOS'
