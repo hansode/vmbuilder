@@ -109,6 +109,7 @@ function run_execscript() {
   [[ -n "${execscript}" ]] || return 0
   [[ -x "${execscript}" ]] || { echo "cannot execute script: ${execscript}" >&2; return 0; }
   printf "[INFO] Excecuting script: %s\n" ${execscript}
+  [[ -n "${distro_arch}" ]] || add_option_distro
   setarch ${distro_arch} ${execscript} ${chroot_dir}
 }
 
