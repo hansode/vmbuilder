@@ -13,7 +13,7 @@
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename}
+  mkdisk ${disk_filename} ${totalsize}
   mkdir -p ${chroot_dir}/tmp/vmbuilder-grub
   function is_dev() { echo is_dev $*; }
   function chroot() { echo chroot $*; }
