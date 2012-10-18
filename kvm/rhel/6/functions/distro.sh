@@ -333,10 +333,11 @@ function configure_networking() {
 	EOS
   config_host_and_domainname ${chroot_dir}
   config_interfaces          ${chroot_dir}
-  [[ -a "${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules" ]] || { echo "file not found: ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules" >&2; return 1; }
+  local udev_70_persistent_net_path=${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
+  [[ -a "${udev_70_persistent_net_path}" ]] || { echo "file not found: ${udev_70_persistent_net_path}" >&2; return 1; }
   printf "[INFO] Unsetting udev 70-persistent-net.rules\n"
-  rm -f ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
-  ln -s /dev/null ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
+  rm -f ${udev_70_persistent_net_path}
+  ln -s /dev/null ${udev_70_persistent_net_path}
 }
 
 function config_host_and_domainname() {
