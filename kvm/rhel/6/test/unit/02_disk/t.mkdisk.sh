@@ -16,8 +16,13 @@ function tearDown() {
   rm -f ${disk_filename}
 }
 
-function test_mkdisk() {
-  mkdisk ${disk_filename} ${totalsize} 2>/dev/null
+function test_mkdisk_size_zero() {
+  mkdisk ${disk_filename} 0
+  assertNotEquals $? 0
+}
+
+function test_mkdisk_size_non_zero() {
+  mkdisk ${disk_filename} ${totalsize}
   assertEquals $? 0
 }
 
