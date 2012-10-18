@@ -248,14 +248,22 @@ function unmapptab() {
   kpartx -vd ${disk_filename}
 
   while read parted_oldmap; do
-    dmsetup info ${parted_oldmap} | egrep ^State: | egrep -w ACTIVE -q || continue
+    # '2>/dev/null' means if device does not exist,
+    # dmsetup shows "Command failed" to stderr.
+    # # dmsetup info ${parted_oldmap}
+    # Command failed
+    dmsetup info ${parted_oldmap} 2>/dev/null | egrep ^State: | egrep -w ACTIVE -q || continue
     printf "[DEBUG] Removing parted old map with 'dmsetup remove %s'\n" ${parted_oldmap}
     dmsetup remove ${parted_oldmap}
   done < <(lsdevmap ${disk_filename})
 
   while read devname; do
     local loop_device=/dev/${devname}
-    losetup --show ${loop_device} || continue
+    # '2>/dev/null' means if device does not exist,
+    # losetup shows "loop: can't get info on device /dev/loopX: No such device or address"
+    # # losetup --show ${loop_device}
+    # loop: can't get info on device /dev/loop6: No such device or address
+    losetup --show ${loop_device} 2>/dev/null || continue
     printf "[DEBUG] Removing mapped loop device with 'losetup -d %s'\n" ${loop_device}
     losetup -d ${loop_device}
   done < <(lsdevmap ${disk_filename} | sed 's,p[0-9]*$,,' | sort | uniq)
