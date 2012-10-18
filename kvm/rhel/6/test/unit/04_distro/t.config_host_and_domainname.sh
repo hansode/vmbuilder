@@ -20,13 +20,35 @@ function tearDown() {
   rm -rf ${chroot_dir}
 }
 
+### set value
+
 function test_config_host_and_domainname() {
   config_host_and_domainname ${chroot_dir}
   assertEquals $? 0
 }
 
-function test_config_host_and_domainname_with_dns() {
+function test_config_host_and_domainname_with_host() {
+  local hostname=github.com
+  config_host_and_domainname ${chroot_dir}
+  assertEquals $? 0
+}
+
+function test_config_host_and_domainname_with_domainname() {
   local dns=8.8.8.8
+  config_host_and_domainname ${chroot_dir}
+  assertEquals $? 0
+}
+
+### set empty
+
+function test_config_host_and_domainname_with_host_empty() {
+  local hostname=
+  config_host_and_domainname ${chroot_dir}
+  assertEquals $? 0
+}
+
+function test_config_host_and_domainname_with_domainname_empty() {
+  local dns=
   config_host_and_domainname ${chroot_dir}
   assertEquals $? 0
 }
