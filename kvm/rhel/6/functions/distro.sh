@@ -334,9 +334,8 @@ function configure_networking() {
   config_host_and_domainname ${chroot_dir}
   config_interfaces          ${chroot_dir}
   local udev_70_persistent_net_path=${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
-  [[ -a "${udev_70_persistent_net_path}" ]] || { echo "file not found: ${udev_70_persistent_net_path}" >&2; return 1; }
   printf "[INFO] Unsetting udev 70-persistent-net.rules\n"
-  rm -f ${udev_70_persistent_net_path}
+  [[ -a "${udev_70_persistent_net_path}" ]] && rm -f ${udev_70_persistent_net_path} || :
   ln -s /dev/null ${udev_70_persistent_net_path}
 }
 
