@@ -305,6 +305,8 @@ function lsdevmap() {
   # loop0p8
   # loop0p9
   [ -z "${_lsdevmaps}" ] && {
+    # if showing devmap table without mapping file, file will be automatically mapped to loop device.
+    # device mapping should be deleted.
     kpartx -l ${disk_filename} \
      | egrep -v "^(gpt|dos):" \
      | awk '{print $1}'
