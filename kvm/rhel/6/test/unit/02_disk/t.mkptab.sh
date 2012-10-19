@@ -43,7 +43,7 @@ function test_mkptab_root_swap() {
   assertEquals $? 0
 }
 
-function test_mkptab_root_swap() {
+function test_mkptab_root_swap_opt() {
   local rootsize=8 swapsize=8 optsize=8
   local totalsize=$((${rootsize} + ${swapsize} + ${optsize}))
   mkdisk ${disk_filename} ${totalsize}
