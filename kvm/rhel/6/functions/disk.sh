@@ -23,7 +23,7 @@ function mkdisk() {
   #
   local disk_filename=$1 size=${2:-0} unit=${3:-m}
   [[ -a "${disk_filename}" ]] && { echo "already exists: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
-  [[ ${size} -gt 0 ]] || { echo "[ERROR] Invalid argument: size:${size} (disk:${LINENO})" >&2; return 1; }
+  [[ "${size}" -gt 0 ]] || { echo "[ERROR] Invalid argument: size:${size} (disk:${LINENO})" >&2; return 1; }
 
   truncate -s ${size}${unit} ${disk_filename}
 }
@@ -117,13 +117,32 @@ function mkpart() {
   #
   # Adds partition to the disk image (does not mkfs or anything like that)
   #
-  local disk_filename=$1 parttype=$2 offset=$3 size=$4 fstype=$5
+  local disk_filename=$1 parttype=${2:-primary} offset=${3:-0} size=${4:-0} fstype=${5:-ext2}
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  [[ "${size}" -gt 0 ]] || { echo "[ERROR] Invalid argument: size:${size} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
+  case "${parttype}" in
+  primary)
+    ;;
+  logical)
+    ;;
+  *)
+    echo "[ERROR] Invalid parttype: ${parttype} (disk:${LINENO})" >&2
+    return 1
+    ;;
+  esac
+
   case "${fstype}" in
-  ext2) ;;
-  swap) fstype="linux-swap(new)" ;;
+  ext2)
+    ;;
+  swap)
+    fstype="linux-swap(new)"
+    ;;
+  *)
+    echo "[ERROR] Invalid fstype: ${fstype} (disk:${LINENO})" >&2
+    return 1
+    ;;
   esac
 
   local partition_start=${offset}
@@ -147,12 +166,24 @@ function mkpart() {
   local previous_partition=$(parted --script -- ${disk_filename} unit s print | egrep -v '^$' | awk '$1 ~ "^[1-9]+"' | tail -1)
 
   case "${previous_partition}" in
-  # 1st primary
-  "") ;;
-  # 1st logical
-  *extended) partition_start=$(echo "${previous_partition}" | awk '{print $2}' | sed 's,s$,,') ;;
-  # others
-  *) false ;;
+  "")
+    # 1st primary
+    case "${parttype}" in
+    primary)
+      ;;
+    *)
+      echo "[ERROR] Invalid parttype: ${parttype} (disk:${LINENO})" >&2
+      return 1
+      ;;
+    esac
+    ;;
+  *extended)
+    # 1st logical
+    partition_start=$(echo "${previous_partition}" | awk '{print $2}' | sed 's,s$,,') ;;
+  *)
+    # others
+    false
+    ;;
   esac && {
     printf "[INFO] Partition at beginning of disk - reserving first cylinder\n"
     partition_start=$((${partition_start} + 63))s
