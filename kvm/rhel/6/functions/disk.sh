@@ -359,7 +359,7 @@ function lsdevmap() {
   # loop0p7
   # loop0p8
   # loop0p9
-  [ -z "${_lsdevmaps}" ] && {
+  [[ -z "${_lsdevmaps}" ]] && {
     # $ man kpartx
     # >  -l     List partition mappings that would be added -a
     #
