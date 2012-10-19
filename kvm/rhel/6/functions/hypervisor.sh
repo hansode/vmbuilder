@@ -120,7 +120,7 @@ function run_execscript() {
 }
 
 function install_os() {
-  local chroot_dir=$1 distro_dir=$2 disk_filename=$3 keepcache=$4 execscript=$5
+  local chroot_dir=$1 distro_dir=$2 disk_filename=$3 keepcache=${4:-0} execscript=$5
   [[ -d "${chroot_dir}" ]] && { echo "already exists: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir} (hypervisor:${LINENO})" >&2; exit 1; }
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
