@@ -305,6 +305,9 @@ function lsdevmap() {
   # loop0p8
   # loop0p9
   [ -z "${_lsdevmaps}" ] && {
+    # $ man kpartx
+    # >  -l     List partition mappings that would be added -a
+    #
     # if showing devmap table without mapping file, file will be automatically mapped to loop device.
     # device mapping should be deleted.
     kpartx -l ${disk_filename} \
