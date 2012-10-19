@@ -388,7 +388,7 @@ function devmap2path() {
 
 function devname2index() {
   local name=$1
-  [[ -n "${name}" ]] || return 1
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (disk:${LINENO})" >&2; return 1; }
 
   local part_index=$(xptabinfo | cat -n | egrep -w ${name} | awk '{print $1}')
   case "${part_index}" in
@@ -406,7 +406,7 @@ function devname2index() {
 function mntpnt2path() {
   local disk_filename=$1 mountpoint=$2
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
-  [[ -n "${mountpoint}" ]] || return 1
+  [[ -n "${mountpoint}" ]] || { echo "[ERROR] Invalid argument: mountpoint:${mountpoint} (disk:${LINENO})" >&2; return 1; }
 
   lsdevmap ${disk_filename} | devmap2path | egrep "$(devname2index "${mountpoint}")\$"
 }
@@ -414,7 +414,7 @@ function mntpnt2path() {
 function mntpntuuid() {
   local disk_filename=$1 mountpoint=$2
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
-  [[ -n "${mountpoint}" ]] || return 1
+  [[ -n "${mountpoint}" ]] || { echo "[ERROR] Invalid argument: mountpoint:${mountpoint} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   local part_filename=$(mntpnt2path ${disk_filename} ${mountpoint})
