@@ -95,8 +95,10 @@ function distroinfo() {
 function build_chroot() {
   add_option_distro
   preflight_check_distro
+
   local chroot_dir=${1:-${abs_dirname}/${distro_short}-${distro_ver}_${distro_arch}}
   [[ -d "${chroot_dir}" ]] && { echo "${chroot_dir} already exists (distro:${LINENO})" >&2; return 1; } || :
+
   distroinfo
   # set_defaults
   bootstrap ${chroot_dir}
@@ -111,7 +113,9 @@ function bootstrap() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] && { echo "${chroot_dir} already exists (distro:${LINENO})" >&2; return 1; } || :
   checkroot || return 1
+
   trap "trap_distro ${chroot_dir}" 1 2 3 15
+
   mkdir -p       ${chroot_dir}
   mkdevice       ${chroot_dir}
   mkprocdir      ${chroot_dir}
@@ -124,6 +128,7 @@ function bootstrap() {
 
 function repofile() {
   local reponame=$1 baseurl="$2" gpgkey="$3" keepcache=${4:-0}
+
   cat <<-EOS
 	[main]
 	cachedir=/var/cache/yum
@@ -172,24 +177,28 @@ function run_yum() {
 
 function configure_mounting() {
   local chroot_dir=$1 disk_filename=$2
+
   install_fstab ${chroot_dir} ${disk_filename}
 }
 
 function update_passwords() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
   chroot ${chroot_dir} pwconv
   chroot ${chroot_dir} bash -c "echo root:root | chpasswd"
 }
 
 function create_initial_user() {
   local chroot_dir=$1
+
   update_passwords ${chroot_dir}
 }
 
 function set_timezone() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
   printf "[INFO] Setting /etc/localtime\n"
   cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
 }
@@ -197,6 +206,7 @@ function set_timezone() {
 function prevent_daemons_starting() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
  #local svc= dummy=
  #while read svc dummy; do
  #  chroot ${chroot_dir} chkconfig --del ${svc}
@@ -206,6 +216,7 @@ function prevent_daemons_starting() {
 function install_grub() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
   local grub_distro_name=
   for grub_distro_name in redhat unknown; do
     grub_src_dir=${chroot_dir}/usr/share/grub/${basearch}-${grub_distro_name}
@@ -216,11 +227,13 @@ function install_grub() {
 
 function install_kernel() {
   local chroot_dir=$1
+
   run_yum ${chroot_dir} install dracut kernel
 }
 
 function install_extras() {
   local chroot_dir=$1
+
   run_yum ${chroot_dir} install openssh openssh-clients openssh-server rpm yum curl dhclient passwd vim-minimal
  #run_yum ${chroot_dir} erase   selinux*
 }
@@ -230,6 +243,7 @@ function install_bootloader_cleanup() {
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
   checkroot || return 1
+
   local tmpdir=/tmp/vmbuilder-grub
   is_dev ${disk_filename} || {
     # # ls -1 ${chroot_dir}/${tmpdir}/
@@ -249,9 +263,10 @@ function install_bootloader() {
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
   checkroot || return 1
-  local root_dev="hd$(get_grub_id)"
 
+  local root_dev="hd$(get_grub_id)"
   local tmpdir=/tmp/vmbuilder-grub
+
   mkdir -p ${chroot_dir}/${tmpdir}
 
   is_dev ${disk_filename} || {
@@ -259,6 +274,7 @@ function install_bootloader() {
     touch ${chroot_dir}/${new_filename}
     mount --bind ${disk_filename} ${chroot_dir}/${new_filename}
   }
+
   local devmapfile=${tmpdir}/device.map
   touch ${chroot_dir}/${devmapfile}
   printf "[INFO] Generating %s\n" ${devmapfile}
@@ -273,18 +289,20 @@ function install_bootloader() {
   cat ${chroot_dir}/${devmapfile}
 
   printf "[INFO] Installing grub\n"
+  install_grub ${chroot_dir}
+
   local grub_cmd=
   is_dev ${disk_filename} && {
     grub_cmd="grub --device-map=${chroot_dir}/${devmapfile} --batch"
   } || {
     grub_cmd="chroot ${chroot_dir} grub --device-map=${devmapfile} --batch"
   }
-  install_grub ${chroot_dir}
   cat <<-_EOS_ | ${grub_cmd}
 	root (${root_dev},0)
 	setup (hd0)
 	quit
 	_EOS_
+
   install_menu_lst ${chroot_dir} ${disk_filename}
   install_bootloader_cleanup ${chroot_dir} ${disk_filename}
 }
@@ -293,12 +311,15 @@ function install_menu_lst() {
   local chroot_dir=$1 disk_filename=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
-  local grub_id=$(get_grub_id)
+
   printf "[INFO] Generating /boot/grub/grub.conf\n"
+
   local bootdir_path=/boot
   xptabinfo | egrep -q /boot && {
     bootdir_path=
   }
+
+  local grub_id=$(get_grub_id)
   cat <<-_EOS_ > ${chroot_dir}/boot/grub/grub.conf
 	default=0
 	timeout=5
@@ -310,6 +331,7 @@ function install_menu_lst() {
 	        initrd ${bootdir_path}/$(cd ${chroot_dir}/boot && ls initramfs-*| tail -1)
 	_EOS_
   cat ${chroot_dir}/boot/grub/grub.conf
+
   cd ${chroot_dir}/boot/grub
   ln -fs grub.conf menu.lst
   cd - >/dev/null
@@ -318,6 +340,7 @@ function install_menu_lst() {
 function configure_os() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
   mount_proc               ${chroot_dir}
   mount_dev                ${chroot_dir}
   create_initial_user      ${chroot_dir}
@@ -331,11 +354,13 @@ function configure_os() {
 function configure_networking() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
   cat <<-EOS > ${chroot_dir}/etc/sysconfig/network
 	NETWORKING=yes
 	EOS
   config_host_and_domainname ${chroot_dir}
   config_interfaces          ${chroot_dir}
+
   local udev_70_persistent_net_path=${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
   printf "[INFO] Unsetting udev 70-persistent-net.rules\n"
   [[ -a "${udev_70_persistent_net_path}" ]] && rm -f ${udev_70_persistent_net_path} || :
@@ -345,9 +370,11 @@ function configure_networking() {
 function config_host_and_domainname() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
   cat <<-EOS > ${chroot_dir}/etc/hosts
 	127.0.0.1       localhost
 	EOS
+
   [[ -z "${hostname}" ]] || {
     printf "[INFO] Setting hostname: %s\n" ${hostname}
     [[ -f ${chroot_dir}/etc/sysconfig/network ]] || {
@@ -362,6 +389,7 @@ function config_host_and_domainname() {
     echo 127.0.0.1 ${hostname} >> ${chroot_dir}/etc/hosts
     cat ${chroot_dir}/etc/hosts
   }
+
   printf "[INFO] Generating /etc/resolv.conf\n"
   [[ -z "${dns}" ]] || {
     cat <<-EOS > ${chroot_dir}/etc/resolv.conf
@@ -374,9 +402,11 @@ function config_host_and_domainname() {
 function config_interfaces() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
   local ifindex=0
   local ifname=eth${ifindex}
   local ifcfg_path=/etc/sysconfig/network-scripts/ifcfg-${ifname}
+
   printf "[INFO] Generating %s\n" ${ifcfg_path}
   [[ -z "${ip}" ]] && {
     cat <<-EOS > ${chroot_dir}${ifcfg_path}
@@ -400,6 +430,7 @@ function config_interfaces() {
 
 function install_resolv_conf() {
   local chroot_dir=$1
+
   cat <<-EOS > ${chroot_dir}/etc/resolv.conf
 	nameserver 8.8.8.8
 	EOS
@@ -410,6 +441,7 @@ function install_fstab() {
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
   checkroot || return 1
+
   printf "[INFO] Overwriting /etc/fstab\n"
   {
   xptabproc <<'EOS'
@@ -436,6 +468,7 @@ EOS
 
 function configure_keepcache() {
   local chroot_dir=$1 keepcache=${2:-0}
+
   case "${keepcache}" in
   [01]) ;;
   *)    keepcache=0 ;;
@@ -449,6 +482,7 @@ function configure_keepcache() {
 function cleanup_distro() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
   find   ${chroot_dir}/var/log/ -type f | xargs rm
   rm -rf ${chroot_dir}/tmp/*
 }
@@ -458,6 +492,7 @@ function cleanup_distro() {
 function trap_distro() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
   umount_nonroot ${chroot_dir}
   [[ -d "${chroot_dir}" ]] && rm -rf ${chroot_dir}
 }
