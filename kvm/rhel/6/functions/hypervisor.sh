@@ -11,7 +11,8 @@
 #  setarch
 #
 # imports:
-#  disk:   xptabproc, mntpnt2path
+#  utils: checkroot
+#  disk: xptabproc, mntpnt2path
 #  distro: add_option_distro, preflight_check_distro, install_kernel, install_bootloader, configure_networking, configure_mounting, configure_keepcache
 #
 
@@ -59,6 +60,7 @@ function mount_ptab_root() {
   local disk_filename=$1 chroot_dir=$2
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  checkroot || return 1
 
   xptabproc <<'EOS'
     part_filename=$(mntpnt2path ${disk_filename} ${mountpoint})
@@ -75,6 +77,7 @@ function mount_ptab_nonroot() {
   local disk_filename=$1 chroot_dir=$2
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  checkroot || return 1
 
   xptabproc <<'EOS'
     part_filename=$(mntpnt2path ${disk_filename} ${mountpoint})
@@ -93,6 +96,7 @@ function mount_ptab() {
   local disk_filename=$1 chroot_dir=$2
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  checkroot || return 1
 
   mount_ptab_root    ${disk_filename} ${chroot_dir}
   mount_ptab_nonroot ${disk_filename} ${chroot_dir}
@@ -101,6 +105,7 @@ function mount_ptab() {
 function umount_ptab() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  checkroot || return 1
 
   umount_nonroot ${chroot_dir}
   umount_root    ${chroot_dir}
@@ -124,6 +129,7 @@ function install_os() {
   [[ -d "${chroot_dir}" ]] && { echo "already exists: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
   [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir} (hypervisor:${LINENO})" >&2; exit 1; }
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
+  checkroot || return 1
 
   mkdir -p ${chroot_dir}
   mount_ptab ${disk_filename} ${chroot_dir}
