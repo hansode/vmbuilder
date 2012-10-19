@@ -20,6 +20,7 @@
 function trap_vm() {
   local disk_filename=$1 chroot_dir=$2
   [[ -d "${chroot_dir}" ]] && umount_ptab ${chroot_dir} || :
+
   is_dev ${disk_filename} || {
     unmapptab ${disk_filename}
     # TODO
@@ -32,6 +33,7 @@ function trap_vm() {
 
 function create_vm() {
   checkroot || return 1
+
   add_option_hypervisor
   preflight_check_hypervisor
   [[ -d "${distro_dir}" ]] || build_chroot ${distro_dir}
@@ -49,17 +51,22 @@ function create_vm() {
     printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${disk_filename} ${totalsize}
     mkdisk ${disk_filename} ${totalsize}
   }
+
   mkptab ${disk_filename}
   is_dev ${disk_filename} || {
     printf "[INFO] Creating loop devices corresponding to the created partitions\n"
     mapptab ${disk_filename}
   }
+
   mkfsdisk ${disk_filename}
+
   install_os ${chroot_dir} ${distro_dir} ${disk_filename} ${keepcache} ${execscript}
+
   is_dev ${disk_filename} || {
     printf "[INFO] Deleting loop devices\n"
     unmapptab ${disk_filename}
   }
+
   printf "[INFO] Generated => %s\n" ${disk_filename}
   printf "[INFO] Complete!\n"
 }
