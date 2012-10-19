@@ -149,23 +149,24 @@ function repofile() {
 }
 
 function run_yum() {
-  local chroot_dir=$1
-  shift
+  local chroot_dir=$1; shift
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
   local reponame=${distro_short}
   local tmpdir=${chroot_dir}/tmp
   local repofile=${tmpdir}/yum-${reponame}.repo
-  local yum_cmd="
-     yum
-     -c ${repofile} \
-     --disablerepo="\*" \
-     --enablerepo="${reponame}" \
-     --installroot=${chroot_dir} \
-     -y
-  "
+
   [[ -d "${tmpdir}" ]] || mkdir ${tmpdir}
   repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache:-0} > ${repofile}
-  ${yum_cmd} $*
+
+  yum \
+   -c ${repofile} \
+   --disablerepo='*' \
+   --enablerepo="${reponame}" \
+   --installroot=${chroot_dir} \
+   -y \
+   $*
+
   rm -f ${repofile}
 }
 
