@@ -117,7 +117,8 @@ function mkpart() {
   #
   # Adds partition to the disk image (does not mkfs or anything like that)
   #
-  local disk_filename=$1 parttype=${2:-primary} offset=${3:-0} size=${4:-0} fstype=${5:-ext2}
+  # fstype: should allow empty for extended parttype
+  local disk_filename=$1 parttype=${2:-primary} offset=${3:-0} size=${4:-0} fstype=${5:-}
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   #
   # size == -1 or size > 0. "-1" means whole disk
@@ -130,6 +131,8 @@ function mkpart() {
     ;;
   logical)
     ;;
+  extended)
+    ;;
   *)
     echo "[ERROR] Invalid parttype: ${parttype} (disk:${LINENO})" >&2
     return 1
@@ -141,6 +144,9 @@ function mkpart() {
     ;;
   swap)
     fstype="linux-swap(new)"
+    ;;
+  "")
+    # for extended parttype
     ;;
   *)
     echo "[ERROR] Invalid fstype: ${fstype} (disk:${LINENO})" >&2

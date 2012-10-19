@@ -52,6 +52,15 @@ function test_mkptab_root_swap_opt() {
   assertEquals $? 0
 }
 
+function test_mkptab_root_swap_opt_home_boot() {
+  local rootsize=8 swapsize=8 optsize=8 homesize=8 bootsize=8
+  local totalsize=$((${rootsize} + ${swapsize} + ${optsize} + ${homesize} + ${bootsize}))
+  mkdisk ${disk_filename} ${totalsize}
+
+  mkptab ${disk_filename}
+  assertEquals $? 0
+}
+
 ## shunit2
 
 . ${shunit2_file}
