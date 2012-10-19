@@ -20,6 +20,7 @@
 function trap_vm() {
   local disk_filename=$1 chroot_dir=$2
   [[ -d "${chroot_dir}" ]] && umount_ptab ${chroot_dir} || :
+  checkroot || return 1
 
   is_dev ${disk_filename} || {
     unmapptab ${disk_filename}
