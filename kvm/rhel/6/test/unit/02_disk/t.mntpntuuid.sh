@@ -42,6 +42,11 @@ function test_mntpntuuid_opt() {
   assertEquals $? 0
 }
 
+function test_mntpntuuid_empty() {
+  mntpntuuid ${disk_filename}
+  assertNotEquals $? 0
+}
+
 ## shunit2
 
 . ${shunit2_file}

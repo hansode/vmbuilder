@@ -414,6 +414,7 @@ function mntpnt2path() {
 function mntpntuuid() {
   local disk_filename=$1 mountpoint=$2
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  [[ -n "${mountpoint}" ]] || return 1
   checkroot || return 1
 
   local part_filename=$(mntpnt2path ${disk_filename} ${mountpoint})
