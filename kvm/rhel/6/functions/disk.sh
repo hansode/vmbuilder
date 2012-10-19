@@ -119,7 +119,10 @@ function mkpart() {
   #
   local disk_filename=$1 parttype=${2:-primary} offset=${3:-0} size=${4:-0} fstype=${5:-ext2}
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
-  [[ "${size}" -gt 0 ]] || { echo "[ERROR] Invalid argument: size:${size} (disk:${LINENO})" >&2; return 1; }
+  #
+  # size == -1 or size > 0. "-1" means whole disk
+  #
+  [ "${size}" -eq -1 -o "${size}" -gt 0 ] || { echo "[ERROR] Invalid argument: size:${size} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   case "${parttype}" in
@@ -440,6 +443,7 @@ function mkfsdisk() {
       mkswap -f ${part_filename}
       ;;
     *)
+      echo ">>> mkfs.ext4 -F -E lazy_itable_init=1 -L ${mountpoint} ${part_filename}"
       mkfs.ext4 -F -E lazy_itable_init=1 -L ${mountpoint} ${part_filename}
       # > This filesystem will be automatically checked every 37 mounts or 180 days, whichever comes first.
       # > Use tune2fs -c or -i to override.
