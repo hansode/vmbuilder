@@ -340,6 +340,7 @@ function install_menu_lst() {
 function configure_os() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  checkroot || return 1
 
   mount_proc               ${chroot_dir}
   mount_dev                ${chroot_dir}
