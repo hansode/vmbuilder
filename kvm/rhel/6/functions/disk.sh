@@ -18,6 +18,9 @@
 ## disk
 
 function mkdisk() {
+  #
+  # Creates the disk image (if it doesn't already exist).
+  #
   local disk_filename=$1 size=${2:-0} unit=${3:-m}
   [[ -a "${disk_filename}" ]] && { echo "already exists: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   [[ ${size} -gt 0 ]] || { echo "[ERROR] Invalid argument: size:${size} (disk:${LINENO})" >&2; return 1; }
@@ -103,6 +106,9 @@ function xptabproc() {
 }
 
 function mkpart() {
+  #
+  # Adds partition to the disk image (does not mkfs or anything like that)
+  #
   local disk_filename=$1 parttype=$2 offset=$3 size=$4 fstype=$5
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
@@ -156,6 +162,12 @@ function mkpart() {
 }
 
 function mkptab() {
+  #
+  # Partitions the disk image. First adds a partition table and then
+  # adds the individual partitions.
+  #
+  # Should only be called once and only after you've added all partitions.
+  #
   local disk_filename=$1
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
 
@@ -363,6 +375,9 @@ function mntpntuuid() {
 }
 
 function mkfsdisk() {
+  #
+  # Creates the partitions' filesystems
+  #
   local disk_filename=$1
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
@@ -393,5 +408,8 @@ EOS
 }
 
 function get_grub_id() {
+  #
+  # Return name of the disk as known by grub
+  #
   echo 0
 }
