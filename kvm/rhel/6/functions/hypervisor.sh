@@ -92,6 +92,7 @@ EOS
 function mount_ptab() {
   local disk_filename=$1 chroot_dir=$2
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
 
   mount_ptab_root    ${disk_filename} ${chroot_dir}
   mount_ptab_nonroot ${disk_filename} ${chroot_dir}
