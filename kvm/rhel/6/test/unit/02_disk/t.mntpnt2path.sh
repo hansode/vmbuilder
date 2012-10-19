@@ -38,6 +38,11 @@ function test_mntpnt2path_opt() {
   assertEquals $? 0
 }
 
+function test_mntpnt2path_empty() {
+  mntpnt2path ${disk_filename}
+  assertNotEquals $? 0
+}
+
 ## shunit2
 
 . ${shunit2_file}
