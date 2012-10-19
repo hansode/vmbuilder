@@ -449,7 +449,6 @@ function mkfsdisk() {
       mkswap -f ${part_filename}
       ;;
     *)
-      echo ">>> mkfs.ext4 -F -E lazy_itable_init=1 -L ${mountpoint} ${part_filename}"
       mkfs.ext4 -F -E lazy_itable_init=1 -L ${mountpoint} ${part_filename}
       # > This filesystem will be automatically checked every 37 mounts or 180 days, whichever comes first.
       # > Use tune2fs -c or -i to override.
