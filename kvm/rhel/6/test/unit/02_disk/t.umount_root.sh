@@ -14,6 +14,7 @@
 
 function setUp() {
   mkdir ${chroot_dir}
+  checkroot || return 1
   mount --bind /proc ${chroot_dir}
 }
 
