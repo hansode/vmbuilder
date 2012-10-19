@@ -17,8 +17,8 @@ function tearDown() {
 }
 
 function test_mkptab_all_zero() {
-  rootsize=0 swapsize=0 optsize=0
-  totalsize=$((${rootsize} + ${swapsize} + ${optsize}))
+  local rootsize=0 swapsize=0 optsize=0
+  local totalsize=$((${rootsize} + ${swapsize} + ${optsize}))
   mkdisk ${disk_filename} ${totalsize}
 
   mkptab ${disk_filename}
@@ -26,8 +26,8 @@ function test_mkptab_all_zero() {
 }
 
 function test_mkptab_root() {
-  rootsize=8 swapsize=0 optsize=0
-  totalsize=$((${rootsize} + ${swapsize} + ${optsize}))
+  local rootsize=8 swapsize=0 optsize=0
+  local totalsize=$((${rootsize} + ${swapsize} + ${optsize}))
   mkdisk ${disk_filename} ${totalsize}
 
   mkptab ${disk_filename}
@@ -35,8 +35,8 @@ function test_mkptab_root() {
 }
 
 function test_mkptab_root_swap() {
-  rootsize=8 swapsize=8 optsize=0
-  totalsize=$((${rootsize} + ${swapsize} + ${optsize}))
+  local rootsize=8 swapsize=8 optsize=0
+  local totalsize=$((${rootsize} + ${swapsize} + ${optsize}))
   mkdisk ${disk_filename} ${totalsize}
 
   mkptab ${disk_filename}
@@ -44,8 +44,8 @@ function test_mkptab_root_swap() {
 }
 
 function test_mkptab_root_swap() {
-  rootsize=8 swapsize=8 optsize=8
-  totalsize=$((${rootsize} + ${swapsize} + ${optsize}))
+  local rootsize=8 swapsize=8 optsize=8
+  local totalsize=$((${rootsize} + ${swapsize} + ${optsize}))
   mkdisk ${disk_filename} ${totalsize}
 
   mkptab ${disk_filename}

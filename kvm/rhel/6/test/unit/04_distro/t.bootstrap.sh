@@ -14,6 +14,7 @@
 
 function setUp() {
   add_option_distro
+
   function run_yum() { echo run_yum $*; }
 }
 

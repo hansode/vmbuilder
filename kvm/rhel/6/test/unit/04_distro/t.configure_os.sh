@@ -15,6 +15,7 @@
 function setUp() {
   mkdir -p ${chroot_dir}/proc
   mkdir -p ${chroot_dir}/dev
+
   function create_initial_user() { echo create_initial_user $*; }
   function prevent_daemons_starting() { echo prevent_daemons_starting $*; }
   function set_timezone() { echo set_timezone $*; }

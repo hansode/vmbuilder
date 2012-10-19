@@ -14,6 +14,7 @@
 
 function setUp() {
   mkdir -p ${chroot_dir}
+
   function chroot() { echo chroot $*; }
 }
 

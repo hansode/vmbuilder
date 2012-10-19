@@ -28,6 +28,7 @@ function tearDown() {
 
 function test_umount_ptab() {
   umount_ptab ${chroot_dir}
+
   unmapptab ${disk_filename}
   assertEquals $? 0
 }

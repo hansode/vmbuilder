@@ -14,6 +14,7 @@
 
 function setUp() {
   mkdir -p ${chroot_dir}
+
   function run_yum() { echo run_yum $*; }
 }
 

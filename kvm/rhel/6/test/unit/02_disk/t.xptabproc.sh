@@ -16,6 +16,7 @@ function test_xptabproc() {
   local rootsize=1024
   local swapsize=1024
   local optsize=1024
+
   diff <(
   xptabproc << 'EOS'
     echo ${mountpoint} ${partsize}

@@ -17,7 +17,8 @@ function setUp() {
 }
 
 function test_repofile() {
-  reponame=${distro_name}
+  local reponame=${distro_name}
+
   repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache} | egrep -q ^baseurl=${baseurl}
   assertEquals $? 0
 }

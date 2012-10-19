@@ -14,9 +14,11 @@
 
 function setUp() {
   mkdisk ${disk_filename} ${totalsize}
+
   local tmpdir=/tmp/vmbuilder-grub
   mkdir -p ${chroot_dir}${tmpdir}
   touch ${chroot_dir}${tmpdir}/device.map
+
   function is_dev() { echo is_dev $*; }
 }
 
