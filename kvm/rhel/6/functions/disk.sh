@@ -441,6 +441,9 @@ function mkfsdisk() {
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
+  max_mount_count=${max_mount_count:-37}
+  interval_between_check=${interval_between_check:-180}
+
   printf "[INFO] Creating file systems\n"
   xptabproc <<'EOS'
     printf "[DEBUG] Creating file system: \"%s\" of size: %dMB\n" ${mountpoint} ${partsize}
@@ -455,7 +458,7 @@ function mkfsdisk() {
       mkfs.ext4 -F -E lazy_itable_init=1 -L ${mountpoint} ${part_filename}
       # > This filesystem will be automatically checked every 37 mounts or 180 days, whichever comes first.
       # > Use tune2fs -c or -i to override.
-      [ ! "${max_mount_count:-37}" -eq 37 -o ! "${interval_between_check:-180}" -eq 180 ] && {
+      [[ ("${max_mount_count}" != 37) || ("${interval_between_check}" != 180) ]] && {
         printf "[INFO] Setting maximal mount count: %s\n" ${max_mount_count}
         printf "[INFO] Setting interval between check(s): %s\n" ${interval_between_check}
         tune2fs -c ${max_mount_count} -i ${interval_between_check} ${part_filename}
