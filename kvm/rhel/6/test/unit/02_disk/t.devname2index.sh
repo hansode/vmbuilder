@@ -24,18 +24,15 @@ function tearDown() {
 }
 
 function test_devname2index_root() {
-  devname2index ${disk_filename} root
-  assertEquals $? 0
+  assertEquals "$(devname2index root)" 1
 }
 
 function test_devname2index_swap() {
-  devname2index ${disk_filename} swap
-  assertEquals $? 0
+  assertEquals "$(devname2index swap)" 2
 }
 
 function test_devname2index_opt() {
-  devname2index ${disk_filename} opt
-  assertEquals $? 0
+  assertEquals "$(devname2index /opt)" 3
 }
 
 
