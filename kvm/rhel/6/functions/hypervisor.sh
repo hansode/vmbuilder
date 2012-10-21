@@ -143,10 +143,7 @@ function install_os() {
   configure_networking ${chroot_dir}
   configure_mounting   ${chroot_dir} ${disk_filename}
   configure_keepcache  ${chroot_dir} ${keepcache}
-  # TODO
-  # if installing kernel in /boot is splited, rpm will get below error after mapping raw file and mounting partitions.
-  # > Non-fatal POSTTRANS scriptlet failure in rpm package kernel-2.6.32-279.el6.x86_64
- #install_kernel       ${chroot_dir}
+  install_kernel       ${chroot_dir}
   install_bootloader   ${chroot_dir} ${disk_filename}
   run_execscript       ${chroot_dir} ${execscript}
 

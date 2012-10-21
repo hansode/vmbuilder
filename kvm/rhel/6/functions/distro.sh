@@ -102,9 +102,6 @@ function build_chroot() {
   distroinfo
   # set_defaults
   bootstrap ${chroot_dir}
-  # TODO
-  # install_kernel shoul be run in install_os.
-  install_kernel ${chroot_dir}
   configure_os ${chroot_dir}
   cleanup_distro ${chroot_dir}
 }

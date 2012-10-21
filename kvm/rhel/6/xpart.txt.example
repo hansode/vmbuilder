@@ -13,12 +13,17 @@
 #  + [mount-point] [size(MB)]
 #  + vmbuilder.sh ignores '^#|^$' and more than 3 column(s).
 #
+# memo:
+#  /tmp should be more than 46.
+#  if not enoguth size is allocated, installing kernel will be failed.
+#  > Non-fatal POSTTRANS scriptlet failure in rpm package kernel-2.6.32-279.el6.x86_64
+#
 /boot  64 # p1 | primary 1 |
-root  224 # p2 | primary 2 |
+root  256 # p2 | primary 2 |
 /vz     4 # p3 | primary 3 |
 #      -- # p4 | extended  | ----
 /usr  384 # p5 | logical 1 |
 /var  128 # p6 | logical 2 |
 swap    4 # p7 | logical 3 |
-/tmp    4 # p8 | logical 4 |
+/tmp   48 # p8 | logical 4 |
 /opt    4 # p9 | logical 5 |
