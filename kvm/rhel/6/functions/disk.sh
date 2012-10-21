@@ -126,7 +126,7 @@ function mkpart() {
   #
   # size == -1 or size > 0. "-1" means whole disk
   #
-  [ "${size}" -eq -1 -o "${size}" -gt 0 ] || { echo "[ERROR] Invalid argument: size:${size} (disk:${LINENO})" >&2; return 1; }
+  [[ ("${size}" == -1) || ("${size}" -gt 0) ]] || { echo "[ERROR] Invalid argument: size:${size} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   case "${parttype}" in
