@@ -405,6 +405,10 @@ function devname2index() {
 
   local part_index=$(xptabinfo | cat -n | egrep -w "${name}" | awk '{print $1}')
   case "${part_index}" in
+  "")
+    echo "[ERROR] not such part_index" >&2
+    return 1
+    ;;
   [1-3])
     echo ${part_index}
     ;;
