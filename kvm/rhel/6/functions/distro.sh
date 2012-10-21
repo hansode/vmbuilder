@@ -226,6 +226,9 @@ function install_kernel() {
   local chroot_dir=$1
 
   run_yum ${chroot_dir} install dracut kernel
+
+  ls ${chroot_dir}/boot/vmlinuz-* || { echo "vmlinuz not found (distro:${LINENO})" >&2; return 1; }
+  ls ${chroot_dir}/boot/initramfs-* || { echo "initramfs not found (distro:${LINENO})" >&2; return 1; }
 }
 
 function install_extras() {
