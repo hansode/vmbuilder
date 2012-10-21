@@ -23,7 +23,39 @@ function tearDown() {
   rm -f ${disk_filename}
 }
 
+### no opts
+
 function test_mkfsdisk() {
+  mkfsdisk ${disk_filename}
+  assertEquals $? 0
+}
+
+### set opts
+
+function test_mkfsdisk_default_max_mount_count() {
+  local max_mount_count=37
+
+  mkfsdisk ${disk_filename}
+  assertEquals $? 0
+}
+
+function test_mkfsdisk_unlimited_max_mount_count() {
+  local max_mount_count=-1
+
+  mkfsdisk ${disk_filename}
+  assertEquals $? 0
+}
+
+function test_mkfsdisk_default_interval_between_check() {
+  local interval_between_check=180
+
+  mkfsdisk ${disk_filename}
+  assertEquals $? 0
+}
+
+function test_mkfsdisk_unlimited_interval_between_check() {
+  local interval_between_check=-1
+
   mkfsdisk ${disk_filename}
   assertEquals $? 0
 }
