@@ -34,6 +34,7 @@ function add_option_hypervisor() {
   homesize=${homesize:-0}
   usrsize=${usrsize:-0}
   varsize=${varsize:-0}
+  tmpsize=${tmpsize:-0}
 
   xpart=${xpart:-}
   execscript=${execscript:-}
