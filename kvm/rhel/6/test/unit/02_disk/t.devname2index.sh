@@ -35,6 +35,10 @@ function test_devname2index_opt() {
   assertEquals "$(devname2index /opt)" 3
 }
 
+function test_devname2index_undevined() {
+  devname2index undefined
+  assertNotEquals $? 0
+}
 
 ## shunit2
 

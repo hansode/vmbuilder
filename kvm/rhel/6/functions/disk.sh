@@ -401,8 +401,9 @@ function devmap2path() {
 function devname2index() {
   local name=$1
   [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (disk:${LINENO})" >&2; return 1; }
+  xptabinfo | cat -n | egrep -w "${name}" -q || { echo "[ERROR] no mutch keyword: ${name} (disk:${LINENO})" >& 2; return 1; }
 
-  local part_index=$(xptabinfo | cat -n | egrep -w ${name} | awk '{print $1}')
+  local part_index=$(xptabinfo | cat -n | egrep -w "${name}" | awk '{print $1}')
   case "${part_index}" in
   [1-3])
     echo ${part_index}
