@@ -5,8 +5,7 @@
 #
 # requires:
 #  bash
-#  tr, dirname, pwd
-#  sed, head
+#  dirname, pwd
 #
 # import:
 #   distro: build_chroot
@@ -46,10 +45,4 @@ extract_args $*
 ## main
 
 register_options
-cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
-
-case "${cmd}" in
-*)
-  build_chroot ${chroot_dir}
-  ;;
-esac
+build_chroot ${chroot_dir}
