@@ -174,6 +174,60 @@ function test_add_option_hypervisor_homesize_empty() {
   assertNotEquals "${old_homesize}" "${homesize}"
 }
 
+### usrsize
+
+function test_add_option_hypervisor_usrsize_exists() {
+  local usrsize=1
+  local old_usrsize=${usrsize}
+
+  add_option_hypervisor
+  assertEquals "${old_usrsize}" "${usrsize}"
+}
+
+function test_add_option_hypervisor_usrsize_empty() {
+  local usrsize=
+  local old_usrsize=${usrsize}
+
+  add_option_hypervisor
+  assertNotEquals "${old_usrsize}" "${usrsize}"
+}
+
+### varsize
+
+function test_add_option_hypervisor_varsize_exists() {
+  local varsize=1
+  local old_varsize=${varsize}
+
+  add_option_hypervisor
+  assertEquals "${old_varsize}" "${varsize}"
+}
+
+function test_add_option_hypervisor_varsize_empty() {
+  local varsize=
+  local old_varsize=${varsize}
+
+  add_option_hypervisor
+  assertNotEquals "${old_varsize}" "${varsize}"
+}
+
+### tmpsize
+
+function test_add_option_hypervisor_tmpsize_exists() {
+  local tmpsize=1
+  local old_tmpsize=${tmpsize}
+
+  add_option_hypervisor
+  assertEquals "${old_tmpsize}" "${tmpsize}"
+}
+
+function test_add_option_hypervisor_tmpsize_empty() {
+  local tmpsize=
+  local old_tmpsize=${tmpsize}
+
+  add_option_hypervisor
+  assertNotEquals "${old_tmpsize}" "${tmpsize}"
+}
+
 ### xpart
 
 function test_add_option_hypervisor_xpart_exists() {
