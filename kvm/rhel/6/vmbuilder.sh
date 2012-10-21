@@ -5,9 +5,7 @@
 #
 # requires:
 #  bash
-#  tr, dirname, pwd
-#  sed, head
-#  printf, awk, rm
+#  dirname, pwd
 #
 # import:
 #  vm: create_vm
@@ -114,10 +112,4 @@ extract_args $*
 ## main
 
 register_options
-cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
-
-case "${cmd}" in
-*)
-  create_vm
-  ;;
-esac
+create_vm
