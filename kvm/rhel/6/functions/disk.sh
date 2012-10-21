@@ -99,6 +99,8 @@ function xptabinfo() {
 	swap  ${swapsize:-0}
 	/opt  ${optsize:-0}
 	/home ${homesize:-0}
+	/usr  ${usrsize:-0}
+	/var  ${varsize:-0}
 	EOS
     }
   } | egrep -v '^$|^#' | awk '$2 != 0 {print $1, $2}'
