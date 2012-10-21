@@ -426,7 +426,6 @@ function test_add_option_hypervisor_hostname_empty() {
   assertEquals "${old_hostname}" "${hostname}"
 }
 
-
 ## shunit2
 
 . ${shunit2_file}
