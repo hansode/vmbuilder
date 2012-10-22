@@ -164,6 +164,7 @@ function install_os() {
   configure_mounting   ${chroot_dir} ${disk_filename}
   configure_keepcache  ${chroot_dir} ${keepcache}
   configure_selinux    ${chroot_dir} ${selinux}
+  set_timezone         ${chroot_dir}
   install_kernel       ${chroot_dir}
   install_bootloader   ${chroot_dir} ${disk_filename}
   run_execscript       ${chroot_dir} ${execscript}
