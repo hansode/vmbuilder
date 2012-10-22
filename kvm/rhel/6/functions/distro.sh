@@ -350,9 +350,9 @@ function configure_os() {
 
   mount_proc               ${chroot_dir}
   mount_dev                ${chroot_dir}
-  prevent_daemons_starting ${chroot_dir}
   #
   # move to hypervisor: install_os
+  # * prevent_daemons_starting ${chroot_dir}
   # * create_initial_user  ${chroot_dir}
   # * set_timezone         ${chroot_dir}
   install_resolv_conf      ${chroot_dir}
