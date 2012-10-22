@@ -14,6 +14,7 @@
 #  utils: checkroot
 #  disk: xptabproc, mntpnt2path
 #  distro: add_option_distro, preflight_check_distro, install_kernel, install_bootloader, configure_networking, configure_mounting, configure_keepcache
+#          configure_selinux, prevent_daemons_starting, create_initial_user, set_timezone
 #
 
 ## depending on global variables
