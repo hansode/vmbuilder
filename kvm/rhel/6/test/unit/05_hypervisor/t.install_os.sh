@@ -39,7 +39,14 @@ function tearDown() {
   rm -rf ${distro_dir}
 }
 
-function test_install_os() {
+function test_install_os_distro_short_empty() {
+  local distro_short=
+  install_os ${chroot_dir} ${distro_dir} ${disk_filename}
+  assertNotEquals $? 0
+}
+
+function test_install_os_distro_short_empty() {
+  local distro_short=centos
   install_os ${chroot_dir} ${distro_dir} ${disk_filename}
   assertEquals $? 0
 }
