@@ -501,6 +501,7 @@ function configure_selinux() {
     ;;
   esac
   [[ -a "${chroot_dir}/etc/sysconfig/selinux" ]] || { echo "file not found: ${chroot_dir}/etc/sysconfig/selinux (distro:${LINENO})" >&2; return 1; }
+  printf "[INFO] Setting /etc/sysconfig/selinux: SELINUX=%s\n" ${selinux}
   sed -i "s/^\(SELINUX=\).*/\1${selinux}/"  ${chroot_dir}/etc/sysconfig/selinux
   egrep ^SELINUX= ${chroot_dir}/etc/sysconfig/selinux
 }
