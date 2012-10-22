@@ -31,6 +31,7 @@ function add_option_distro() {
   distro_name=${distro_name:-centos}
 
   keepcache=${keepcache:-0}
+  selinux=${selinux:-disabled}
 
   case "${distro_name}" in
   centos)
@@ -483,6 +484,22 @@ function configure_keepcache() {
   printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
   sed -i s,^keepcache=.*,keepcache=${keepcache}, ${chroot_dir}/etc/yum.conf
   egrep ^keepcache= ${chroot_dir}/etc/yum.conf
+}
+
+function configure_selinux() {
+  local chroot_dir=$1 selinux=${2:-disabled}
+
+  case "${selinux}" in
+  enforcing|permissive|disabled)
+    ;;
+  *)
+    echo "[ERROR] unknown SELINUX value: ${selinux} (distro:${LINENO})" >&2
+    return 1
+    ;;
+  esac
+  [[ -a "${chroot_dir}/etc/sysconfig/selinux" ]] || { echo "file not found: ${chroot_dir}/etc/sysconfig/selinux (distro:${LINENO})" >&2; return 1; }
+  sed -i "s/^\(SELINUX=\).*/\1${selinux}/"  ${chroot_dir}/etc/sysconfig/selinux
+  egrep ^SELINUX= ${chroot_dir}/etc/sysconfig/selinux
 }
 
 function cleanup_distro() {
