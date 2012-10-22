@@ -127,6 +127,21 @@ function run_execscript() {
   setarch ${distro_arch} ${execscript} ${chroot_dir}
 }
 
+function sync_os() {
+  #
+  # Synchronize directories
+  #
+  # **The argument order is depending on rsync**
+  #
+  local distro_dir=$1 chroot_dir=$2
+  [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir} (hypervisor:${LINENO})" >&2; exit 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "no such directory: ${chroot_dir} (hypervisor:${LINENO})" >&2; exit 1; }
+  checkroot || return 1
+
+  rsync -aHA ${distro_dir}/ ${chroot_dir}
+  sync
+}
+
 function install_os() {
   local chroot_dir=$1 distro_dir=$2 disk_filename=$3 keepcache=${4:-0} execscript=$5
   [[ -d "${chroot_dir}" ]] && { echo "already exists: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
@@ -138,8 +153,8 @@ function install_os() {
   mount_ptab ${disk_filename} ${chroot_dir}
 
   printf "[DEBUG] Installing OS to %s\n" ${chroot_dir}
-  rsync -aHA ${distro_dir}/ ${chroot_dir}
-  sync
+  # ${distro_dir} -> ${chroot_dir}
+  sync_os ${distro_dir} ${chroot_dir}
 
   mount_proc           ${chroot_dir}
   mount_dev            ${chroot_dir}

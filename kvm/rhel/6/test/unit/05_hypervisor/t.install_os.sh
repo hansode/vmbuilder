@@ -22,6 +22,7 @@ function setUp() {
   mapptab ${disk_filename}
   mkfsdisk ${disk_filename}
 
+  function sync_os() { echo sync_os $*; }
   function mount_proc() { echo mount_proc $*; }
   function mount_dev() { echo mount_dev $*; }
   function configure_networking() { echo configure_networking $*; }
