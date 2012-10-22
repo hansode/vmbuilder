@@ -156,6 +156,8 @@ function repofile() {
 function run_yum() {
   local chroot_dir=$1; shift
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  # install_kernel depends on distro_short.
+  [[ -n "${distro_short}" ]] || { echo "[ERROR] Invalid argument: distro_short:${distro_short} (distro:${LINENO})" >&2; return 1; }
 
   local reponame=${distro_short}
   local tmpdir=${chroot_dir}/tmp
