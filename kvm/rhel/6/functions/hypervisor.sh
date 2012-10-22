@@ -57,7 +57,6 @@ function preflight_check_hypervisor() {
   :
 }
 
-
 ## vmdisk
 
 function mount_ptab_root() {
