@@ -188,6 +188,7 @@ function update_passwords() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
+  printf "[INFO] Updating passwords\n"
   chroot ${chroot_dir} pwconv
   chroot ${chroot_dir} bash -c "echo root:root | chpasswd"
 }
