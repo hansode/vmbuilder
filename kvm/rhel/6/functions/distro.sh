@@ -242,8 +242,14 @@ function install_extras() {
   local chroot_dir=$1
 
   run_yum ${chroot_dir} install openssh openssh-clients openssh-server rpm yum curl dhclient passwd vim-minimal
- #run_yum ${chroot_dir} erase   selinux*
 }
+
+function erase_selinux() {
+  local chroot_dir=$1
+
+  run_yum ${chroot_dir} erase selinux*
+}
+
 
 function install_bootloader_cleanup() {
   local chroot_dir=$1 disk_filename=$2
