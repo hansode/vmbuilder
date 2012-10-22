@@ -491,6 +491,7 @@ function configure_keepcache() {
 
 function configure_selinux() {
   local chroot_dir=$1 selinux=${2:-disabled}
+  [[ -a "${chroot_dir}/etc/sysconfig/selinux" ]] || return 0
 
   case "${selinux}" in
   enforcing|permissive|disabled)
@@ -500,7 +501,6 @@ function configure_selinux() {
     return 1
     ;;
   esac
-  [[ -a "${chroot_dir}/etc/sysconfig/selinux" ]] || { echo "file not found: ${chroot_dir}/etc/sysconfig/selinux (distro:${LINENO})" >&2; return 1; }
   printf "[INFO] Setting /etc/sysconfig/selinux: SELINUX=%s\n" ${selinux}
   sed -i "s/^\(SELINUX=\).*/\1${selinux}/"  ${chroot_dir}/etc/sysconfig/selinux
   egrep ^SELINUX= ${chroot_dir}/etc/sysconfig/selinux

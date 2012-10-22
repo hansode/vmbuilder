@@ -21,6 +21,13 @@ function tearDown() {
   rm -rf ${chroot_dir}
 }
 
+function test_configure_selinux_file_not_found() {
+  rm ${chroot_dir}/etc/sysconfig/selinux
+
+  configure_selinux ${chroot_dir} ""
+  assertEquals $? 0
+}
+
 function test_configure_selinux_empty() {
   configure_selinux ${chroot_dir} ""
   assertEquals $? 0
