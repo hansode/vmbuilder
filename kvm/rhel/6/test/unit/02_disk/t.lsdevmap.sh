@@ -10,11 +10,15 @@
 
 ## variables
 
+declare _lsdevmaps="loop0p1
+loop0p2
+loop0p3
+"
+
 ## public functions
 
 function setUp() {
   mkdisk ${disk_filename} ${totalsize} 2>/dev/null
-  mkptab ${disk_filename}
 }
 
 function tearDown() {
