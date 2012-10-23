@@ -357,11 +357,14 @@ function configure_os() {
 
   mount_proc               ${chroot_dir}
   mount_dev                ${chroot_dir}
-  #
-  # move to hypervisor: install_os
-  # * prevent_daemons_starting ${chroot_dir}
-  # * create_initial_user  ${chroot_dir}
-  # * set_timezone         ${chroot_dir}
+
+  # TODO
+  #  should decide where the better place is distro or hypervisor or both.
+  #  so far following three functions are defined in distro.
+  prevent_daemons_starting ${chroot_dir}
+  create_initial_user      ${chroot_dir}
+  set_timezone             ${chroot_dir}
+
   install_resolv_conf      ${chroot_dir}
   install_extras           ${chroot_dir}
   umount_nonroot           ${chroot_dir}

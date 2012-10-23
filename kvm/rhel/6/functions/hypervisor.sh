@@ -14,7 +14,7 @@
 #  utils: checkroot
 #  disk: xptabproc, mntpnt2path
 #  distro: add_option_distro, preflight_check_distro, install_kernel, install_bootloader, configure_networking, configure_mounting, configure_keepcache
-#          configure_selinux, erase_selinux, prevent_daemons_starting, create_initial_user, set_timezone
+#          configure_selinux, erase_selinux
 #
 
 ## depending on global variables
@@ -170,9 +170,6 @@ function install_os() {
  #configure_selinux    ${chroot_dir} ${selinux}
   erase_selinux        ${chroot_dir}
 
-  prevent_daemons_starting ${chroot_dir}
-  create_initial_user  ${chroot_dir}
-  set_timezone         ${chroot_dir}
   install_kernel       ${chroot_dir}
   install_bootloader   ${chroot_dir} ${disk_filename}
   run_execscript       ${chroot_dir} ${execscript}
