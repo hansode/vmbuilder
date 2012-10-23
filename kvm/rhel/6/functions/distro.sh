@@ -359,6 +359,12 @@ function configure_os() {
   mount_dev                ${chroot_dir}
 
   # TODO
+  #  should use configure_selinux,
+  #  but configure_selinux has an issue which don't allow logging in by root without erasing selinux.
+ #configure_selinux        ${chroot_dir} ${selinux}
+  erase_selinux            ${chroot_dir}
+
+  # TODO
   #  should decide where the better place is distro or hypervisor or both.
   #  so far following three functions are defined in distro.
   prevent_daemons_starting ${chroot_dir}

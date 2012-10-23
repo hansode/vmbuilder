@@ -14,7 +14,6 @@
 #  utils: checkroot
 #  disk: xptabproc, mntpnt2path
 #  distro: add_option_distro, preflight_check_distro, install_kernel, install_bootloader, configure_networking, configure_mounting, configure_keepcache
-#          configure_selinux, erase_selinux
 #
 
 ## depending on global variables
@@ -163,13 +162,6 @@ function install_os() {
   configure_networking ${chroot_dir}
   configure_mounting   ${chroot_dir} ${disk_filename}
   configure_keepcache  ${chroot_dir} ${keepcache}
-
-  # TODO
-  #  should use configure_selinux,
-  #  but configure_selinux has an issue which don't allow logging in by root without erasing selinux.
- #configure_selinux    ${chroot_dir} ${selinux}
-  erase_selinux        ${chroot_dir}
-
   install_kernel       ${chroot_dir}
   install_bootloader   ${chroot_dir} ${disk_filename}
   run_execscript       ${chroot_dir} ${execscript}

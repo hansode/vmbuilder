@@ -28,8 +28,6 @@ function setUp() {
   function configure_networking() { echo configure_networking $*; }
   function configure_mounting() { echo configure_mounting $*; }
   function configure_keepcache() { echo configure_keepcache $*; }
- #function configure_selinux() { echo configure_selinux $*; }
-  function erase_selinux() { echo erase_selinux $*; }
   function install_kernel() { echo install_kernel $*; }
   function install_bootloader() { echo install_bootloader $*; }
   function run_execscript() { echo run_execscript $*; }

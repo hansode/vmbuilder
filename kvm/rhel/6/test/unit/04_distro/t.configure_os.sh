@@ -16,6 +16,8 @@ function setUp() {
   mkdir -p ${chroot_dir}/proc
   mkdir -p ${chroot_dir}/dev
 
+ #function configure_selinux() { echo configure_selinux $*; }
+  function erase_selinux() { echo erase_selinux $*; }
   function prevent_daemons_starting() { echo prevent_daemons_starting $*; }
   function create_initial_user() { echo create_initial_user $*; }
   function set_timezone() { echo set_timezone $*; }
