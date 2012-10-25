@@ -3,8 +3,8 @@ vmbuilder.sh
 
 ``vmbuilder.sh`` builds virtual machines for CentOS 6.x from the command line.
 
-System Requiremenets
---------------------
+System Requirements
+-------------------
 
 + RHEL 6.x / CentOS 6.x
 
