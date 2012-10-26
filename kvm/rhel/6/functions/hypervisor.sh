@@ -133,8 +133,8 @@ function sync_os() {
   # **The argument order is depending on rsync**
   #
   local distro_dir=$1 chroot_dir=$2
-  [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir} (hypervisor:${LINENO})" >&2; exit 1; }
-  [[ -d "${chroot_dir}" ]] || { echo "no such directory: ${chroot_dir} (hypervisor:${LINENO})" >&2; exit 1; }
+  [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "no such directory: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   rsync -aHA ${distro_dir}/ ${chroot_dir}
@@ -144,7 +144,7 @@ function sync_os() {
 function install_os() {
   local chroot_dir=$1 distro_dir=$2 disk_filename=$3 keepcache=${4:-0} execscript=$5
   [[ -d "${chroot_dir}" ]] && { echo "already exists: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
-  [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir} (hypervisor:${LINENO})" >&2; exit 1; }
+  [[ -d "${distro_dir}" ]] || { echo "no such directory: ${distro_dir} (hypervisor:${LINENO})" >&2; return 1; }
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
   # install_kernel depends on distro_short.
   [[ -n "${distro_short}" ]] || { echo "[ERROR] Invalid argument: distro_short:${distro_short} (hypervisor:${LINENO})" >&2; return 1; }
