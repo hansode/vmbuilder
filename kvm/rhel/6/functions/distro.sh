@@ -65,6 +65,9 @@ function get_normalized_distro_name() {
   [[ -n "${distro_name}" ]] || { echo "[ERROR] Invalid argument: distro_name:${distro_name} (distro:${LINENO})" >&2; return 1; }
 
   case "${distro_name}" in
+  rhel)
+    echo rhel
+    ;;
   centos)
     echo centos
     ;;

@@ -12,6 +12,11 @@
 
 ## public functions
 
+function test_get_normalized_distro_name_defined_rhel() {
+  get_normalized_distro_name rhel
+  assertEquals $? 0
+}
+
 function test_get_normalized_distro_name_defined_centos() {
   get_normalized_distro_name centos
   assertEquals $? 0
