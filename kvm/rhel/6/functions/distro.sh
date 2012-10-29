@@ -33,9 +33,10 @@ function add_option_distro() {
   keepcache=${keepcache:-0}
   selinux=${selinux:-disabled}
 
+  distro_name=$(get_normalized_distro_name ${distro_name})
   case "${distro_name}" in
   centos)
-    distro_short=centos
+    distro_short=${distro_name}
     distro_snake=CentOS
     baseurl=${baseurl:-http://ftp.riken.go.jp/pub/Linux/centos/${distro_ver}/os/${basearch}}
     case "${distro_ver}" in
@@ -44,8 +45,8 @@ function add_option_distro() {
       ;;
     esac
     ;;
-  sl|scientific|scientificlinux)
-    distro_short=sl
+  sl)
+    distro_short=${distro_name}
     distro_snake="Scientific Linux"
     baseurl=${baseurl:-http://ftp.riken.go.jp/pub/Linux/scientific/${distro_ver}/${basearch}/os}
     case "${distro_ver}" in
@@ -56,6 +57,24 @@ function add_option_distro() {
     ;;
   *)
     echo "no mutch distro" >&2
+    return 1
+    ;;
+  esac
+}
+
+function get_normalized_distro_name() {
+  local distro_name=$1
+  [[ -n "${distro_name}" ]] || { echo "[ERROR] Invalid argument: distro_name:${distro_name} (distro:${LINENO})" >&2; return 1; }
+
+  case "${distro_name}" in
+  centos)
+    echo centos
+    ;;
+  sl|scientific|scientificlinux)
+    echo sl
+    ;;
+  *)
+    echo "no mutch distro: ${distro_name}" >&2
     return 1
     ;;
   esac
