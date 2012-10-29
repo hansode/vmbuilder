@@ -34,24 +34,16 @@ function add_option_distro() {
   selinux=${selinux:-disabled}
 
   distro_name=$(get_normalized_distro_name ${distro_name})
-  case "${distro_name}" in
-  centos)
+  case "${distro_name}$(get_distro_major_ver ${distro_ver})" in
+  centos6)
     distro_snake=CentOS
     baseurl=${baseurl:-http://ftp.riken.go.jp/pub/Linux/centos/${distro_ver}/os/${basearch}}
-    case "${distro_ver}" in
-    6|6.*)
-      gpgkey="${gpgkey:-${baseurl}/RPM-GPG-KEY-${distro_snake}-6}"
-      ;;
-    esac
+    gpgkey="${gpgkey:-${baseurl}/RPM-GPG-KEY-${distro_snake}-6}"
     ;;
-  sl)
+  sl6)
     distro_snake="Scientific Linux"
     baseurl=${baseurl:-http://ftp.riken.go.jp/pub/Linux/scientific/${distro_ver}/${basearch}/os}
-    case "${distro_ver}" in
-    6|6.*)
-      gpgkey="${gpgkey:-${baseurl}/RPM-GPG-KEY-sl ${baseurl}/RPM-GPG-KEY-sl6}"
-      ;;
-    esac
+    gpgkey="${gpgkey:-${baseurl}/RPM-GPG-KEY-sl ${baseurl}/RPM-GPG-KEY-sl6}"
     ;;
   *)
     echo "no mutch distro" >&2
