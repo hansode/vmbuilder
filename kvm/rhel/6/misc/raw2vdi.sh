@@ -16,5 +16,7 @@ readonly abs_dirname=$(cd $(dirname $0) && pwd)
 
 ### prepare
 
-# disk_filename=$1
-convert_disk ${1}
+declare disk_filename=${1}
+
+[[ -f "${disk_filename}" ]] || { echo "no such file: ${disk_filename}" >&2; exit 1; }
+convert_disk ${disk_filename} $(pwd) vdi
