@@ -487,3 +487,27 @@ function get_suffix() {
 
   echo ${1##*.}
 }
+
+function convert_disk() {
+  #
+  # Convert the disk image
+  #
+  local disk_filename=$1 dest_dir=${2:-$(pwd)} dest_format=${3:-vdi}
+  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+
+  # build dest_filename
+  local base_filename=${disk_filename##*/}
+  local dest_filename=${dest_dir}/${base_filename%%.$(get_suffix ${disk_filename})}.${dest_format}
+
+  printf "[INFO] Converting %s to %s, format %s\n" ${disk_filename} ${dest_filename} ${dest_format}
+  case "${dest_format}" in
+  vdi)
+    # TODO: add "vbox_manager_path" function to detect path
+    VBoxManage convertfromraw -format VDI ${disk_filename} ${dest_filename}
+    ;;
+  *)
+    # TODO: add "qemu_img_path" function to detect path
+    qemu-img convert -O ${dest_format} ${disk_filename} ${dest_filename}
+    ;;
+  esac
+}
