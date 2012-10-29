@@ -81,6 +81,14 @@ function get_normalized_distro_name() {
   esac
 }
 
+function get_distro_major_ver() {
+  local distro_ver=$1
+  [[ -n "${distro_ver}" ]] || { echo "[ERROR] Invalid argument: distro_ver:${distro_ver} (distro:${LINENO})" >&2; return 1; }
+
+  # x.y -> x
+  echo ${distro_ver%%.*}
+}
+
 function preflight_check_distro() {
   case "${baseurl}" in
   http://*)  ;;
