@@ -23,7 +23,7 @@ function test_repofile_required_opts_empty() {
 
 function test_repofile_required_reponame() {
   add_option_distro
-  local reponame=${distro_short}
+  local reponame=${distro_name}
   local baseurl= gpgkey=
 
   repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache} | egrep -q ^baseurl=${baseurl}
@@ -32,7 +32,7 @@ function test_repofile_required_reponame() {
 
 function test_repofile_required_reponame_baseurl() {
   add_option_distro
-  local reponame=${distro_short}
+  local reponame=${distro_name}
   local gpgkey=
 
   repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache} | egrep -q ^baseurl=${baseurl}
@@ -41,7 +41,7 @@ function test_repofile_required_reponame_baseurl() {
 
 function test_repofile_required_reponame_baseurl_gpgkey() {
   add_option_distro
-  local reponame=${distro_short}
+  local reponame=${distro_name}
 
   repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache} | egrep -q ^baseurl=${baseurl}
   assertEquals $? 0
@@ -51,7 +51,7 @@ function test_repofile_required_reponame_baseurl_gpgkey() {
 
 function test_repofile_optonal_keepcache_empty() {
   add_option_distro
-  local reponame=${distro_short}
+  local reponame=${distro_name}
   local keepcache=
 
   repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache} | egrep -q ^baseurl=${baseurl}
@@ -60,7 +60,7 @@ function test_repofile_optonal_keepcache_empty() {
 
 function test_repofile_optonal_keepcache_exists() {
   add_option_distro
-  local reponame=${distro_short}
+  local reponame=${distro_name}
   local keepcache=1
 
   repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache} | egrep -q ^baseurl=${baseurl}

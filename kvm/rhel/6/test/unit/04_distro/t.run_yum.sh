@@ -20,12 +20,12 @@ function tearDown() {
   rm -rf ${chroot_dir}
 }
 
-function test_run_yum_distro_short_empty() {
+function test_run_yum_distro_name_empty() {
   run_yum ${chroot_dir} help >/dev/null
   assertNotEquals $? 0
 }
 
-function test_run_yum_distro_short_exists() {
+function test_run_yum_distro_name_exists() {
   add_option_distro
 
   run_yum ${chroot_dir} help >/dev/null

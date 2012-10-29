@@ -36,7 +36,6 @@ function add_option_distro() {
   distro_name=$(get_normalized_distro_name ${distro_name})
   case "${distro_name}" in
   centos)
-    distro_short=${distro_name}
     distro_snake=CentOS
     baseurl=${baseurl:-http://ftp.riken.go.jp/pub/Linux/centos/${distro_ver}/os/${basearch}}
     case "${distro_ver}" in
@@ -46,7 +45,6 @@ function add_option_distro() {
     esac
     ;;
   sl)
-    distro_short=${distro_name}
     distro_snake="Scientific Linux"
     baseurl=${baseurl:-http://ftp.riken.go.jp/pub/Linux/scientific/${distro_ver}/${basearch}/os}
     case "${distro_ver}" in
@@ -116,7 +114,7 @@ function build_chroot() {
   add_option_distro
   preflight_check_distro
 
-  local chroot_dir=${1:-${abs_dirname}/${distro_short}-${distro_ver}_${distro_arch}}
+  local chroot_dir=${1:-${abs_dirname}/${distro_name}-${distro_ver}_${distro_arch}}
   [[ -d "${chroot_dir}" ]] && { echo "${chroot_dir} already exists (distro:${LINENO})" >&2; return 1; } || :
 
   distroinfo
@@ -176,10 +174,10 @@ function repofile() {
 function run_yum() {
   local chroot_dir=$1; shift
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-  # install_kernel depends on distro_short.
-  [[ -n "${distro_short}" ]] || { echo "[ERROR] Invalid argument: distro_short:${distro_short} (distro:${LINENO})" >&2; return 1; }
+  # install_kernel depends on distro_name.
+  [[ -n "${distro_name}" ]] || { echo "[ERROR] Invalid argument: distro_name:${distro_name} (distro:${LINENO})" >&2; return 1; }
 
-  local reponame=${distro_short}
+  local reponame=${distro_name}
   local tmpdir=${chroot_dir}/tmp
   local repofile=${tmpdir}/yum-${reponame}.repo
 
