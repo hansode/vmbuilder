@@ -65,7 +65,7 @@ function test_add_option_distro_name_empty() {
 }
 
 function test_add_option_distro_name_centos() {
-  local distro_name=sl
+  local distro_name=centos
   local old_distro_name=${distro_name}
 
   add_option_distro
