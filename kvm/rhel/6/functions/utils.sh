@@ -61,3 +61,9 @@ function is_dev() {
        *) return 1 ;;
   esac
 }
+
+function get_suffix() {
+  [[ -n "${1}" ]] || { echo "[ERROR] Invalid argument: empty (disk:${LINENO})" >&2; return 1; }
+
+  echo ${1##*.}
+}

@@ -13,7 +13,7 @@
 #  VBoxManage, qemu-img
 #
 # imports:
-#  utils: checkroot
+#  utils: checkroot, get_suffix
 #
 
 ## disk
@@ -481,12 +481,6 @@ function get_grub_id() {
   # Return name of the disk as known by grub
   #
   echo 0
-}
-
-function get_suffix() {
-  [[ -n "${1}" ]] || { echo "[ERROR] Invalid argument: empty (disk:${LINENO})" >&2; return 1; }
-
-  echo ${1##*.}
 }
 
 function convert_disk() {
