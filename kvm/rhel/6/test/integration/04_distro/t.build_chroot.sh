@@ -26,8 +26,9 @@ function test_build_chroot_distro_name_default() {
   assertEquals $? 0
 }
 
-function test_build_chroot_distro_name_centos() {
+function test_build_chroot_distro_name_centos6() {
   local distro_name=centos
+  local distro_ver=6
 
   (
     set -e
@@ -36,8 +37,9 @@ function test_build_chroot_distro_name_centos() {
   assertEquals $? 0
 }
 
-function test_build_chroot_distro_name_sl() {
+function test_build_chroot_distro_name_sl6() {
   local distro_name=sl
+  local distro_ver=6
 
   (
     set -e
