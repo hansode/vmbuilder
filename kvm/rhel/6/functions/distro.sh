@@ -34,22 +34,28 @@ function add_option_distro() {
   selinux=${selinux:-disabled}
 
   distro_name=$(get_normalized_distro_name ${distro_name})
-  case "${distro_name}$(get_distro_major_ver ${distro_ver})" in
-  centos6)
-    distro_snake=CentOS
-    baseurl=${baseurl:-http://ftp.riken.go.jp/pub/Linux/centos/${distro_ver}/os/${basearch}}
-    gpgkey="${gpgkey:-${baseurl}/RPM-GPG-KEY-${distro_snake}-6}"
-    ;;
-  sl6)
-    distro_snake="Scientific Linux"
-    baseurl=${baseurl:-http://ftp.riken.go.jp/pub/Linux/scientific/${distro_ver}/${basearch}/os}
-    gpgkey="${gpgkey:-${baseurl}/RPM-GPG-KEY-sl ${baseurl}/RPM-GPG-KEY-sl6}"
+
+  local distro_plugin_name="${distro_name}$(get_distro_major_ver ${distro_ver})"
+  case "${distro_plugin_name}" in
+  centos6|sl6)
+    load_plugin_distro ${distro_plugin_name}
     ;;
   *)
     echo "no mutch distro" >&2
     return 1
     ;;
   esac
+}
+
+function load_plugin_distro() {
+  local distro_plugin_name=$1
+  [[ -n "${distro_plugin_name}" ]] || { echo "[ERROR] Invalid argument: distro_plugin_name:${distro_plugin_name} (distro:${LINENO})" >&2; return 1; }
+
+  local distro_plugin_path=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/distro/${distro_plugin_name}.sh
+  [[ -f "${distro_plugin_path}" ]] || { echo "[ERROR] no such distro plugin: ${distro_plugin_path} (distro:${LINENO})" >&2; return 1; }
+
+  . ${distro_plugin_path}
+  add_option_distro_${distro_plugin_name}
 }
 
 function get_normalized_distro_name() {
