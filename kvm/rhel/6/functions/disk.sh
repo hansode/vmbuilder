@@ -10,6 +10,7 @@
 #  cat, egrep, awk
 #  parted, kpartx, udevadm, blkid
 #  mkfs.ext4, tune2fs, mkswap
+#  VBoxManage, qemu-img
 #
 # imports:
 #  utils: checkroot
