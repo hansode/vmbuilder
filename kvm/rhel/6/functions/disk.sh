@@ -481,3 +481,9 @@ function get_grub_id() {
   #
   echo 0
 }
+
+function get_suffix() {
+  [[ -n "${1}" ]] || { echo "[ERROR] Invalid argument: empty (disk:${LINENO})" >&2; return 1; }
+
+  echo ${1##*.}
+}
