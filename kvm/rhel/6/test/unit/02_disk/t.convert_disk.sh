@@ -10,22 +10,17 @@
 
 ## variables
 
-declare dest_formart=vdi
-declare dest_filename=${disk_filename%%."$(get_suffix ${disk_filename})"}.${dest_formart}
-
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename} ${totalsize} 2>/dev/null
-  mkptab ${disk_filename}
-  mapptab ${disk_filename}
-  mkfsdisk ${disk_filename}
+  touch ${disk_filename}
+
+  function VBoxManage() { echo VBoxManage $*; }
+  function qemu-img()   { echo qemu-img   $*; }
 }
 
 function tearDown() {
-  unmapptab ${disk_filename}
   rm -f ${disk_filename}
-  rm -f ${dest_filename}
 }
 
 ### no opts
@@ -46,8 +41,13 @@ function test_convert_disk_filename_destdir() {
   assertEquals $? 0
 }
 
-function test_convert_disk_filename_destdir_destformat() {
-  convert_disk ${disk_filename} `pwd` ${dest_formart}
+function test_convert_disk_filename_destdir_destformat_vdi() {
+  convert_disk ${disk_filename} `pwd` vdi
+  assertEquals $? 0
+}
+
+function test_convert_disk_filename_destdir_destformat_vmdk() {
+  convert_disk ${disk_filename} `pwd` vmdk
   assertEquals $? 0
 }
 
