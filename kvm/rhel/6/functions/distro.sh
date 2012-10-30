@@ -38,7 +38,7 @@ function add_option_distro() {
   local distro_driver_name="${distro_name}$(get_distro_major_ver ${distro_ver})"
   case "${distro_driver_name}" in
   centos6|sl6)
-    load_driver_distro ${distro_driver_name}
+    load_distro_driver ${distro_driver_name}
     ;;
   *)
     echo "no mutch distro" >&2
@@ -47,12 +47,12 @@ function add_option_distro() {
   esac
 }
 
-function load_driver_distro() {
+function load_distro_driver() {
   local distro_driver_name=$1
   [[ -n "${distro_driver_name}" ]] || { echo "[ERROR] Invalid argument: distro_driver_name:${distro_driver_name} (distro:${LINENO})" >&2; return 1; }
 
   local distro_driver_path=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/distro/${distro_driver_name}.sh
-  [[ -f "${distro_driver_path}" ]] || { echo "[ERROR] no such distro plugin: ${distro_driver_path} (distro:${LINENO})" >&2; return 1; }
+  [[ -f "${distro_driver_path}" ]] || { echo "[ERROR] no such distro driver: ${distro_driver_path} (distro:${LINENO})" >&2; return 1; }
 
   . ${distro_driver_path}
   add_option_distro_${distro_driver_name}
