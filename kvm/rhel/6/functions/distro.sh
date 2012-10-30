@@ -40,6 +40,9 @@ function add_option_distro() {
   centos6|sl6)
     load_distro_driver ${distro_driver_name}
     ;;
+  centos5)
+    load_distro_driver ${distro_driver_name}
+    ;;
   *)
     echo "no mutch distro" >&2
     return 1
