@@ -13,4 +13,5 @@ function add_option_distro_centos5() {
   gpgkey="${gpgkey:-${baseurl}/RPM-GPG-KEY-${distro_snake}-5}"
 
   preferred_filesystem=ext3
+  preferred_initrd=initrd
 }

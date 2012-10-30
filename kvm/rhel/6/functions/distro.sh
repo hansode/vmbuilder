@@ -258,13 +258,17 @@ function install_grub() {
   done
 }
 
+function preferred_initrd() {
+  echo ${preferred_initrd:-initramfs}
+}
+
 function install_kernel() {
   local chroot_dir=$1
 
   run_yum ${chroot_dir} install dracut kernel
 
   ls ${chroot_dir}/boot/vmlinuz-* || { echo "vmlinuz not found (distro:${LINENO})" >&2; return 1; }
-  ls ${chroot_dir}/boot/initramfs-* || { echo "initramfs not found (distro:${LINENO})" >&2; return 1; }
+  ls ${chroot_dir}/boot/$(preferred_initrd)-* || { echo "$(preferred_initrd) not found (distro:${LINENO})" >&2; return 1; }
 }
 
 function install_extras() {
@@ -370,7 +374,7 @@ function install_menu_lst() {
 	title ${distro} ($(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1 | sed 's,^vmlinuz-,,'))
 	        root (hd${grub_id},0)
 	        kernel ${bootdir_path}/$(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1) ro root=UUID=$(mntpntuuid ${disk_filename} root) rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto  KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM
-	        initrd ${bootdir_path}/$(cd ${chroot_dir}/boot && ls initramfs-*| tail -1)
+	        initrd ${bootdir_path}/$(cd ${chroot_dir}/boot && ls $(preferred_initrd)-*| tail -1)
 	_EOS_
   cat ${chroot_dir}/boot/grub/grub.conf
 

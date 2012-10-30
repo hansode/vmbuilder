@@ -13,4 +13,5 @@ function add_option_distro_centos6() {
   gpgkey="${gpgkey:-${baseurl}/RPM-GPG-KEY-${distro_snake}-6}"
 
   preferred_filesystem=ext4
+  preferred_initrd=initramfs
 }

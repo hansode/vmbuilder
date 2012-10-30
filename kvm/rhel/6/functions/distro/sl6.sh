@@ -13,4 +13,5 @@ function add_option_distro_sl6() {
   gpgkey="${gpgkey:-${baseurl}/RPM-GPG-KEY-sl ${baseurl}/RPM-GPG-KEY-sl6}"
 
   preferred_filesystem=ext4
+  preferred_initrd=initramfs
 }
