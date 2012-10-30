@@ -498,14 +498,15 @@ function install_fstab() {
 
   printf "[INFO] Overwriting /etc/fstab\n"
   {
+  local default_filesystem=$(preferred_filesystem)
   xptabproc <<'EOS'
     case "${mountpoint}" in
-    /boot) fstype=ext4 dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
-    root)  fstype=ext4 dumpopt=1 fsckopt=1 mountpath=/             ;;
-    swap)  fstype=swap dumpopt=0 fsckopt=0 mountpath=${mountpoint} ;;
-    /opt)  fstype=ext4 dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
-    /home) fstype=ext4 dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
-    *)     fstype=ext4 dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
+    /boot) fstype=${default_filesystem} dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
+    root)  fstype=${default_filesystem} dumpopt=1 fsckopt=1 mountpath=/             ;;
+    swap)  fstype=swap                  dumpopt=0 fsckopt=0 mountpath=${mountpoint} ;;
+    /opt)  fstype=${default_filesystem} dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
+    /home) fstype=${default_filesystem} dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
+    *)     fstype=${default_filesystem} dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
     esac
     uuid=$(mntpntuuid ${disk_filename} ${mountpoint})
     printf "UUID=%s %s\t%s\tdefaults\t%s %s\n" ${uuid} ${mountpath} ${fstype} ${dumpopt} ${fsckopt}
