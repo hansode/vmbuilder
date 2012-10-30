@@ -484,7 +484,7 @@ function mkfs_fstype() {
 
   case "${fstype}" in
   ext3)
-    echo mkfs.ext3 -F
+    echo mkfs.ext3 -F -I 128
     ;;
   ext4)
     echo mkfs.ext4 -F -E lazy_itable_init=1
