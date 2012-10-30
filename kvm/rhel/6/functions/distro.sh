@@ -558,6 +558,10 @@ function cleanup_distro() {
   rm -rf ${chroot_dir}/tmp/*
 }
 
+function preferred_filesystem() {
+  echo ${preferred_filesystem:-ext3}
+}
+
 ##
 
 function trap_distro() {
