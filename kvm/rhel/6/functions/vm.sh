@@ -11,7 +11,7 @@
 #  utils: is_dev, checkroot
 #  mbr: rmmbr
 #  disk: xptabinfo, mkdisk, mkptab, mapptab, mkfsdisk, unmapptab
-#  distro: build_chroot
+#  distro: build_chroot, preferred_filesystem
 #  hypervisor: preflight_check_hypervisor, install_os, umount_ptab
 #
 
@@ -59,7 +59,7 @@ function create_vm() {
     mapptab ${disk_filename}
   }
 
-  mkfsdisk ${disk_filename}
+  mkfsdisk ${disk_filename} $(preferred_filesystem)
 
   install_os ${chroot_dir} ${distro_dir} ${disk_filename} ${keepcache} ${execscript}
 
