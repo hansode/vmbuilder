@@ -13,7 +13,10 @@
 ## public functions
 
 function setUp() {
-  mkdir -p ${chroot_dir}
+  mkdir -p ${chroot_dir}/boot
+  touch    ${chroot_dir}/boot/initrd-asdf
+  touch    ${chroot_dir}/boot/initramfs-asdf
+  touch    ${chroot_dir}/boot/vmlinuz-asdf
 
   function run_yum() { echo run_yum $*; }
 }
