@@ -265,7 +265,13 @@ function preferred_initrd() {
 function install_kernel() {
   local chroot_dir=$1
 
-  run_yum ${chroot_dir} install dracut kernel
+  #
+  # rhel5) run_yum ${chroot_dir} install mkinitrd kernel
+  # rhel6) run_yum ${chroot_dir} install dracut kernel
+  #
+  # if installing kernel, mkinitrd/dracut also will be installed.
+  #
+  run_yum ${chroot_dir} install kernel
 }
 
 function install_extras() {
