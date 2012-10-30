@@ -30,6 +30,7 @@ function setUp() {
   function configure_keepcache() { echo configure_keepcache $*; }
   function install_kernel() { echo install_kernel $*; }
   function install_bootloader() { echo install_bootloader $*; }
+  function run_copy()       { echo run_copy       $*; }
   function run_execscript() { echo run_execscript $*; }
 }
 

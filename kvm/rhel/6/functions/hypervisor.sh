@@ -8,6 +8,7 @@
 #  mount, umount
 #  mkdir, rmdir
 #  rsync, sync
+#  cp, egrep
 #  setarch
 #
 # imports:
@@ -37,6 +38,7 @@ function add_option_hypervisor() {
   tmpsize=${tmpsize:-0}
 
   xpart=${xpart:-}
+  copy=${copy:-}
   execscript=${execscript:-}
   raw=${raw:-./${distro}.raw}
 
@@ -115,6 +117,22 @@ function umount_ptab() {
 
 ##
 
+function run_copy() {
+  local chroot_dir=$1 copy=$2
+  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -n "${copy}" ]] || return 0
+  [[ -f "${copy}" ]] || { echo "[ERROR] The path to the copy directive is invalid: ${copy}. Make sure you are providing a full path. (hypervisor:${LINENO})" >&2; return 1; }
+
+  printf "[INFO] Copying files specified by copy in: %s\n" ${copy}
+  while read line; do
+    set ${line}
+    [[ $# == 2 ]] || continue
+    local destdir=${chroot_dir}$(dirname ${2})
+    [[ -d "${destdir}" ]] || mkdir -p ${destdir}
+    cp -LpR ${1} ${chroot_dir}${2} || :
+  done < <(egrep -v '^$' ${copy})
+}
+
 function run_execscript() {
   local chroot_dir=$1 execscript=$2
   [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
@@ -164,6 +182,7 @@ function install_os() {
   configure_keepcache  ${chroot_dir} ${keepcache}
   install_kernel       ${chroot_dir}
   install_bootloader   ${chroot_dir} ${disk_filename}
+  run_copy             ${chroot_dir} ${copy}
   run_execscript       ${chroot_dir} ${execscript}
 
   umount_ptab          ${chroot_dir}
