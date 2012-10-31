@@ -443,8 +443,9 @@ function mkfsdisk() {
   #
   # Creates the partitions' filesystems
   #
-  local disk_filename=$1
+  local disk_filename=$1 default_filesystem=$2
   [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  [[ -n "${default_filesystem}" ]] || { echo "[ERROR] Invalid argument: default_filesystem:${default_filesystem} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   max_mount_count=${max_mount_count:-37}
@@ -461,7 +462,8 @@ function mkfsdisk() {
       mkswap -f ${part_filename}
       ;;
     *)
-      mkfs.ext4 -F -E lazy_itable_init=1 -L ${mountpoint} ${part_filename}
+      local cmd="$(mkfs_fstype ${default_filesystem}) -L ${mountpoint} ${part_filename}"
+      eval ${cmd}
       # > This filesystem will be automatically checked every 37 mounts or 180 days, whichever comes first.
       # > Use tune2fs -c or -i to override.
       [[ ("${max_mount_count}" != 37) || ("${interval_between_check}" != 180) ]] && {
@@ -474,6 +476,24 @@ function mkfsdisk() {
     # Let udev have a chance to extract the UUID for us
     udevadm settle
 EOS
+}
+
+function mkfs_fstype() {
+  local fstype=$1
+  [[ -n "${fstype}" ]] || { echo "[ERROR] Invalid argument: fstype:${fstype} (disk:${LINENO})" >&2; return 1; }
+
+  case "${fstype}" in
+  ext3)
+    echo mkfs.ext3 -F -I 128
+    ;;
+  ext4)
+    echo mkfs.ext4 -F -E lazy_itable_init=1
+    ;;
+  *)
+    echo "[ERROR] Invalid fstype: ${fsype} (disk:${LINENO})" >&2
+    return 1
+    ;;
+  esac
 }
 
 function get_grub_id() {

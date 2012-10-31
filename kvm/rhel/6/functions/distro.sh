@@ -37,7 +37,10 @@ function add_option_distro() {
 
   local distro_driver_name="${distro_name}$(get_distro_major_ver ${distro_ver})"
   case "${distro_driver_name}" in
-  centos6|sl6)
+  rhel6|centos6|sl6)
+    load_distro_driver ${distro_driver_name}
+    ;;
+  rhel5|centos5)
     load_distro_driver ${distro_driver_name}
     ;;
   *)
@@ -109,7 +112,7 @@ function distroinfo() {
   cat <<-EOS
 	--------------------
 	distro_arch: ${distro_arch}
-	distro_name: ${distro_name} ${distro_snake}
+	distro_name: ${distro_name}
 	distro_ver:  ${distro_ver}
 	chroot_dir:  ${chroot_dir}
 	keepcache:   ${keepcache}
@@ -255,13 +258,28 @@ function install_grub() {
   done
 }
 
+function preferred_initrd() {
+  echo ${preferred_initrd:-initramfs}
+}
+
+function verify_kernel_installation() {
+  local chroot_dir=$1
+
+  ls ${chroot_dir}/boot/vmlinuz-* || { echo "vmlinuz not found (distro:${LINENO})" >&2; return 1; }
+  ls ${chroot_dir}/boot/$(preferred_initrd)-* || { echo "$(preferred_initrd) not found (distro:${LINENO})" >&2; return 1; }
+}
+
 function install_kernel() {
   local chroot_dir=$1
 
-  run_yum ${chroot_dir} install dracut kernel
-
-  ls ${chroot_dir}/boot/vmlinuz-* || { echo "vmlinuz not found (distro:${LINENO})" >&2; return 1; }
-  ls ${chroot_dir}/boot/initramfs-* || { echo "initramfs not found (distro:${LINENO})" >&2; return 1; }
+  #
+  # rhel5) run_yum ${chroot_dir} install mkinitrd kernel
+  # rhel6) run_yum ${chroot_dir} install dracut kernel
+  #
+  # if installing kernel, mkinitrd/dracut also will be installed.
+  #
+  run_yum ${chroot_dir} install kernel
+  verify_kernel_installation ${chroot_dir}
 }
 
 function install_extras() {
@@ -367,7 +385,7 @@ function install_menu_lst() {
 	title ${distro} ($(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1 | sed 's,^vmlinuz-,,'))
 	        root (hd${grub_id},0)
 	        kernel ${bootdir_path}/$(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1) ro root=UUID=$(mntpntuuid ${disk_filename} root) rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto  KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM
-	        initrd ${bootdir_path}/$(cd ${chroot_dir}/boot && ls initramfs-*| tail -1)
+	        initrd ${bootdir_path}/$(cd ${chroot_dir}/boot && ls $(preferred_initrd)-*| tail -1)
 	_EOS_
   cat ${chroot_dir}/boot/grub/grub.conf
 
@@ -495,14 +513,15 @@ function install_fstab() {
 
   printf "[INFO] Overwriting /etc/fstab\n"
   {
+  local default_filesystem=$(preferred_filesystem)
   xptabproc <<'EOS'
     case "${mountpoint}" in
-    /boot) fstype=ext4 dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
-    root)  fstype=ext4 dumpopt=1 fsckopt=1 mountpath=/             ;;
-    swap)  fstype=swap dumpopt=0 fsckopt=0 mountpath=${mountpoint} ;;
-    /opt)  fstype=ext4 dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
-    /home) fstype=ext4 dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
-    *)     fstype=ext4 dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
+    /boot) fstype=${default_filesystem} dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
+    root)  fstype=${default_filesystem} dumpopt=1 fsckopt=1 mountpath=/             ;;
+    swap)  fstype=swap                  dumpopt=0 fsckopt=0 mountpath=${mountpoint} ;;
+    /opt)  fstype=${default_filesystem} dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
+    /home) fstype=${default_filesystem} dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
+    *)     fstype=${default_filesystem} dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
     esac
     uuid=$(mntpntuuid ${disk_filename} ${mountpoint})
     printf "UUID=%s %s\t%s\tdefaults\t%s %s\n" ${uuid} ${mountpath} ${fstype} ${dumpopt} ${fsckopt}
@@ -553,6 +572,10 @@ function cleanup_distro() {
 
   find   ${chroot_dir}/var/log/ -type f | xargs rm
   rm -rf ${chroot_dir}/tmp/*
+}
+
+function preferred_filesystem() {
+  echo ${preferred_filesystem:-ext3}
 }
 
 ##
