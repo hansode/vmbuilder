@@ -37,10 +37,10 @@ function add_option_distro() {
 
   local distro_driver_name="${distro_name}$(get_distro_major_ver ${distro_ver})"
   case "${distro_driver_name}" in
-  centos6|sl6)
+  rhel6|centos6|sl6)
     load_distro_driver ${distro_driver_name}
     ;;
-  centos5)
+  rhel5|centos5)
     load_distro_driver ${distro_driver_name}
     ;;
   *)
