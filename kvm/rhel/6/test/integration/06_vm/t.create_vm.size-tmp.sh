@@ -20,7 +20,7 @@ function test_create_vm_not_enough_tmp() {
   assertNotEquals $? 0
 }
 
-function _test_create_vm_minimal_tmp() {
+function test_create_vm_minimal_tmp() {
   local rootsize=700 tmpsize=46
 
   (
