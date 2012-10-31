@@ -262,6 +262,13 @@ function preferred_initrd() {
   echo ${preferred_initrd:-initramfs}
 }
 
+function verify_kernel_installation() {
+  local chroot_dir=$1
+
+  ls ${chroot_dir}/boot/vmlinuz-* || { echo "vmlinuz not found (distro:${LINENO})" >&2; return 1; }
+  ls ${chroot_dir}/boot/$(preferred_initrd)-* || { echo "$(preferred_initrd) not found (distro:${LINENO})" >&2; return 1; }
+}
+
 function install_kernel() {
   local chroot_dir=$1
 
@@ -272,6 +279,7 @@ function install_kernel() {
   # if installing kernel, mkinitrd/dracut also will be installed.
   #
   run_yum ${chroot_dir} install kernel
+  verify_kernel_installation ${chroot_dir}
 }
 
 function install_extras() {
