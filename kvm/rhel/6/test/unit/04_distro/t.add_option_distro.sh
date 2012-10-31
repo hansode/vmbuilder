@@ -64,6 +64,14 @@ function test_add_option_distro_name_empty() {
   assertNotEquals "${old_distro_name}" "${distro_name}"
 }
 
+function test_add_option_distro_name_rhel() {
+  local distro_name=rhel
+  local old_distro_name=${distro_name}
+
+  add_option_distro
+  assertEquals "${old_distro_name}" "${distro_name}"
+}
+
 function test_add_option_distro_name_centos() {
   local distro_name=centos
   local old_distro_name=${distro_name}

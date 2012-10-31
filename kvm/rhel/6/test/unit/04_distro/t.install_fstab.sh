@@ -25,10 +25,20 @@ function tearDown() {
   rm -rf ${chroot_dir}
 }
 
-function test_install_fstab() {
+function test_install_fstab_ext3() {
+  local preferred_filesystem=ext3
+
   install_fstab ${chroot_dir} ${disk_filename}
   assertEquals $? 0
 }
+
+function test_install_fstab_ext4() {
+  local preferred_filesystem=ext4
+
+  install_fstab ${chroot_dir} ${disk_filename}
+  assertEquals $? 0
+}
+
 
 ## shunit2
 
