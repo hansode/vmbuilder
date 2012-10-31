@@ -112,7 +112,7 @@ function distroinfo() {
   cat <<-EOS
 	--------------------
 	distro_arch: ${distro_arch}
-	distro_name: ${distro_name} ${distro_snake}
+	distro_name: ${distro_name}
 	distro_ver:  ${distro_ver}
 	chroot_dir:  ${chroot_dir}
 	keepcache:   ${keepcache}
