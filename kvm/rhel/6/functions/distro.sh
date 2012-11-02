@@ -44,7 +44,7 @@ function add_option_distro() {
     load_distro_driver ${distro_driver_name}
     ;;
   *)
-    echo "no mutch distro" >&2
+    echo "[ERROR] no mutch distro (distro:${LINENO})" >&2
     return 1
     ;;
   esac
@@ -76,7 +76,7 @@ function get_normalized_distro_name() {
     echo sl
     ;;
   *)
-    echo "no mutch distro: ${distro_name}" >&2
+    echo "[ERROR] no mutch distro: ${distro_name} (distro:${LINENO})" >&2
     return 1
     ;;
   esac
@@ -96,7 +96,7 @@ function preflight_check_distro() {
   https://*) ;;
   ftp://*)   ;;
   *)
-    echo "unknown scheme: ${baseurl}" >&2
+    echo "[ERROR] unknown scheme: ${baseurl} (distro:${LINENO})" >&2
     return 1
     ;;
   esac
@@ -127,7 +127,7 @@ function build_chroot() {
   preflight_check_distro
 
   local chroot_dir=${1:-${abs_dirname}/${distro_name}-${distro_ver}_${distro_arch}}
-  [[ -d "${chroot_dir}" ]] && { echo "${chroot_dir} already exists (distro:${LINENO})" >&2; return 1; } || :
+  [[ -d "${chroot_dir}" ]] && { echo "[ERROR] ${chroot_dir} already exists (distro:${LINENO})" >&2; return 1; } || :
 
   distroinfo
   # set_defaults
@@ -138,7 +138,7 @@ function build_chroot() {
 
 function bootstrap() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] && { echo "${chroot_dir} already exists (distro:${LINENO})" >&2; return 1; } || :
+  [[ -d "${chroot_dir}" ]] && { echo "[ERROR] ${chroot_dir} already exists (distro:${LINENO})" >&2; return 1; } || :
   checkroot || return 1
 
   trap "trap_distro ${chroot_dir}" 1 2 3 15
@@ -185,7 +185,7 @@ function repofile() {
 
 function run_yum() {
   local chroot_dir=$1; shift
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
   # install_kernel depends on distro_name.
   [[ -n "${distro_name}" ]] || { echo "[ERROR] Invalid argument: distro_name:${distro_name} (distro:${LINENO})" >&2; return 1; }
 
@@ -215,7 +215,7 @@ function configure_mounting() {
 
 function update_passwords() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
   printf "[INFO] Updating passwords\n"
   chroot ${chroot_dir} pwconv
@@ -230,7 +230,7 @@ function create_initial_user() {
 
 function set_timezone() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
   printf "[INFO] Setting /etc/localtime\n"
   cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
@@ -238,7 +238,7 @@ function set_timezone() {
 
 function prevent_daemons_starting() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
  #local svc= dummy=
  #while read svc dummy; do
@@ -248,7 +248,7 @@ function prevent_daemons_starting() {
 
 function install_grub() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
   local grub_distro_name=
   for grub_distro_name in redhat unknown; do
@@ -265,8 +265,8 @@ function preferred_initrd() {
 function verify_kernel_installation() {
   local chroot_dir=$1
 
-  ls ${chroot_dir}/boot/vmlinuz-* || { echo "vmlinuz not found (distro:${LINENO})" >&2; return 1; }
-  ls ${chroot_dir}/boot/$(preferred_initrd)-* || { echo "$(preferred_initrd) not found (distro:${LINENO})" >&2; return 1; }
+  ls ${chroot_dir}/boot/vmlinuz-* || { echo "[ERROR] vmlinuz not found (distro:${LINENO})" >&2; return 1; }
+  ls ${chroot_dir}/boot/$(preferred_initrd)-* || { echo "[ERROR] $(preferred_initrd) not found (distro:${LINENO})" >&2; return 1; }
 }
 
 function install_kernel() {
@@ -297,8 +297,8 @@ function erase_selinux() {
 
 function install_bootloader_cleanup() {
   local chroot_dir=$1 disk_filename=$2
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   local tmpdir=/tmp/vmbuilder-grub
@@ -317,8 +317,8 @@ function install_bootloader_cleanup() {
 
 function install_bootloader() {
   local chroot_dir=$1 disk_filename=$2
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   local root_dev="hd$(get_grub_id)"
@@ -366,8 +366,8 @@ function install_bootloader() {
 
 function install_menu_lst() {
   local chroot_dir=$1 disk_filename=$2
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
 
   printf "[INFO] Generating /boot/grub/grub.conf\n"
 
@@ -396,7 +396,7 @@ function install_menu_lst() {
 
 function configure_os() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   mount_proc               ${chroot_dir}
@@ -422,7 +422,7 @@ function configure_os() {
 
 function configure_networking() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
   cat <<-EOS > ${chroot_dir}/etc/sysconfig/network
 	NETWORKING=yes
@@ -438,7 +438,7 @@ function configure_networking() {
 
 function config_host_and_domainname() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
   cat <<-EOS > ${chroot_dir}/etc/hosts
 	127.0.0.1       localhost
@@ -470,7 +470,7 @@ function config_host_and_domainname() {
 
 function config_interfaces() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
   local ifindex=0
   local ifname=eth${ifindex}
@@ -507,8 +507,8 @@ function install_resolv_conf() {
 
 function install_fstab() {
   local chroot_dir=$1 disk_filename=$2
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   printf "[INFO] Overwriting /etc/fstab\n"
@@ -543,7 +543,7 @@ function configure_keepcache() {
   [01]) ;;
   *)    keepcache=0 ;;
   esac
-  [[ -a "${chroot_dir}/etc/yum.conf" ]] || { echo "file not found: ${chroot_dir}/etc/yum.conf (distro:${LINENO})" >&2; return 1; }
+  [[ -a "${chroot_dir}/etc/yum.conf" ]] || { echo "[ERROR] file not found: ${chroot_dir}/etc/yum.conf (distro:${LINENO})" >&2; return 1; }
   printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
   sed -i s,^keepcache=.*,keepcache=${keepcache}, ${chroot_dir}/etc/yum.conf
   egrep ^keepcache= ${chroot_dir}/etc/yum.conf
@@ -568,7 +568,7 @@ function configure_selinux() {
 
 function cleanup_distro() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
   find   ${chroot_dir}/var/log/ -type f | xargs rm
   rm -rf ${chroot_dir}/tmp/*
@@ -582,7 +582,7 @@ function preferred_filesystem() {
 
 function trap_distro() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
   umount_nonroot ${chroot_dir}
   [[ -d "${chroot_dir}" ]] && rm -rf ${chroot_dir}
