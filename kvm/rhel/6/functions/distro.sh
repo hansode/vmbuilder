@@ -43,6 +43,9 @@ function add_option_distro() {
   rhel5|centos5)
     load_distro_driver ${distro_driver_name}
     ;;
+  rhel4|centos4)
+    load_distro_driver ${distro_driver_name}
+    ;;
   *)
     echo "[ERROR] no mutch distro (distro:${LINENO})" >&2
     return 1
