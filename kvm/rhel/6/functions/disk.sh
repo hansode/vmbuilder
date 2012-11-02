@@ -23,7 +23,7 @@ function mkdisk() {
   # Creates the disk image (if it doesn't already exist).
   #
   local disk_filename=$1 size=${2:-0} unit=${3:-m}
-  [[ -a "${disk_filename}" ]] && { echo "already exists: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] && { echo "[ERROR] already exists: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   [[ "${size}" -gt 0 ]] || { echo "[ERROR] Invalid argument: size:${size} (disk:${LINENO})" >&2; return 1; }
 
   truncate -s ${size}${unit} ${disk_filename}
@@ -33,7 +33,7 @@ function mkdisk() {
 
 function mkdevice() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   mkdir ${chroot_dir}/dev
@@ -45,14 +45,14 @@ function mkdevice() {
 
 function mkprocdir() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
 
   mkdir ${chroot_dir}/proc
 }
 
 function mount_proc() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   mount --bind /proc ${chroot_dir}/proc
@@ -60,7 +60,7 @@ function mount_proc() {
 
 function mount_dev() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   mount --bind /dev ${chroot_dir}/dev
@@ -68,7 +68,7 @@ function mount_dev() {
 
 function umount_root() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   printf "[DEBUG] Unmounting %s\n" ${chroot_dir}
@@ -77,7 +77,7 @@ function umount_root() {
 
 function umount_nonroot() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   local mountpoint=
@@ -123,7 +123,7 @@ function mkpart() {
   #
   # fstype: should allow empty for extended parttype
   local disk_filename=$1 parttype=${2:-primary} offset=${3:-0} size=${4:-0} fstype=${5:-}
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   #
   # size == -1 or size > 0. "-1" means whole disk
   #
@@ -221,7 +221,7 @@ function mkptab() {
   # Should only be called once and only after you've added all partitions.
   #
   local disk_filename=$1
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
 
   printf "[INFO] Adding partition table to disk image: %s\n" ${disk_filename}
   parted --script ${disk_filename} mklabel msdos
@@ -275,7 +275,7 @@ function mapptab() {
   # Call this after L{partition}.
   #
   local disk_filename=$1
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   # # kpartx -va ${disk_filename}
@@ -302,7 +302,7 @@ function unmapptab() {
   # Unsets L{Partition}s' and L{Filesystem}s' filename attribute
   #
   local disk_filename=$1
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   local tries=0 max_tries=3
@@ -349,7 +349,7 @@ function unmapptab() {
 declare _lsdevmaps=
 function lsdevmap() {
   local disk_filename=$1
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   # # kpartx -l ${disk_filename}
@@ -423,7 +423,7 @@ function devname2index() {
 
 function mntpnt2path() {
   local disk_filename=$1 mountpoint=$2
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   [[ -n "${mountpoint}" ]] || { echo "[ERROR] Invalid argument: mountpoint:${mountpoint} (disk:${LINENO})" >&2; return 1; }
 
   lsdevmap ${disk_filename} | devmap2path | egrep "$(devname2index "${mountpoint}")\$"
@@ -431,7 +431,7 @@ function mntpnt2path() {
 
 function mntpntuuid() {
   local disk_filename=$1 mountpoint=$2
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   [[ -n "${mountpoint}" ]] || { echo "[ERROR] Invalid argument: mountpoint:${mountpoint} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
@@ -444,7 +444,7 @@ function mkfsdisk() {
   # Creates the partitions' filesystems
   #
   local disk_filename=$1 default_filesystem=$2
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   [[ -n "${default_filesystem}" ]] || { echo "[ERROR] Invalid argument: default_filesystem:${default_filesystem} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
@@ -508,7 +508,7 @@ function convert_disk() {
   # Convert the disk image
   #
   local disk_filename=$1 dest_dir=${2:-$(pwd)} dest_format=${3:-vdi}
-  [[ -a "${disk_filename}" ]] || { echo "file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
 
   # build dest_filename
   local base_filename=${disk_filename##*/}
