@@ -18,7 +18,7 @@ function setUp() {
   mkdisk ${disk_filename} ${totalsize} 2>/dev/null
   mkptab ${disk_filename}
   mapptab ${disk_filename}
-  mkfsdisk ${disk_filename}
+  mkfsdisk ${disk_filename} ext4
 }
 
 function tearDown() {
