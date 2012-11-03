@@ -90,22 +90,29 @@ function get_distro_major_ver() {
   echo ${distro_ver%%.*}
 }
 
-function preflight_check_distro() {
-  case "${baseurl}" in
+function preflight_check_uri() {
+  local uri=$1
+  [[ -n "${uri}" ]] || { echo "[ERROR] Invalid argument: uri:${uri} (distro:${LINENO})" >&2; return 1; }
+
+  case "${uri}" in
   http://*)  ;;
   https://*) ;;
   ftp://*)   ;;
   *)
-    echo "[ERROR] unknown scheme: ${baseurl} (distro:${LINENO})" >&2
+    echo "[ERROR] unknown scheme: ${uri} (distro:${LINENO})" >&2
     return 1
     ;;
   esac
-  printf "[DEBUG] Testing access to %s\n" ${baseurl}
-  curl -f -s ${baseurl} >/dev/null || {
+  printf "[DEBUG] Testing access to %s\n" ${uri}
+  curl -f -s ${uri} >/dev/null || {
     ret=$?
-    printf "[ERROR] Could not connect to %s. Please check your connectivity and try again.\n" ${baseurl}
+    printf "[ERROR] Could not connect to %s. Please check your connectivity and try again.\n" ${uri}
     return ${ret}
   }
+}
+
+function preflight_check_distro() {
+  preflight_check_uri "${baseurl}"
 }
 
 function distroinfo() {
