@@ -112,7 +112,13 @@ function preflight_check_uri() {
 }
 
 function preflight_check_distro() {
-  preflight_check_uri "${baseurl}"
+  [[ -n "${baseurl}" ]] || { echo "[ERROR] Invalid argument: baseurl:${baseurl} (distro:${LINENO})" >&2; return 1; }
+  preflight_check_uri "${baseurl}" || return 1
+
+  [[ -n "${gpgkey}" ]] || { echo "[ERROR] Invalid argument: gpgkey:${gpgkey} (distro:${LINENO})" >&2; return 1; }
+  for i in ${gpgkey}; do
+    preflight_check_uri "${i}" || return 1
+  done
 }
 
 function distroinfo() {
