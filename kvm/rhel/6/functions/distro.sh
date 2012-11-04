@@ -489,7 +489,8 @@ function config_interfaces() {
 	BOOTPROTO=static
 	ONBOOT=yes
 	IPADDR=${ip}
-	$([[ -z "${net}"   ]] || echo "NETMASK=${net}")
+	$([[ -z "${mask}"  ]] || echo "NETMASK=${mask}")
+	$([[ -z "${net}"   ]] || echo "NETWORK=${net}")
 	$([[ -z "${bcast}" ]] || echo "BROADCAST=${bcast}")
 	$([[ -z "${gw}"    ]] || echo "GATEWAY=${gw}")
 	EOS
