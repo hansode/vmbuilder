@@ -20,15 +20,15 @@ function setUp() {
   [[ -d ${distro_dir} ]] || build_chroot ${distro_dir}
   trap "unmapptab ${disk_filename}" 1 2 3 15
 
-  mkdisk ${disk_filename} ${totalsize}
-  mkptab ${disk_filename}
-  mapptab ${disk_filename}
+  mkdisk   ${disk_filename} ${totalsize}
+  mkptab   ${disk_filename}
+  mapptab  ${disk_filename}
   mkfsdisk ${disk_filename} ext4
 }
 
 function tearDown() {
   unmapptab ${disk_filename}
-  rm -f ${disk_filename}
+  rm -f     ${disk_filename}
 }
 
 function test_install_os() {
