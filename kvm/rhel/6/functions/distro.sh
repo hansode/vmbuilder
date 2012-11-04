@@ -23,7 +23,7 @@
 function add_option_distro() {
   distro_arch=${distro_arch:-$(arch)}
   case "${distro_arch}" in
-  i*86)   basearch=i386; distro_arch=i686 ;;
+  i*86)   basearch=i386 distro_arch=i686 ;;
   x86_64) basearch=${distro_arch} ;;
   esac
 
@@ -144,8 +144,8 @@ function build_chroot() {
 
   distroinfo
   # set_defaults
-  bootstrap ${chroot_dir}
-  configure_os ${chroot_dir}
+  bootstrap      ${chroot_dir}
+  configure_os   ${chroot_dir}
   cleanup_distro ${chroot_dir}
 }
 
@@ -169,8 +169,8 @@ function bootstrap() {
 function repofile() {
   local reponame=$1 baseurl="$2" gpgkey="$3" keepcache=${4:-0}
   [[ -n "${reponame}" ]] || { echo "[ERROR] Invalid argument: reponame:${reponame} (distro:${LINENO})" >&2; return 1; }
-  [[ -n "${baseurl}" ]] || { echo "[ERROR] Invalid argument: baseurl:${baseurl} (distro:${LINENO})" >&2; return 1; }
-  [[ -n "${gpgkey}" ]] || { echo "[ERROR] Invalid argument: gpgkey:${gpgkey} (distro:${LINENO})" >&2; return 1; }
+  [[ -n "${baseurl}"  ]] || { echo "[ERROR] Invalid argument: baseurl:${baseurl} (distro:${LINENO})" >&2; return 1; }
+  [[ -n "${gpgkey}"   ]] || { echo "[ERROR] Invalid argument: gpgkey:${gpgkey} (distro:${LINENO})" >&2; return 1; }
 
   cat <<-EOS
 	[main]
@@ -198,7 +198,7 @@ function repofile() {
 
 function run_yum() {
   local chroot_dir=$1; shift
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"  ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
   # install_kernel depends on distro_name.
   [[ -n "${distro_name}" ]] || { echo "[ERROR] Invalid argument: distro_name:${distro_name} (distro:${LINENO})" >&2; return 1; }
 
@@ -310,7 +310,7 @@ function erase_selinux() {
 
 function install_bootloader_cleanup() {
   local chroot_dir=$1 disk_filename=$2
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
@@ -330,7 +330,7 @@ function install_bootloader_cleanup() {
 
 function install_bootloader() {
   local chroot_dir=$1 disk_filename=$2
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
@@ -379,7 +379,7 @@ function install_bootloader() {
 
 function install_menu_lst() {
   local chroot_dir=$1 disk_filename=$2
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
 
   printf "[INFO] Generating /boot/grub/grub.conf\n"
@@ -521,7 +521,7 @@ function install_resolv_conf() {
 
 function install_fstab() {
   local chroot_dir=$1 disk_filename=$2
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
