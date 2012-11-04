@@ -25,10 +25,17 @@ function test_run_yum_distro_name_empty() {
   assertNotEquals $? 0
 }
 
-function test_run_yum_distro_name_exists() {
+function test_run_yum_distro_name_exists_help() {
   add_option_distro
 
   run_yum ${chroot_dir} help >/dev/null
+  assertEquals $? 0
+}
+
+function test_run_yum_distro_name_exists_repolist() {
+  add_option_distro
+
+  run_yum ${chroot_dir} repolist
   assertEquals $? 0
 }
 

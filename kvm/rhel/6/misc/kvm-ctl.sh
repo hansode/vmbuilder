@@ -17,6 +17,14 @@ set -e
 
 ## private functions
 
+function kvm_path() {
+  local execs="/usr/libexec/qemu-kvm /usr/bin/kvm"
+
+  for exe in ${execs}; do
+    [[ -x "${exe}" ]] && echo ${exe} || :
+  done
+}
+
 function register_options() {
   debug=${debug:-}
   [[ -z "${debug}" ]] || set -x
@@ -29,7 +37,7 @@ function register_options() {
 
   brname=${brname:-br0}
 
-  kvm_path=${kvm_path:-/usr/libexec/qemu-kvm}
+  kvm_path=${kvm_path:-$(kvm_path)}
   kvm_opts=${kvm_opts:-}
 
   mem_size=${mem_size:-1024}

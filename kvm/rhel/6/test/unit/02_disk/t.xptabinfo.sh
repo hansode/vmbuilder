@@ -20,7 +20,7 @@ declare totalsize=$((${rootsize} + ${swapsize} + ${optsize}))
 ## public functions
 
 function test_xptabinfo_all_zero() {
-  assertEquals `xptabinfo | wc -l` 0
+  assertEquals $(xptabinfo | wc -l) 0
 }
 
 function test_xptabinfo_rootsize() {
@@ -49,7 +49,7 @@ function test_xptabinfo_rootsize_swapsize_optsize() {
   local swapsize=1024
   local optsize=1024
 
-  assertEquals `xptabinfo | wc -l` 3
+  assertEquals $(xptabinfo | wc -l) 3
 }
 
 ## shunit2

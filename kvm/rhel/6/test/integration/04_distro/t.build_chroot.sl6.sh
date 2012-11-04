@@ -12,9 +12,9 @@
 
 ## public functions
 
-function test_build_chroot_distro_name_centos5() {
-  local distro_name=centos
-  local distro_ver=5
+function test_build_chroot_distro_name_sl6() {
+  local distro_name=sl
+  local distro_ver=6
 
   (
     set -e

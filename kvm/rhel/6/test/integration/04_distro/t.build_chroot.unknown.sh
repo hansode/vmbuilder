@@ -12,15 +12,14 @@
 
 ## public functions
 
-function test_build_chroot_distro_name_centos5() {
-  local distro_name=centos
-  local distro_ver=5
+function test_build_chroot_distro_name_unknown() {
+  local distro_name=unknown
 
   (
     set -e
     build_chroot ${chroot_dir}
   )
-  assertEquals $? 0
+  assertNotEquals $? 0
 }
 
 ## shunit2

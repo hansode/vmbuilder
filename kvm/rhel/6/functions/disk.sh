@@ -6,7 +6,7 @@
 # requires:
 #  bash
 #  truncate, rm
-#  mkdir, MAKEDEV, mount, umount
+#  mkdir, mknod, mount, umount
 #  cat, egrep, awk
 #  parted, kpartx, udevadm, blkid
 #  mkfs.ext4, tune2fs, mkswap
@@ -37,10 +37,19 @@ function mkdevice() {
   checkroot || return 1
 
   mkdir ${chroot_dir}/dev
-  local i=
-  for i in console null tty1 tty2 tty3 tty4 zero; do
-    MAKEDEV -d ${chroot_dir}/dev -x ${i}
-  done
+  while read name mode type major minor; do
+    [[ -a ${chroot_dir}/dev/${name} ]] || \
+      mknod -m ${mode} ${chroot_dir}/dev/${name} ${type} ${major} ${minor}
+  done < <(cat <<-EOS
+	console 600 c 5 1
+	null    666 c 1 3
+	tty1    620 c 4 1
+	tty2    620 c 4 2
+	tty3    620 c 4 3
+	tty4    620 c 4 4
+	zero    666 c 1 5
+	EOS
+	)
 }
 
 function mkprocdir() {
@@ -424,7 +433,7 @@ function devname2index() {
 function mntpnt2path() {
   local disk_filename=$1 mountpoint=$2
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
-  [[ -n "${mountpoint}" ]] || { echo "[ERROR] Invalid argument: mountpoint:${mountpoint} (disk:${LINENO})" >&2; return 1; }
+  [[ -n "${mountpoint}"    ]] || { echo "[ERROR] Invalid argument: mountpoint:${mountpoint} (disk:${LINENO})" >&2; return 1; }
 
   lsdevmap ${disk_filename} | devmap2path | egrep "$(devname2index "${mountpoint}")\$"
 }
@@ -432,7 +441,7 @@ function mntpnt2path() {
 function mntpntuuid() {
   local disk_filename=$1 mountpoint=$2
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
-  [[ -n "${mountpoint}" ]] || { echo "[ERROR] Invalid argument: mountpoint:${mountpoint} (disk:${LINENO})" >&2; return 1; }
+  [[ -n "${mountpoint}"    ]] || { echo "[ERROR] Invalid argument: mountpoint:${mountpoint} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   local part_filename=$(mntpnt2path ${disk_filename} ${mountpoint})
@@ -444,7 +453,7 @@ function mkfsdisk() {
   # Creates the partitions' filesystems
   #
   local disk_filename=$1 default_filesystem=$2
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}"      ]] || { echo "[ERROR] file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   [[ -n "${default_filesystem}" ]] || { echo "[ERROR] Invalid argument: default_filesystem:${default_filesystem} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
