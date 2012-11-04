@@ -10,7 +10,7 @@
 #  cat, egrep, awk
 #  parted, kpartx, udevadm, blkid
 #  mkfs.ext4, tune2fs, mkswap
-#  VBoxManage, qemu-img
+#  VBoxManage, qemu-img, kvm-img
 #
 # imports:
 #  utils: checkroot, get_suffix
@@ -530,8 +530,15 @@ function convert_disk() {
     VBoxManage convertfromraw -format VDI ${disk_filename} ${dest_filename}
     ;;
   *)
-    # TODO: add "qemu_img_path" function to detect path
-    qemu-img convert -O ${dest_format} ${disk_filename} ${dest_filename}
+    $(qemu_img_path) convert -O ${dest_format} ${disk_filename} ${dest_filename}
     ;;
   esac
+}
+
+function qemu_img_path() {
+  local execs="/usr/libexec/qemu-img /usr/bin/kvm-img"
+
+  for exe in ${execs}; do
+    [[ -x "${exe}" ]] && echo ${exe} || :
+  done
 }
