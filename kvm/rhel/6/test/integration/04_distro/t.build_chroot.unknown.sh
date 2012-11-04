@@ -12,10 +12,6 @@
 
 ## public functions
 
-function tearDown() {
-  rm -rf ${chroot_dir}
-}
-
 function test_build_chroot_distro_name_unknown() {
   local distro_name=unknown
 
