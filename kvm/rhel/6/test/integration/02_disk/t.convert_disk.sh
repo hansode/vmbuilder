@@ -15,16 +15,16 @@ declare dest_filename=${disk_filename%%."$(get_suffix ${disk_filename})"}
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename} ${totalsize} 2>/dev/null
-  mkptab ${disk_filename}
-  mapptab ${disk_filename}
+  mkdisk   ${disk_filename} ${totalsize} 2>/dev/null
+  mkptab   ${disk_filename}
+  mapptab  ${disk_filename}
   mkfsdisk ${disk_filename} ext4
 }
 
 function tearDown() {
   unmapptab ${disk_filename}
-  rm -f ${disk_filename}
-  rm -f ${dest_filename}.*
+  rm -f     ${disk_filename}
+  rm -f     ${dest_filename}.*
 }
 
 ### no opts
