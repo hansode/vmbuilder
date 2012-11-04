@@ -63,7 +63,7 @@ function preflight_check_hypervisor() {
 function mount_ptab_root() {
   local disk_filename=$1 chroot_dir=$2
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   xptabproc <<'EOS'
@@ -80,7 +80,7 @@ EOS
 function mount_ptab_nonroot() {
   local disk_filename=$1 chroot_dir=$2
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   xptabproc <<'EOS'
@@ -99,7 +99,7 @@ EOS
 function mount_ptab() {
   local disk_filename=$1 chroot_dir=$2
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   mount_ptab_root    ${disk_filename} ${chroot_dir}
@@ -161,11 +161,11 @@ function sync_os() {
 
 function install_os() {
   local chroot_dir=$1 distro_dir=$2 disk_filename=$3 keepcache=${4:-0} execscript=$5
-  [[ -d "${chroot_dir}" ]] && { echo "[ERROR] already exists: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
-  [[ -d "${distro_dir}" ]] || { echo "[ERROR] no such directory: ${distro_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] && { echo "[ERROR] already exists: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -d "${distro_dir}"    ]] || { echo "[ERROR] no such directory: ${distro_dir} (hypervisor:${LINENO})" >&2; return 1; }
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
   # install_kernel depends on distro_name.
-  [[ -n "${distro_name}" ]] || { echo "[ERROR] Invalid argument: distro_name:${distro_name} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -n "${distro_name}"   ]] || { echo "[ERROR] Invalid argument: distro_name:${distro_name} (hypervisor:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   mkdir -p ${chroot_dir}
