@@ -536,9 +536,13 @@ function convert_disk() {
 }
 
 function qemu_img_path() {
-  local execs="/usr/libexec/qemu-img /usr/bin/kvm-img"
+  local execs="/usr/bin/qemu-img /usr/bin/kvm-img"
 
+  local command_path=
   for exe in ${execs}; do
-    [[ -x "${exe}" ]] && echo ${exe} || :
+    [[ -x "${exe}" ]] && command_path=${exe} || :
   done
+
+  [[ -n "${command_path}" ]] || { echo "[ERROR] command not found: ${execs}." >&2; return 1; }
+  echo ${command_path}
 }
