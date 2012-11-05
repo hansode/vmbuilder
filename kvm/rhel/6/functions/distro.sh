@@ -555,12 +555,13 @@ EOS
 
 function configure_keepcache() {
   local chroot_dir=$1 keepcache=${2:-0}
+  [[ -a "${chroot_dir}/etc/yum.conf" ]] || { echo "[ERROR] file not found: ${chroot_dir}/etc/yum.conf (distro:${LINENO})" >&2; return 1; }
 
   case "${keepcache}" in
   [01]) ;;
   *)    keepcache=0 ;;
   esac
-  [[ -a "${chroot_dir}/etc/yum.conf" ]] || { echo "[ERROR] file not found: ${chroot_dir}/etc/yum.conf (distro:${LINENO})" >&2; return 1; }
+
   printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
   egrep -q ^keepcache= ${chroot_dir}/etc/yum.conf || {
     echo keepcache=${keepcache} >> ${chroot_dir}/etc/yum.conf
