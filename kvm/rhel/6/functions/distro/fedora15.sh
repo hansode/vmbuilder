@@ -11,5 +11,7 @@
 #
 
 function add_option_distro_fedora15() {
+  baseurl=${baseurl:-http://ftp.riken.go.jp/pub/Linux/fedora/releases/${distro_ver}/Fedora/${basearch}/os}
+
   load_distro_driver fedora14
 }
