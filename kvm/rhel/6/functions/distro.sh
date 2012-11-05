@@ -562,7 +562,12 @@ function configure_keepcache() {
   esac
   [[ -a "${chroot_dir}/etc/yum.conf" ]] || { echo "[ERROR] file not found: ${chroot_dir}/etc/yum.conf (distro:${LINENO})" >&2; return 1; }
   printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
-  sed -i s,^keepcache=.*,keepcache=${keepcache}, ${chroot_dir}/etc/yum.conf
+  egrep -q ^keepcache= ${chroot_dir}/etc/yum.conf || {
+    echo keepcache=${keepcache} >> ${chroot_dir}/etc/yum.conf
+  } || {
+    sed -i "s,^keepcache=.*,keepcache=${keepcache}," ${chroot_dir}/etc/yum.conf
+  }
+
   egrep ^keepcache= ${chroot_dir}/etc/yum.conf
 }
 
