@@ -46,6 +46,9 @@ function add_option_distro() {
   rhel4|centos4)
     load_distro_driver ${distro_driver_name}
     ;;
+  fedora[7-9]|fedora1[0-6])
+    load_distro_driver ${distro_driver_name}
+    ;;
   *)
     echo "[ERROR] no mutch distro (distro:${LINENO})" >&2
     return 1
@@ -77,6 +80,9 @@ function get_normalized_distro_name() {
     ;;
   sl|scientific|scientificlinux)
     echo sl
+    ;;
+  fedora)
+    echo fedora
     ;;
   *)
     echo "[ERROR] no mutch distro: ${distro_name} (distro:${LINENO})" >&2

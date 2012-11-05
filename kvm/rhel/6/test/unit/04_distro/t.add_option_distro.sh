@@ -88,6 +88,15 @@ function test_add_option_distro_name_sl() {
   assertEquals "${old_distro_name}" "${distro_name}"
 }
 
+function test_add_option_distro_name_fedora() {
+  local distro_name=fedora
+  local distro_ver=16
+  local old_distro_name=${distro_name}
+
+  add_option_distro
+  assertEquals "${old_distro_name}" "${distro_name}"
+}
+
 ### distro_ver
 
 function test_add_option_distro_ver_empty() {
@@ -103,7 +112,7 @@ function test_add_option_distro_ver_major() {
   local old_distro_ver=${distro_ver}
 
   add_option_distro
-  assertEquals "${old_distro_ver}" "${distro_ver}"
+  assertNotEquals "${old_distro_ver}" "${distro_ver}"
 }
 
 function test_add_option_distro_ver_major_minor() {
