@@ -70,6 +70,8 @@ function shlog() {
 }
 
 function run_kvm() {
+  checkroot || return 1
+
   case "$1" in
   start)
     shlog ${kvm_path} ${kvm_opts} \
