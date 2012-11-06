@@ -15,5 +15,5 @@ function add_option_distro_fedora7() {
   gpgkey=${gpgkey:-${baseurl}/RPM-GPG-KEY ${baseurl}/RPM-GPG-KEY-fedora}
 
   preferred_filesystem=ext4
-  preferred_initrd=initramfs
+  preferred_initrd=initrd
 }
