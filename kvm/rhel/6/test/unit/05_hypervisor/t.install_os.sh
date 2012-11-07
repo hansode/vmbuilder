@@ -25,6 +25,7 @@ function setUp() {
   function sync_os() { echo sync_os $*; }
   function mount_proc() { echo mount_proc $*; }
   function mount_dev() { echo mount_dev $*; }
+  function mount_sys() { echo mount_sys $*; }
   function configure_networking() { echo configure_networking $*; }
   function configure_mounting() { echo configure_mounting $*; }
   function configure_keepcache() { echo configure_keepcache $*; }

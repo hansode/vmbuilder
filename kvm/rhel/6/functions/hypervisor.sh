@@ -14,7 +14,8 @@
 # imports:
 #  utils: checkroot
 #  disk: xptabproc, mntpnt2path
-#  distro: add_option_distro, preflight_check_distro, install_kernel, install_bootloader, configure_networking, configure_mounting, configure_keepcache
+#  distro: add_option_distro, preflight_check_distro, install_kernel, install_bootloader, mount_proc
+#          mount_dev, mount_sys, configure_networking, configure_mounting, configure_keepcache
 #
 
 ## depending on global variables
@@ -177,6 +178,7 @@ function install_os() {
 
   mount_proc           ${chroot_dir}
   mount_dev            ${chroot_dir}
+  mount_sys            ${chroot_dir}
   configure_networking ${chroot_dir}
   configure_mounting   ${chroot_dir} ${disk_filename}
   configure_keepcache  ${chroot_dir} ${keepcache}
