@@ -15,7 +15,7 @@
 #
 # imports:
 #  utils: is_dev, checkroot
-#  disk: mkdevice, mkprocdir, mount_proc, mount_dev, mount_sys, umount_nonroot, xptabinfo, mntpntuuid, get_grub_id
+#  disk: mkdevice, mkprocdir, mount_proc, umount_nonroot, xptabinfo, mntpntuuid, get_grub_id
 #
 
 ## depending on global variables
@@ -445,6 +445,28 @@ function install_menu_lst_grub2() {
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
 }
 
+function mangle_grub_menu_lst_grub2() {
+  local chroot_dir=$1 disk_filename=$2
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
+
+  local bootdir_path=/boot
+  xptabinfo | egrep -q /boot && {
+    bootdir_path=
+  }
+
+  # - set root='(/dev/loop0,msdos1)'
+  # + set root='(hd0,0)'
+  local grub_id=$(get_grub_id)
+  sed -i "s|set root=[^ ]*|set root='(hd${grub_id},0)'|" ${chroot_dir}/boot/grub2/grub.cfg
+
+  # - linux   /boot/vmlinuz-3.1.0-7.fc16.x86_64 root=/dev/mapper/loop0p1 ro quiet rhgb
+  # + linux   ${bootdir_path}/vmlinuz-3.1.0-7.fc16.x86_64 root=UUID=$(mntpntuuid ${disk_filename} root) ro quiet rhgb
+
+  sed -i "s,/boot,${bootdir_path}," ${chroot_dir}/boot/grub2/grub.cfg
+  sed -i "s,root=/[^ ]*,root=UUID=$(mntpntuuid ${disk_filename} root)," ${chroot_dir}/boot/grub2/grub.cfg
+}
+
 function configure_os() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
@@ -452,7 +474,6 @@ function configure_os() {
 
   mount_proc               ${chroot_dir}
   mount_dev                ${chroot_dir}
-  mount_sys                ${chroot_dir}
 
   # TODO
   #  should use configure_selinux,
