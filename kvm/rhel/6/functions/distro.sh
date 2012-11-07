@@ -284,6 +284,14 @@ function install_grub() {
   done
 }
 
+function install_grub2() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  # fedora >= 16 should be used not grub but grub2
+  run_yum ${chroot_dir} install grub2
+}
+
 function preferred_initrd() {
   echo ${preferred_initrd:-initramfs}
 }
