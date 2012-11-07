@@ -37,6 +37,7 @@ function mkdevice() {
   checkroot || return 1
 
   mkdir ${chroot_dir}/dev
+  mkdir ${chroot_dir}/sys
   while read name mode type major minor; do
     [[ -a ${chroot_dir}/dev/${name} ]] || \
       mknod -m ${mode} ${chroot_dir}/dev/${name} ${type} ${major} ${minor}
