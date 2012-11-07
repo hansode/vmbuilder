@@ -19,7 +19,11 @@ function setUp() {
   function is_dev() { echo is_dev $*; }
   function chroot() { echo chroot $*; }
   function grub() { cat; }
+  function grub2-setup() { echo grub2-setup $*; }
   function install_menu_lst() { echo install_menu_lst $*; }
+
+  function install_grub()  { echo install_grub  $*; }
+  function install_grub2() { echo install_grub2 $*; }
 }
 
 function tearDown() {
@@ -27,7 +31,16 @@ function tearDown() {
   rm -rf ${chroot_dir}
 }
 
-function test_install_bootloader() {
+function test_install_bootloader_grub_ver1() {
+  preferred_grub=grub
+
+  install_bootloader ${chroot_dir} ${disk_filename}
+  assertEquals $? 0
+}
+
+function test_install_bootloader_grub_ver2() {
+  preferred_grub=grub2
+
   install_bootloader ${chroot_dir} ${disk_filename}
   assertEquals $? 0
 }

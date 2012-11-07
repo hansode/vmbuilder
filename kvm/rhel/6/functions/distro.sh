@@ -15,7 +15,7 @@
 #
 # imports:
 #  utils: is_dev, checkroot
-#  disk: mkdevice, mkprocdir, mount_proc, umount_nonroot, xptabinfo, mntpntuuid, get_grub_id
+#  disk: mkdevice, mkprocdir, mount_proc, umount_nonroot, xptabinfo, mntpntuuid, get_grub_id, lsdevmap, devmap2lodev
 #
 
 ## depending on global variables
@@ -380,19 +380,45 @@ function install_bootloader() {
   cat ${chroot_dir}/${devmapfile}
 
   printf "[INFO] Installing grub\n"
-  install_grub ${chroot_dir}
 
   local grub_cmd=
+  case "$(preferred_grub)" in
+  grub)
+    grub_cmd="grub --batch"
+    install_grub ${chroot_dir}
+    ;;
+  grub2)
+    local target_device=
+    is_dev ${disk_filename} && {
+      target_device="${disk_filename}"
+    } || {
+      target_device="$(lsdevmap ${disk_filename} | devmap2lodev)"
+    }
+    grub_cmd="grub2-setup ${target_device}"
+
+    install_grub2 ${chroot_dir}
+    chroot        ${chroot_dir} grub2-install ${target_device}
+    ;;
+  esac
+
   is_dev ${disk_filename} && {
-    grub_cmd="grub --device-map=${chroot_dir}/${devmapfile} --batch"
+    grub_cmd="${grub_cmd} --device-map=${chroot_dir}/${devmapfile}"
   } || {
-    grub_cmd="chroot ${chroot_dir} grub --device-map=${devmapfile} --batch"
+    grub_cmd="chroot ${chroot_dir} ${grub_cmd} --device-map=${devmapfile}"
   }
-  cat <<-_EOS_ | ${grub_cmd}
+
+  case "$(preferred_grub)" in
+  grub)
+    cat <<-_EOS_ | ${grub_cmd}
 	root (${root_dev},0)
 	setup (hd0)
 	quit
 	_EOS_
+    ;;
+  grub2)
+    ${grub_cmd}
+    ;;
+  esac
 
   install_menu_lst           ${chroot_dir} ${disk_filename}
   install_bootloader_cleanup ${chroot_dir} ${disk_filename}
