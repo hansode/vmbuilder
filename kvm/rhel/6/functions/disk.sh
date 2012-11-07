@@ -74,6 +74,14 @@ function mksysdir() {
   mkdir ${chroot_dir}/sys
 }
 
+function mount_sys() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  mount --bind /sys ${chroot_dir}/sys
+}
+
 function mount_dev() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
