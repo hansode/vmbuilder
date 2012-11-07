@@ -15,6 +15,7 @@
 function setUp() {
   mkdir -p ${chroot_dir}/proc
   mkdir -p ${chroot_dir}/dev
+  mkdir -p ${chroot_dir}/sys
 
  #function configure_selinux() { echo configure_selinux $*; }
   function erase_selinux() { echo erase_selinux $*; }

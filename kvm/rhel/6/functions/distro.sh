@@ -15,7 +15,7 @@
 #
 # imports:
 #  utils: is_dev, checkroot
-#  disk: mkdevice, mkprocdir, mount_proc, mount_dev, umount_nonroot, xptabinfo, mntpntuuid, get_grub_id
+#  disk: mkdevice, mkprocdir, mount_proc, mount_dev, mount_sys, umount_nonroot, xptabinfo, mntpntuuid, get_grub_id
 #
 
 ## depending on global variables
@@ -452,6 +452,7 @@ function configure_os() {
 
   mount_proc               ${chroot_dir}
   mount_dev                ${chroot_dir}
+  mount_sys                ${chroot_dir}
 
   # TODO
   #  should use configure_selinux,
