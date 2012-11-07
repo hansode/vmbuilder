@@ -14,11 +14,10 @@
 
 function setUp() {
   mkdisk ${disk_filename} ${totalsize}
-  mkdir -p ${chroot_dir}/boot/grub
-  touch ${chroot_dir}/boot/vmlinuz-$$
-  touch ${chroot_dir}/boot/initramfs-$$
+  mkdir -p ${chroot_dir}
 
-  function mntpntuuid() { echo ASDF-ASDF-ASDF; }
+  function install_menu_lst_grub()  { echo install_menu_lst_grub  $*; }
+  function install_menu_lst_grub2() { echo install_menu_lst_grub2 $*; }
 }
 
 function tearDown() {
@@ -26,7 +25,16 @@ function tearDown() {
   rm -rf ${chroot_dir}
 }
 
-function test_install_menu_lst() {
+function test_install_menu_lst_grub_ver1() {
+  local preferred_grub=grub
+
+  install_menu_lst ${chroot_dir} ${disk_filename}
+  assertEquals $? 0
+}
+
+function test_install_menu_lst_grub_ver2() {
+  local preferred_grub=grub2
+
   install_menu_lst ${chroot_dir} ${disk_filename}
   assertEquals $? 0
 }

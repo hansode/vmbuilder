@@ -403,6 +403,17 @@ function install_menu_lst() {
   [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
 
+  case "$(preferred_grub)" in
+  grub)  install_menu_lst_grub  ;;
+  grub2) install_menu_lst_grub2 ;;
+  esac
+}
+
+function install_menu_lst_grub() {
+  local chroot_dir=$1 disk_filename=$2
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
+
   printf "[INFO] Generating /boot/grub/grub.conf\n"
 
   local bootdir_path=/boot
@@ -426,6 +437,12 @@ function install_menu_lst() {
   cd ${chroot_dir}/boot/grub
   ln -fs grub.conf menu.lst
   cd - >/dev/null
+}
+
+function install_menu_lst_grub2() {
+  local chroot_dir=$1 disk_filename=$2
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
 }
 
 function configure_os() {
