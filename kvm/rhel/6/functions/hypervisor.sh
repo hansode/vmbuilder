@@ -178,7 +178,10 @@ function install_os() {
 
   mount_proc           ${chroot_dir}
   mount_dev            ${chroot_dir}
+
+  # need to mount /sys to install grub2
   mount_sys            ${chroot_dir}
+
   configure_networking ${chroot_dir}
   configure_mounting   ${chroot_dir} ${disk_filename}
   configure_keepcache  ${chroot_dir} ${keepcache}
