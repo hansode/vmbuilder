@@ -394,7 +394,7 @@ function install_bootloader() {
 	quit
 	_EOS_
 
-  install_menu_lst ${chroot_dir} ${disk_filename}
+  install_menu_lst           ${chroot_dir} ${disk_filename}
   install_bootloader_cleanup ${chroot_dir} ${disk_filename}
 }
 
@@ -404,8 +404,8 @@ function install_menu_lst() {
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
 
   case "$(preferred_grub)" in
-  grub)  install_menu_lst_grub  ;;
-  grub2) install_menu_lst_grub2 ;;
+  grub)  install_menu_lst_grub  ${chroot_dir} ${disk_filename} ;;
+  grub2) install_menu_lst_grub2 ${chroot_dir} ${disk_filename} ;;
   esac
 }
 
