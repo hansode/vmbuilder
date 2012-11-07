@@ -7,7 +7,7 @@
 #  bash
 #  cat
 #  yum, mkdir, arch
-#  chroot, pwconv, chroot, chkconfig, grub
+#  chroot, pwconv, chroot, chkconfig, grub, grub2-mkconfig, grub2-set-default
 #  cp, rm, ln, touch, rsync
 #  find, egrep, sed, xargs
 #  mount, umount
@@ -443,6 +443,15 @@ function install_menu_lst_grub2() {
   local chroot_dir=$1 disk_filename=$2
   [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
+
+  printf "[INFO] Generating /boot/grub2/grub.cfg\n"
+
+  chroot ${chroot_dir} grub2-mkconfig -o /boot/grub2/grub.cfg
+  chroot ${chroot_dir} grub2-set-default 0
+
+  mangle_grub_menu_lst_grub2 ${chroot_dir} ${disk_filename}
+
+  cat ${chroot_dir}/boot/grub2/grub.cfg
 }
 
 function mangle_grub_menu_lst_grub2() {
