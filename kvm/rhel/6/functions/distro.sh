@@ -287,7 +287,7 @@ function preferred_initrd() {
 function verify_kernel_installation() {
   local chroot_dir=$1
 
-  ls ${chroot_dir}/boot/vmlinuz-* || { echo "[ERROR] vmlinuz not found (distro:${LINENO})" >&2; return 1; }
+  ls ${chroot_dir}/boot/vmlinuz-*             || { echo "[ERROR] vmlinuz not found (distro:${LINENO})" >&2; return 1; }
   ls ${chroot_dir}/boot/$(preferred_initrd)-* || { echo "[ERROR] $(preferred_initrd) not found (distro:${LINENO})" >&2; return 1; }
 }
 
