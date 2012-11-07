@@ -68,13 +68,6 @@ function mount_proc() {
   mount --bind /proc ${chroot_dir}/proc
 }
 
-function mksysdir() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
-
-  mkdir ${chroot_dir}/sys
-}
-
 function mount_sys() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
