@@ -15,7 +15,7 @@
 #
 # imports:
 #  utils: is_dev, checkroot
-#  disk: mkdevice, mkprocdir, mount_proc, umount_nonroot, xptabinfo, mntpntuuid, get_grub_id
+#  disk: mkdevice, mkprocdir, mount_proc, mount_dev, umount_nonroot, xptabinfo, mntpntuuid, get_grub_id
 #
 
 ## depending on global variables
