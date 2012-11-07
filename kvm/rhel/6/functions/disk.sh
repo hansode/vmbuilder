@@ -408,6 +408,18 @@ function devmap2path() {
   done < <(cat)
 }
 
+function devmap2lodev() {
+  while read devmap; do
+    case "${devmap}" in
+    loop*)
+      echo /dev/${devmap%p[0-9]*}
+      ;;
+    *)
+      ;;
+    esac
+  done < <(cat) | sort | uniq
+}
+
 function devname2index() {
   local name=$1
   [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (disk:${LINENO})" >&2; return 1; }
