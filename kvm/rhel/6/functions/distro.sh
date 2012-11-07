@@ -474,6 +474,9 @@ function mangle_grub_menu_lst_grub2() {
 
   sed -i "s,/boot,${bootdir_path}," ${chroot_dir}/boot/grub2/grub.cfg
   sed -i "s,root=/[^ ]*,root=UUID=$(mntpntuuid ${disk_filename} root)," ${chroot_dir}/boot/grub2/grub.cfg
+
+  # show booting progress
+  sed -i "s,quiet rhgb,," ${chroot_dir}/boot/grub2/grub.cfg
 }
 
 function configure_os() {

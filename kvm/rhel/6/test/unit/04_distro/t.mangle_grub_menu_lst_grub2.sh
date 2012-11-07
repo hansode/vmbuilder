@@ -128,6 +128,9 @@ function test_mangle_grub_menu_lst_grub2() {
 
   egrep "root=UUID=${rootdev_uuid}" ${chroot_dir}/boot/grub2/grub.cfg
   assertEquals $? 0
+
+  egrep linux ${chroot_dir}/boot/grub2/grub.cfg | egrep 'quiet rhgb'
+  assertNotEquals $? 0
 }
 
 ## shunit2
