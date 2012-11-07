@@ -16,4 +16,5 @@ function add_option_distro_fedora7() {
 
   preferred_filesystem=ext3
   preferred_initrd=initrd
+  preferred_grub=grub
 }

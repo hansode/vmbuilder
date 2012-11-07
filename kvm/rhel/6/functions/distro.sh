@@ -268,6 +268,10 @@ function prevent_daemons_starting() {
  #done < <(chroot ${chroot_dir} chkconfig --list | egrep -v :on)
 }
 
+function preferred_grub() {
+  echo ${preferred_grub:-grub}
+}
+
 function install_grub() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
