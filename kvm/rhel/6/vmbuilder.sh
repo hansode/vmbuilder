@@ -54,6 +54,10 @@
 #                     DNS address in dotted form [default: based on ip setting (first valid address in the network)]
 #
 #    Post install actions:
+#        --copy=FILE
+#               Read 'source dest' lines from FILE, copying  source  files  from
+#               host to dest in the guest's file system.
+#
 #        --execscript=SCRIPT
 #               Run SCRIPT after distro installation finishes. Script will be called with the guest's chroot as first argument, so you can use chroot $1 <cmd> to  run  code  in
 #               the virtual machine.
