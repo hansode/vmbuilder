@@ -26,8 +26,8 @@ yum install -y ${distro_pkgs}
 cd /tmp
 
 echo "git clone."
-[[ -d gist-1108422 ]] || git clone git://gist.github.com/1108422.git gist-1108422
-cd gist-1108422
+[[ -d env-bootstrap ]] || git clone git://github.com/hansode/env-bootstrap.git env-bootstrap
+cd env-bootstrap
 pwd
 
 echo "add work user."
