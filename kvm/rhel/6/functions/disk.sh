@@ -65,6 +65,7 @@ function mount_proc() {
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
+  printf "[DEBUG] Mounting %s\n" ${chroot_dir}/proc
   mount --bind /proc ${chroot_dir}/proc
 }
 
@@ -73,6 +74,7 @@ function mount_sys() {
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
+  printf "[DEBUG] Mounting %s\n" ${chroot_dir}/sys
   mount --bind /sys ${chroot_dir}/sys
 }
 
@@ -81,6 +83,7 @@ function mount_dev() {
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
+  printf "[DEBUG] Mounting %s\n" ${chroot_dir}/dev
   mount --bind /dev ${chroot_dir}/dev
 }
 
