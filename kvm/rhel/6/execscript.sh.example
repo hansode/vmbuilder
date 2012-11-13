@@ -44,5 +44,5 @@ egrep -q ^umask ${devel_home}/.bashrc || {
 }
 
 cd /tmp
-rm -rf gist-1108422
+rm -rf env-bootstrap
 EOS
