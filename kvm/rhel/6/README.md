@@ -14,6 +14,19 @@ Installing vmbuilder.sh
     $ git clone git://github.com/hansode/vmbuilder.git
     $ cd vmbuilder/kvm/rhel/6/
 
+Installing Required Packages
+----------------------------
+
+### RHEL Base Packages
+
+    # yum install -y bridge-utils kpartx parted qemu-img qemu-kvm
+
+### VirtualBox
+
+    # curl http://download.virtualbox.org/virtualbox/debian/oracle_vbox.asc  | rpm --import -
+    # curl http://download.virtualbox.org/virtualbox/rpm/el/virtualbox.repo -o /etc/yum.repos.d/virtualbox.repo
+    # yum install -y VirtualBox-4.2.x86_64
+
 Building virtual machine image
 -------------------------------
 
