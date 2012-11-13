@@ -15,7 +15,7 @@ function extract_args() {
   for arg in ${*}; do
     case "${arg}" in
     --*=*)
-      key=${arg%%=*}; key=$(echo ${key##--} | tr - _)
+      key=${arg%%=*}; key=${key##--}; key=${key//-/_}
       value=${arg##--*=}
       eval "${key}=\"${value}\""
       ;;

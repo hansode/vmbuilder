@@ -26,6 +26,19 @@ function test_extract_args_options_success() {
   assertEquals "${commands}" "${CMD_ARGS}"
 }
 
+function test_extract_args_underbar_to_hyphen() {
+  local commands="command sub-command"
+  local options="--k-e-y-0=value0 --k-e-y-1=value1"
+  local opts="${commands} ${options}"
+
+  extract_args ${opts}
+  assertEquals "${commands}" "${CMD_ARGS}"
+
+  assertEquals "${k_e_y_0}" "value0"
+  assertEquals "${k_e_y_1}" "value1"
+}
+
+
 ## shunit2
 
 . ${shunit2_file}
