@@ -124,7 +124,7 @@ function run_kvm() {
 
 ### read-only variables
 
-readonly abs_dirname=$(cd $(dirname $0) && pwd)
+readonly abs_dirname=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
 
 ### include files
 
