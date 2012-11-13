@@ -12,6 +12,7 @@
 # usage:
 #
 #  $0 start --image-path=/path/to/vmimage.raw
+#  $0 start --image-path=/path/to/vmimage.raw --kvm-opts="-enable-nesting"
 #
 set -e
 
