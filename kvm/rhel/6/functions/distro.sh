@@ -163,6 +163,13 @@ function bootstrap() {
   [[ -d "${chroot_dir}" ]] && { echo "[ERROR] ${chroot_dir} already exists (distro:${LINENO})" >&2; return 1; } || :
   checkroot || return 1
 
+  # via $ trap -l
+  #
+  #  1) SIGHUP
+  #  2) SIGINT
+  #  3) SIGQUIT
+  # 15) SIGTERM
+  #
   trap "trap_distro ${chroot_dir}" 1 2 3 15
 
   mkdir -p       ${chroot_dir}
