@@ -41,6 +41,14 @@ function create_vm() {
 
   local disk_filename=${raw}
 
+  # via $ trap -l
+  #
+  #  1) SIGHUP
+  #  2) SIGINT
+  #  3) SIGQUIT
+  # 13) SIGPIPE
+  # 15) SIGTERM
+  #
   trap 'exit 1'  HUP INT PIPE QUIT TERM
   trap "trap_vm ${disk_filename} ${chroot_dir}" EXIT
 
