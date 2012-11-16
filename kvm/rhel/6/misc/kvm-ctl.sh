@@ -54,6 +54,9 @@ function register_options() {
   monitor_addr=${monitor_addr:-127.0.0.1}
   monitor_port=${monitor_port:-4444}
 
+  serial_addr=${serial_addr:-127.0.0.1}
+  serial_port=${serial_port:-5555}
+
   vif_name=${vif_name:-${name}-${monitor_port}}
   vif_num=${vif_num:-1}
 
@@ -76,15 +79,16 @@ function run_kvm() {
   case "$1" in
   start)
     shlog ${kvm_path} ${kvm_opts} \
-     -name    ${name} \
-     -m       ${mem_size} \
-     -smp     ${cpu_num} \
-     -vnc     ${vnc_addr}:${vnc_port} \
-     -drive   file=${image_path},media=disk,boot=on,index=0,cache=none \
-     -monitor telnet:${monitor_addr}:${monitor_port},server,nowait \
+     -name     ${name} \
+     -m        ${mem_size} \
+     -smp      ${cpu_num} \
+     -vnc      ${vnc_addr}:${vnc_port} \
+     -drive    file=${image_path},media=disk,boot=on,index=0,cache=none \
+     -monitor  telnet:${monitor_addr}:${monitor_port},server,nowait \
+     -serial   telnet:${serial_addr}:${serial_port},server,nowait \
      $(for i in $(seq 1 ${vif_num}); do offset=$((${i} - 1)); [[ "${offset}" == 0 ]] && suffix= || suffix=.${offset}; echo \
-     -net     nic,macaddr=$(gen_macaddr ${offset}),model=virtio \
-     -net     tap,ifname=${vif_name}${suffix},script=,downscript= \
+     -net      nic,macaddr=$(gen_macaddr ${offset}),model=virtio \
+     -net      tap,ifname=${vif_name}${suffix},script=,downscript= \
      ; done) \
      -daemonize
 
@@ -113,6 +117,9 @@ function run_kvm() {
 
 	monitor_addr=${monitor_addr}
 	monitor_port=${monitor_port}
+
+	serial_addr=${serial_addr}
+	serial_port=${serial_port}
 	EOS
     ;;
   *)
