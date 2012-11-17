@@ -8,7 +8,7 @@
 #  mount, umount
 #  mkdir, rmdir
 #  rsync, sync
-#  cp, egrep
+#  egrep
 #  setarch
 #
 # imports:
@@ -130,7 +130,7 @@ function run_copy() {
     [[ $# == 2 ]] || continue
     local destdir=${chroot_dir}$(dirname ${2})
     [[ -d "${destdir}" ]] || mkdir -p ${destdir}
-    cp -LpR ${1} ${chroot_dir}${2} || :
+    rsync -aHA ${1} ${chroot_dir}${2} || :
   done < <(egrep -v '^$' ${copy})
 }
 
