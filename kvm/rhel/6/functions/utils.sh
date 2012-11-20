@@ -98,6 +98,19 @@ function is_dev() {
   esac
 }
 
+function is_dmdev() {
+  local disk_filename=$1
+  # do not use "-a" in this case.
+  [[ -n "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (utils:${LINENO})" >&2; return 1; }
+
+  disk_filename=$(extract_path ${disk_filename})
+
+  case "${disk_filename}" in
+  /dev/dm-[0-9]*) return 0 ;;
+               *) return 1 ;;
+  esac
+}
+
 function get_suffix() {
   [[ -n "${1}" ]] || { echo "[ERROR] Invalid argument: empty (disk:${LINENO})" >&2; return 1; }
 
