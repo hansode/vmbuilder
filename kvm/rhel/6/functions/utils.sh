@@ -30,6 +30,13 @@ function extract_args() {
   CMD_ARGS=${CMD_ARGS## }
 }
 
+function extract_dirname() {
+  local filepath=$1
+  [[ -a "${filepath}" ]] || { echo "[ERROR] file not found: ${filepath} (utils:${LINENO})" >&2; return 1; }
+
+  cd $(dirname ${filepath}) && pwd
+}
+
 function run_cmd() {
   #
   # Runs a command.
