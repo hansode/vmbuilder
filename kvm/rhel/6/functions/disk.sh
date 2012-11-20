@@ -413,6 +413,19 @@ function devmap2path() {
     loop*)
       echo /dev/mapper/${devmap}
       ;;
+    *p[0-9])
+      # ex. LVM
+      #
+      # $ ls -la /dev/vbox/vbox1
+      # lrwxrwxrwx 1 root root 7 Nov 20 14:54 /dev/vbox/vbox1 -> ../dm-0
+      #
+      # $ ls -la /dev/mapper/vbox-vbox1*
+      # lrwxrwxrwx 1 root root 7 Nov 20 14:54 /dev/mapper/vbox-vbox1 -> ../dm-0
+      # lrwxrwxrwx 1 root root 7 Nov 20 15:52 /dev/mapper/vbox-vbox1p1 -> ../dm-4
+      # lrwxrwxrwx 1 root root 7 Nov 20 15:52 /dev/mapper/vbox-vbox1p2 -> ../dm-5
+      #
+      echo /dev/mapper/${devmap}
+      ;;
     *)
       echo /dev/${devmap}
       ;;

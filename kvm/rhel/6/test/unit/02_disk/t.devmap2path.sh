@@ -24,6 +24,12 @@ function test_devmap2path_nonloop() {
   assertEquals $(echo ${devname} | devmap2path) /dev/${devname}
 }
 
+function test_devmap2path_lvm() {
+  local devname=dm-0
+
+  assertEquals $(echo ${devname} | devmap2path) /dev/${devname}
+}
+
 ## shunit2
 
 . ${shunit2_file}
