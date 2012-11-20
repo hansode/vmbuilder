@@ -44,6 +44,28 @@ function expand_path() {
   echo $(extract_dirname ${filepath})/$(basename ${filepath})
 }
 
+function extract_path() {
+  local filepath=$1
+  [[ -a "${filepath}" ]] || { echo "[ERROR] file not found: ${filepath} (utils:${LINENO})" >&2; return 1; }
+
+  local tmp_path=${filepath}
+  local tmp_dirname=$(extract_dirname ${filepath})
+
+  [[ -L "${filepath}" ]] && {
+    tmp_path=$(readlink ${filepath})
+    tmp_path=$(extract_dirname ${tmp_dirname}/${tmp_path})/$(basename ${tmp_path})
+  } || {
+    tmp_path=${tmp_dirname}/$(basename ${tmp_path})
+  }
+
+  # nested symlink?
+  [[ -L "${tmp_path}" ]] && {
+    extract_path ${tmp_path}
+  } || {
+    echo ${tmp_path}
+  }
+}
+
 function run_cmd() {
   #
   # Runs a command.
