@@ -37,6 +37,13 @@ function extract_dirname() {
   cd $(dirname ${filepath}) && pwd
 }
 
+function expand_path() {
+  local filepath=$1
+  [[ -a "${filepath}" ]] || { echo "[ERROR] file not found: ${filepath} (utils:${LINENO})" >&2; return 1; }
+
+  echo $(extract_dirname ${filepath})/$(basename ${filepath})
+}
+
 function run_cmd() {
   #
   # Runs a command.
