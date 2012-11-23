@@ -27,8 +27,8 @@ function add_option_distro() {
   x86_64) basearch=${distro_arch} ;;
   esac
 
-  distro_ver=${distro_ver:-6}
-  distro_name=${distro_name:-centos}
+  distro_name=${distro_name}
+  distro_ver=${distro_ver}
 
   keepcache=${keepcache:-0}
   selinux=${selinux:-disabled}

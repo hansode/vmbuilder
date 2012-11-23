@@ -26,6 +26,9 @@ function register_options() {
   debug=${debug:-}
   [[ -z "${debug}" ]] || set -x
   chroot_dir=${chroot_dir:-}
+
+  distro_name=centos
+  distro_ver=${distro_ver:-6}
 }
 
 ### read-only variables

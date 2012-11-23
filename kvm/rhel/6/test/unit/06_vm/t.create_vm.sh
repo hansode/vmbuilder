@@ -11,6 +11,8 @@
 ## variables
 
 declare raw=${disk_filename}
+declare distro_name=centos
+declare distro_ver=6
 
 ## public functions
 

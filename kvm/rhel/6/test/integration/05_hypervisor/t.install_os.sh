@@ -12,6 +12,7 @@
 
 declare distro_dir=${abs_dirname}/_distro_dir
 declare distro_name=centos
+declare distro_ver=6
 
 ## public functions
 

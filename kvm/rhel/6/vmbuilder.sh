@@ -94,6 +94,9 @@ set -e
 function register_options() {
   debug=${debug:-}
   [[ -z "${debug}" ]] || set -x
+
+  distro_name=${distro_name:-centos}
+  distro_ver=${distro_ver:-6}
 }
 
 ### read-only variables
