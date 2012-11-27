@@ -74,10 +74,10 @@ function shlog() {
 }
 
 function run_kvm() {
-  checkroot || return 1
-
   case "$1" in
   start)
+    checkroot || return 1
+
     shlog ${kvm_path} ${kvm_opts} \
      -name     ${name} \
      -m        ${mem_size} \
