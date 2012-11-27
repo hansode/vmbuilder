@@ -97,6 +97,12 @@ function run_kvm() {
     shlog ifconfig ${vif_name} up
     shlog brctl addif ${brname} ${vif_name}
     ;;
+  stop)
+    exec 5<>/dev/tcp/${monitor_addr}/${monitor_port}
+    echo quit >&5
+    cat  <&5 >/dev/null
+    exec <&5-
+    ;;
   dump)
     cat <<-EOS
 	name=${name}
