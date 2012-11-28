@@ -7,7 +7,7 @@
 #  bash
 #  dirname, pwd
 #  sed, head
-#  /usr/libexec/qemu-kvm, date, seq, cat, ifconfig, brctl
+#  /usr/libexec/qemu-kvm, date, seq, cat, ifconfig, brctl, telnet
 #
 # usage:
 #
@@ -102,6 +102,9 @@ function run_kvm() {
     echo quit >&5
     cat  <&5 >/dev/null
     exec <&5-
+    ;;
+  console)
+    telnet ${serial_addr} ${serial_port}
     ;;
   dump)
     cat <<-EOS
