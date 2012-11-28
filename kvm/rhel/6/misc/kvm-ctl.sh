@@ -35,6 +35,8 @@ function register_options() {
   debug=${debug:-}
   [[ -z "${debug}" ]] || set -x
 
+  config_path=${config_path:-}
+
   name=${name:-rhel6}
 
   image_format=${image_format:-raw}
@@ -142,6 +144,10 @@ function run_kvm() {
   esac
 }
 
+function load_config() {
+  [[ -f "${config_path}" ]] && . ${config_path} || :
+}
+
 ### read-only variables
 
 readonly abs_dirname=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
@@ -159,4 +165,5 @@ extract_args $*
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
 register_options
+load_config
 run_kvm ${cmd}
