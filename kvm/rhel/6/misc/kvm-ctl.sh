@@ -164,6 +164,6 @@ extract_args $*
 
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
-register_options
 load_config
+register_options
 run_kvm ${cmd}
