@@ -144,10 +144,6 @@ function run_kvm() {
   esac
 }
 
-function load_config() {
-  [[ -f "${config_path}" ]] && . ${config_path} || :
-}
-
 ### read-only variables
 
 readonly abs_dirname=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
@@ -164,6 +160,6 @@ extract_args $*
 
 cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
-load_config
+[[ -f "${config_path}" ]] && load_config ${config_path} || :
 register_options
 run_kvm ${cmd}

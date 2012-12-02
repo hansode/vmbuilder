@@ -116,3 +116,10 @@ function get_suffix() {
 
   echo ${1##*.}
 }
+
+function load_config() {
+  local config_path=$1
+  [[ -a "${config_path}" ]] || { echo "[ERROR] file not found: ${config_path} (utils:${LINENO})" >&2; return 1; }
+
+  . ${config_path}
+}
