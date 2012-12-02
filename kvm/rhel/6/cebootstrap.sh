@@ -47,5 +47,6 @@ extract_args $*
 
 ## main
 
+[[ -f "${config_path}" ]] && load_config ${config_path} || :
 register_options
 build_chroot ${chroot_dir}
