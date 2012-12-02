@@ -52,8 +52,8 @@ function register_options() {
   serial_addr=${serial_addr:-127.0.0.1}
   serial_port=${serial_port:-5555}
 
-  vif_name=${vif_name:-${name}-${monitor_port}}
   vif_num=${vif_num:-1}
+  viftab=${viftab:-}
 
   vendor_id=${vendor_id:-52:54:00}
 }
@@ -66,6 +66,43 @@ function gen_macaddr() {
 function shlog() {
   echo "\$ $*"
   eval $*
+}
+
+function viftabinfo() {
+  # format:
+  #  [vif_name] [macaddr] [bridge_if]
+
+  {
+    [[ -n "${viftab}" ]] && [[ -f "${viftab}" ]] && {
+      cat ${viftab}
+    } || {
+      local vif_name=${name}-${monitor_port}
+      for i in $(seq 1 ${vif_num}); do
+        local offset=$((${i} - 1)) suffix=
+        [[ "${offset}" == 0 ]] && suffix= || suffix=.${offset}
+        echo ${vif_name}${suffix} $(gen_macaddr ${offset}) ${brname}
+      done
+    }
+  } | egrep -v '^$|^#'
+}
+
+function viftabproc() {
+  local blk="$(cat)"
+
+  local vif_name macaddr bridge_if
+  while read vif_name macaddr bridge_if; do
+    eval "${blk}"
+  done < <(viftabinfo)
+}
+
+function build_vif_opt() {
+  local vif_name macaddr bridge_if
+
+  viftabproc <<-'EOS'
+    echo \
+     -net nic,macaddr=${macaddr},model=virtio \
+     -net tap,ifname=${vif_name},script=,downscript=
+EOS
 }
 
 function run_kvm() {
@@ -81,16 +118,13 @@ function run_kvm() {
      -drive    file=${image_path},media=disk,boot=on,index=0,cache=none \
      -monitor  telnet:${monitor_addr}:${monitor_port},server,nowait \
      -serial   telnet:${serial_addr}:${serial_port},server,nowait \
-     $(for i in $(seq 1 ${vif_num}); do offset=$((${i} - 1)); [[ "${offset}" == 0 ]] && suffix= || suffix=.${offset}; echo \
-     -net      nic,macaddr=$(gen_macaddr ${offset}),model=virtio \
-     -net      tap,ifname=${vif_name}${suffix},script=,downscript= \
-     ; done) \
+     $(build_vif_opt ${vif_num}) \
      -daemonize
 
-    # basically this scripts add only 1 vif to the bridge interface,
-    # even if creating more than 2 vifs with vif-num.
-    shlog ifconfig ${vif_name} up
-    shlog brctl addif ${brname} ${vif_name}
+    viftabproc <<'EOS'
+      shlog ifconfig ${vif_name} up
+      [[ -z "${bridge_if}" ]] || shlog brctl addif ${bridge_if} ${vif_name}
+EOS
     ;;
   stop)
     exec 5<>/dev/tcp/${monitor_addr}/${monitor_port}
