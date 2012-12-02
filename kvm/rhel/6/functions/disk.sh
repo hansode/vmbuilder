@@ -580,6 +580,6 @@ function qemu_img_path() {
     [[ -x "${exe}" ]] && command_path=${exe} || :
   done
 
-  [[ -n "${command_path}" ]] || { echo "[ERROR] command not found: ${execs}." >&2; return 1; }
+  [[ -n "${command_path}" ]] || { echo "[ERROR] command not found: ${execs} (disk:${LINENO})." >&2; return 1; }
   echo ${command_path}
 }
