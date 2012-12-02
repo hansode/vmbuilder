@@ -10,6 +10,7 @@
 #  rsync, sync
 #  egrep
 #  setarch
+#  /usr/libexec/qemu-kvm, /usr/bin/kvm
 #
 # imports:
 #  utils: checkroot
@@ -192,4 +193,18 @@ function install_os() {
 
   umount_ptab          ${chroot_dir}
   rmdir                ${chroot_dir}
+}
+
+##
+
+function qemu_kvm_path() {
+  local execs="/usr/libexec/qemu-kvm /usr/bin/kvm"
+
+  local command_path=
+  for exe in ${execs}; do
+    [[ -x "${exe}" ]] && command_path=${exe} || :
+  done
+
+  [[ -n "${command_path}" ]] || { echo "[ERROR] command not found: ${execs} (hypervisor:${LINENO})." >&2; return 1; }
+  echo ${command_path}
 }

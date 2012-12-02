@@ -7,8 +7,12 @@
 #  bash
 #  dirname, pwd
 #  sed, head
-#  /usr/libexec/qemu-kvm, date, seq, cat, ifconfig, brctl
+#  date, seq, cat, ifconfig, brctl
 #  telnet, ps, egrep, xargs, cut
+#
+# import:
+#  utils: extract_args
+#  hypervisor: qemu_kvm_path
 #
 # usage:
 #
@@ -18,18 +22,6 @@
 set -e
 
 ## private functions
-
-function qemu_kvm_path() {
-  local execs="/usr/libexec/qemu-kvm /usr/bin/kvm"
-
-  local command_path=
-  for exe in ${execs}; do
-    [[ -x "${exe}" ]] && command_path=${exe} || :
-  done
-
-  [[ -n "${command_path}" ]] || { echo "[ERROR] command not found: ${execs}." >&2; return 1; }
-  echo ${command_path}
-}
 
 function register_options() {
   debug=${debug:-}
@@ -160,6 +152,7 @@ readonly abs_dirname=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
 ### include files
 
 . ${abs_dirname}/../functions/utils.sh
+. ${abs_dirname}/../functions/hypervisor.sh
 
 ### prepare
 
