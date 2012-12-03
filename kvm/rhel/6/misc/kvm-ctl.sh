@@ -46,6 +46,7 @@ function register_options() {
 
   vnc_addr=${vnc_addr:-0.0.0.0}
   vnc_port=${vnc_port:-1001}
+  vnc_keymap=${vnc_keymap:-en-us} # [ en-us | ja ]
 
   monitor_addr=${monitor_addr:-127.0.0.1}
   monitor_port=${monitor_port:-4444}
@@ -132,6 +133,7 @@ function run_kvm() {
      -m        ${mem_size} \
      -smp      ${cpu_num} \
      -vnc      ${vnc_addr}:${vnc_port} \
+     -k        ${vnc_keymap} \
      -drive    file=${image_path},media=disk,boot=on,index=0,cache=none \
      -monitor  telnet:${monitor_addr}:${monitor_port},server,nowait \
      -serial   telnet:${serial_addr}:${serial_port},server,nowait \
