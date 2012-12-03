@@ -7,7 +7,7 @@
 #  bash
 #  dirname, pwd
 #  sed, head
-#  date, seq, cat, ifconfig, brctl
+#  date, seq, cat, ip, brctl
 #  telnet, ps, egrep, xargs, cut
 #  awk, ls, sort
 #
@@ -134,7 +134,7 @@ function run_kvm() {
      -daemonize
 
     viftabproc <<'EOS'
-      shlog ifconfig ${vif_name} up
+      shlog ip link set ${vif_name} up
       [[ -z "${bridge_if}" ]] || shlog brctl addif ${bridge_if} ${vif_name}
 EOS
     ;;
