@@ -81,7 +81,7 @@ function viftabinfo() {
       for i in $(seq 1 ${vif_num}); do
         local offset=$((${i} - 1)) suffix=
         [[ "${offset}" == 0 ]] && suffix= || suffix=.${offset}
-        echo ${vif_name}${suffix} $(gen_macaddr ${offset}) ${brname}
+        echo "${vif_name}${suffix} - ${brname}"
       done
     }
   } | egrep -v '^$|^#'
@@ -104,6 +104,11 @@ function build_vif_opt() {
     local netdev_id=hostnet${offset}
     # "addr" should be more than 0x3
     local addr="0x$((3 + ${offset}))"
+
+    case "${macaddr}" in
+    "-") macaddr=$(gen_macaddr ${offset}) ;;
+    esac
+
     echo \
       -netdev tap,ifname=${vif_name},id=${netdev_id},script=,downscript= \
       -device virtio-net-pci,netdev=${netdev_id},mac=${macaddr},bus=pci.0,addr=${addr}
