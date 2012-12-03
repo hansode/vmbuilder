@@ -90,19 +90,23 @@ function viftabinfo() {
 function viftabproc() {
   local blk="$(cat)"
 
-  local vif_name macaddr bridge_if
-  while read vif_name macaddr bridge_if; do
+  local index vif_name macaddr bridge_if
+  while read index vif_name macaddr bridge_if; do
     eval "${blk}"
-  done < <(viftabinfo)
+  done < <(viftabinfo | cat -n)
 }
 
 function build_vif_opt() {
   local vif_name macaddr bridge_if
 
   viftabproc <<-'EOS'
+    local offset=$((${index} - 1))
+    local netdev_id=hostnet${offset}
+    # "addr" should be more than 0x3
+    local 0x$((3 + ${offset}))
     echo \
-     -net nic,macaddr=${macaddr},model=virtio \
-     -net tap,ifname=${vif_name},script=,downscript=
+      -netdev tap,ifname=${vif_name},id=${netdev_id},script=,downscript= \
+      -device virtio-net-pci,netdev=${netdev_id},mac=${macaddr},bus=pci.0,addr=${addr}
 EOS
 }
 
