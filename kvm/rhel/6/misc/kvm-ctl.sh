@@ -9,6 +9,7 @@
 #  sed, head
 #  date, seq, cat, ifconfig, brctl
 #  telnet, ps, egrep, xargs, cut
+#  awk, ls, sort
 #
 # import:
 #  utils: extract_args
@@ -105,6 +106,13 @@ function build_vif_opt() {
 EOS
 }
 
+function kvmof() {
+  local name=$1
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (kvm-ctl:${LINENO})" >&2; return 1; }
+
+  $0 list | egrep -w -- "-name ${name}"
+}
+
 function run_kvm() {
   case "$1" in
   start)
@@ -136,13 +144,24 @@ EOS
     telnet ${serial_addr} ${serial_port}
     ;;
   info)
+    checkroot || return 1
+
     while read arg; do
       case "${arg}" in
       -*) echo -n "${arg}"  ;;
        *) echo    " ${arg}" ;;
       esac
-    done < <($0 list | egrep -w -- "-name ${name}" | xargs echo | cut -d' ' -f9- | sed "s, ,\n,g")
+    done < <(kvmof ${name} | xargs echo | cut -d' ' -f9- | sed "s, ,\n,g")
     echo
+
+    local pid=$(kvmof ${name} | awk '{print $2}')
+    [[ -z "${pid}" ]] || {
+      echo
+      # 1. list kvm process fd
+      # 2. delete "total XXX"
+      # 3. order by fd number
+      ls -l /proc/${pid}/fd/ | sed -e 1d |  sort -k 9 -n
+    }
     ;;
   list)
     ps -ef | egrep -w ${kvm_path} | egrep -v "egrep -w ${kvm_path}"
