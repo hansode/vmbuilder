@@ -103,7 +103,7 @@ function build_vif_opt() {
     local offset=$((${index} - 1))
     local netdev_id=hostnet${offset}
     # "addr" should be more than 0x3
-    local 0x$((3 + ${offset}))
+    local addr="0x$((3 + ${offset}))"
     echo \
       -netdev tap,ifname=${vif_name},id=${netdev_id},script=,downscript= \
       -device virtio-net-pci,netdev=${netdev_id},mac=${macaddr},bus=pci.0,addr=${addr}
