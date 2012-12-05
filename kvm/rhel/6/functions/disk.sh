@@ -11,10 +11,10 @@
 #  parted, kpartx, udevadm, blkid
 #  mkfs.ext4, tune2fs, mkswap
 #  VBoxManage, qemu-img, kvm-img
-#  losetup
+#  losetup, dmsetup
 #
 # imports:
-#  utils: checkroot, get_suffix, inodeof
+#  utils: checkroot, get_suffix, inodeof, is_dev
 #
 
 ## disk
@@ -394,19 +394,25 @@ function lsdevmap() {
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
-  # really mapped?
-  local inode=$(inodeof ${disk_filename})
-  # /dev/loop0: [fd02]:8126769 (/path/to/file.raw)
-  # /dev/loop1: [fd02]:8126769 (/path/to/file.raw)
+  is_dev ${disk_filename} && {
+    kpartx -l ${disk_filename} \
+     | egrep -v "^(gpt|dos):" \
+     | awk '{print $1}'
+  } || {
+    # really mapped?
+    local inode=$(inodeof ${disk_filename})
+    # /dev/loop0: [fd02]:8126769 (/path/to/file.raw)
+    # /dev/loop1: [fd02]:8126769 (/path/to/file.raw)
 
-  # unmapped?
-  local losetup_output=$(losetup -a | egrep "\]:${inode} ") || return 0
+    # unmapped?
+    local losetup_output=$(losetup -a | egrep "\]:${inode} ") || return 0
 
-  # still mapped
-  local mapped_lodev=$(echo "${losetup_output}" | awk -F: '{print $1}' | sed "s,^/dev/,,")
-  [[ -n "${mapped_lodev}" ]] || return 0
+    # still mapped
+    local mapped_lodev=$(echo "${losetup_output}" | awk -F: '{print $1}' | sed "s,^/dev/,,")
+    [[ -n "${mapped_lodev}" ]] || return 0
 
-  dmsetup ls | egrep ^${mapped_lodev} | awk '{print $1}'
+    dmsetup ls | egrep ^${mapped_lodev} | awk '{print $1}'
+  }
 }
 
 function devmap2path() {
