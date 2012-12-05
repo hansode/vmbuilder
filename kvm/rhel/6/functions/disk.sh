@@ -11,9 +11,10 @@
 #  parted, kpartx, udevadm, blkid
 #  mkfs.ext4, tune2fs, mkswap
 #  VBoxManage, qemu-img, kvm-img
+#  losetup
 #
 # imports:
-#  utils: checkroot, get_suffix
+#  utils: checkroot, get_suffix, inodeof
 #
 
 ## disk
@@ -394,13 +395,27 @@ function lsdevmap() {
   # loop0p8
   # loop0p9
   [[ -z "${_lsdevmaps}" ]] && {
+    # really mapped?
+    local inode=$(inodeof ${disk_filename})
+    # /dev/loop0: [fd02]:8126769 (/path/to/file.raw)
+    # /dev/loop1: [fd02]:8126769 (/path/to/file.raw)
+    losetup -a | egrep "\]:${inode} " -q || return 0
+
     # $ man kpartx
     # >  -l     List partition mappings that would be added -a
     #
     # if showing devmap table without mapping file, file will be automatically mapped to loop device.
     # device mapping should be deleted.
+    #
+    # kpartx shows following message not mapped file
+    #
+    # # kpartx -l ${disk_filename}
+    # loop2p1 : 0 15997984 /dev/loop2 63
+    # loop2p2 : 0 1998047 /dev/loop2 16000000
+    # loop deleted : /dev/loop2
+    #
     kpartx -l ${disk_filename} \
-     | egrep -v "^(gpt|dos):" \
+     | egrep -v -w loop \
      | awk '{print $1}'
   } || {
     echo "${_lsdevmaps}"
