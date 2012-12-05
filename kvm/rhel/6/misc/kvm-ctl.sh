@@ -10,6 +10,7 @@
 #  date, seq, cat, ip, brctl
 #  telnet, ps, egrep, xargs, cut
 #  awk, ls, sort
+#  ../vmbuilder.sh
 #
 # import:
 #  utils: extract_args
@@ -125,6 +126,10 @@ function kvmof() {
 
 function run_kvm() {
   case "$1" in
+  build)
+    # kind of virt-install
+    ${abs_dirname}/../vmbuilder.sh --config-path=${config_path}
+    ;;
   start)
     checkroot || return 1
 
