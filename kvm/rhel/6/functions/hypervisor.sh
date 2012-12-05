@@ -11,6 +11,7 @@
 #  egrep
 #  setarch
 #  /usr/libexec/qemu-kvm, /usr/bin/kvm
+#  cat, mv, chmod
 #
 # imports:
 #  utils: checkroot
@@ -42,6 +43,7 @@ function add_option_hypervisor() {
   xpart=${xpart:-}
   copy=${copy:-}
   execscript=${execscript:-}
+  firstboot=${firstboot:-}
   raw=${raw:-./${distro}.raw}
 
   chroot_dir=${chroot_dir:-/tmp/tmp$(date +%s)}
@@ -146,6 +148,31 @@ function run_execscript() {
   setarch ${distro_arch} ${execscript} ${chroot_dir}
 }
 
+function install_firstboot() {
+  local chroot_dir=$1 firstboot=$2
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -n "${firstboot}"  ]] || return 0
+  [[ -f "${firstboot}"  ]] || { echo "[ERROR] The path to the firstboot directive is invalid: ${firstboot}. Make sure you are providing a full path. (hypervisor:${LINENO})" >&2; return 1; }
+
+  printf "[DEBUG] Installing firstboot script %s\n" ${firstboot}
+  rsync -aHA ${firstboot} ${chroot_dir}/root/firstboot.sh
+  chmod 755 ${chroot_dir}/root/firstboot.sh
+
+  mv ${chroot_dir}/etc/rc.d/rc.local ${chroot_dir}/etc/rc.d/rc.local.orig
+  cat <<-'EOS' > ${chroot_dir}/etc/rc.d/rc.local
+	#!/bin/sh -e
+	#execute firstboot.sh only once
+	if [ ! -e /root/firstboot_done ]; then
+	    if [ -e /root/firstboot.sh ]; then
+	        /root/firstboot.sh
+	    fi
+	    touch /root/firstboot_done
+	fi
+	exit 0
+	EOS
+  chmod 755 ${chroot_dir}/etc/rc.d/rc.local
+}
+
 function sync_os() {
   #
   # Synchronize directories
@@ -190,6 +217,7 @@ function install_os() {
   install_bootloader   ${chroot_dir} ${disk_filename}
   run_copy             ${chroot_dir} ${copy}
   run_execscript       ${chroot_dir} ${execscript}
+  install_firstboot    ${chroot_dir} ${firstboot}
 
   umount_ptab          ${chroot_dir}
   rmdir                ${chroot_dir}
