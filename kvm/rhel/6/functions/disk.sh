@@ -310,10 +310,17 @@ function mapptab() {
   # add map loop0p7 (253:9): 0 6144 linear /dev/loop0 1382400
   # add map loop0p8 (253:10): 0 6144 linear /dev/loop0 1390592
   # add map loop0p9 (253:11): 0 6144 linear /dev/loop0 1398784
-  kpartx_output=$(kpartx -va ${disk_filename})
-  echo "${kpartx_output}"
-  _lsdevmaps=$(echo "${kpartx_output}"| egrep -v 'gpt:|dos:' | egrep -w add | awk '{print $3}')
 
+  local inode=$(inodeof ${disk_filename})
+  # already mapped?
+  losetup -a | egrep "\]:${inode} " -q && {
+    lsdevmap ${disk_filename}
+  } || {
+    # not mapped
+    kpartx_output=$(kpartx -va ${disk_filename})
+    echo "${kpartx_output}"
+    _lsdevmaps=$(echo "${kpartx_output}"| egrep -v 'gpt:|dos:' | egrep -w add | awk '{print $3}')
+  }
   udevadm settle
 }
 
