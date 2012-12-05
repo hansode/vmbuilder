@@ -314,13 +314,14 @@ function mapptab() {
   local inode=$(inodeof ${disk_filename})
   # already mapped?
   losetup -a | egrep "\]:${inode} " -q && {
-    lsdevmap ${disk_filename}
-  } || {
-    # not mapped
-    kpartx_output=$(kpartx -va ${disk_filename})
-    echo "${kpartx_output}"
-    _lsdevmaps=$(echo "${kpartx_output}"| egrep -v 'gpt:|dos:' | egrep -w add | awk '{print $3}')
-  }
+    echo "[WARN] already mapped: ${disk_filename} (disk:${LINENO})"
+    return 0
+  } || :
+
+  # not mapped
+  local kpartx_output=$(kpartx -va ${disk_filename})
+  echo "${kpartx_output}"
+
   udevadm settle
 }
 
@@ -353,6 +354,8 @@ function unmapptab() {
   # loop deleted : /dev/loop0
   kpartx -vd ${disk_filename}
 
+  local lsdevmap_output=$(lsdevmap ${disk_filename})
+
   while read parted_oldmap; do
     # '2>/dev/null' means if device does not exist,
     # dmsetup shows "Command failed" to stderr.
@@ -361,7 +364,7 @@ function unmapptab() {
     dmsetup info ${parted_oldmap} 2>/dev/null | egrep ^State: | egrep -w ACTIVE -q || continue
     printf "[DEBUG] Removing parted old map with 'dmsetup remove %s'\n" ${parted_oldmap}
     dmsetup remove ${parted_oldmap}
-  done < <(lsdevmap ${disk_filename})
+  done < <(echo "${lsdevmap_output}")
 
   while read devname; do
     local loop_device=/dev/${devname}
@@ -372,61 +375,36 @@ function unmapptab() {
     losetup --show ${loop_device} 2>/dev/null || continue
     printf "[DEBUG] Removing mapped loop device with 'losetup -d %s'\n" ${loop_device}
     losetup -d ${loop_device}
-  done < <(lsdevmap ${disk_filename} | sed 's,p[0-9]*$,,' | sort | uniq)
+  done < <(echo "${lsdevmap_output}" | sed 's,p[0-9]*$,,' | sort | uniq)
+
+  # still mapped /dev/loopXX ?
+  local losetup_output=$(losetup -a | egrep "\]:${inode} ") || return 0
+
+  # still mapped /dev/loopXX
+  local mapped_lodev=$(echo "${losetup_output}" | awk -F: '{print $1}' | sed "s,^/dev/,,")
+  [[ -n "${mapped_lodev}" ]] || return 0
+
+  losetup -d ${mapped_lodev}
 }
 
-declare _lsdevmaps=
 function lsdevmap() {
   local disk_filename=$1
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
-  # # kpartx -l ${disk_filename}
-  # loop0p1 : 0 60484 /dev/loop0 63
-  # loop0p2 : 0 436224 /dev/loop0 61440
-  # loop0p3 : 0 6144 /dev/loop0 499712
-  # loop0p4 : 0 2 /dev/loop0 507904
-  # loop0p5 : 0 747893 /dev/loop0 507967
-  # loop0p6 : 0 122880 /dev/loop0 1257472
-  # loop0p7 : 0 6144 /dev/loop0 1382400
-  # loop0p8 : 0 6144 /dev/loop0 1390592
-  # loop0p9 : 0 6144 /dev/loop0 1398784
-  # # kpartx -l ${disk_filename} | egrep -v "^(gpt|dos):" | awk '{print $1}'
-  # loop0p1
-  # loop0p2
-  # loop0p3
-  # loop0p4
-  # loop0p5
-  # loop0p6
-  # loop0p7
-  # loop0p8
-  # loop0p9
-  [[ -z "${_lsdevmaps}" ]] && {
-    # really mapped?
-    local inode=$(inodeof ${disk_filename})
-    # /dev/loop0: [fd02]:8126769 (/path/to/file.raw)
-    # /dev/loop1: [fd02]:8126769 (/path/to/file.raw)
-    losetup -a | egrep "\]:${inode} " -q || return 0
+  # really mapped?
+  local inode=$(inodeof ${disk_filename})
+  # /dev/loop0: [fd02]:8126769 (/path/to/file.raw)
+  # /dev/loop1: [fd02]:8126769 (/path/to/file.raw)
 
-    # $ man kpartx
-    # >  -l     List partition mappings that would be added -a
-    #
-    # if showing devmap table without mapping file, file will be automatically mapped to loop device.
-    # device mapping should be deleted.
-    #
-    # kpartx shows following message not mapped file
-    #
-    # # kpartx -l ${disk_filename}
-    # loop2p1 : 0 15997984 /dev/loop2 63
-    # loop2p2 : 0 1998047 /dev/loop2 16000000
-    # loop deleted : /dev/loop2
-    #
-    kpartx -l ${disk_filename} \
-     | egrep -v -w loop \
-     | awk '{print $1}'
-  } || {
-    echo "${_lsdevmaps}"
-  }
+  # unmapped?
+  local losetup_output=$(losetup -a | egrep "\]:${inode} ") || return 0
+
+  # still mapped
+  local mapped_lodev=$(echo "${losetup_output}" | awk -F: '{print $1}' | sed "s,^/dev/,,")
+  [[ -n "${mapped_lodev}" ]] || return 0
+
+  dmsetup ls | egrep ^${mapped_lodev} | awk '{print $1}'
 }
 
 function devmap2path() {
