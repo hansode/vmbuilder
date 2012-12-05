@@ -5,6 +5,7 @@
 #
 # requires:
 #  bash
+#  pwd, stat
 #
 # imports:
 #
@@ -122,4 +123,11 @@ function load_config() {
   [[ -a "${config_path}" ]] || { echo "[ERROR] file not found: ${config_path} (utils:${LINENO})" >&2; return 1; }
 
   . ${config_path}
+}
+
+function inodeof() {
+  local filepath=$1
+  [[ -a "${filepath}" ]] || { echo "[ERROR] file not found: ${filepath} (utils:${LINENO})" >&2; return 1; }
+
+  stat --format=%i ${filepath}
 }
