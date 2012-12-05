@@ -354,7 +354,8 @@ function unmapptab() {
   # loop deleted : /dev/loop0
   kpartx -vd ${disk_filename}
 
-  local lsdevmap_output=$(lsdevmap ${disk_filename})
+  local lsdevmap_output="$(lsdevmap ${disk_filename})"
+  [[ -n "${lsdevmap_output}" ]] || return 0
 
   while read parted_oldmap; do
     # '2>/dev/null' means if device does not exist,
@@ -367,6 +368,7 @@ function unmapptab() {
   done < <(echo "${lsdevmap_output}")
 
   while read devname; do
+    [[ -n "${devname}" ]] || continue
     local loop_device=/dev/${devname}
     # '2>/dev/null' means if device does not exist,
     # losetup shows "loop: can't get info on device /dev/loopX: No such device or address"
