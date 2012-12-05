@@ -22,6 +22,8 @@ readonly shunit2_file=${abs_dirname}/../../shunit2
 
 declare chroot_dir=${abs_dirname}/_chroot.$$
 declare disk_filename=${abs_dirname}/_disk.$$.raw
+declare distro_name=centos
+declare distro_ver=6
 
 ## for create_vm
 
