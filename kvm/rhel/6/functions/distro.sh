@@ -54,6 +54,9 @@ function add_option_distro() {
     return 1
     ;;
   esac
+
+  # settings for the initial user
+  rootpass=${rootpass:-root}
 }
 
 function load_distro_driver() {
@@ -248,7 +251,7 @@ function update_passwords() {
 
   printf "[INFO] Updating passwords\n"
   chroot ${chroot_dir} pwconv
-  chroot ${chroot_dir} bash -c "echo root:root | chpasswd"
+  chroot ${chroot_dir} bash -c "echo root:${rootpass} | chpasswd"
 }
 
 function create_initial_user() {
