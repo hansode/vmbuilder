@@ -387,10 +387,10 @@ function unmapptab() {
   done < <(echo "${lsdevmap_output}" | sed 's,p[0-9]*$,,' | sort | uniq)
 
   # still mapped /dev/loopXX ?
-  local losetup_output=$(is_mapped ${disk_filename}) || return 0
+  local mapped_names=$(is_mapped ${disk_filename}) || return 0
 
   # still mapped /dev/loopXX
-  local mapped_lodev=$(echo "${losetup_output}" | awk -F: '{print $1}' | sed "s,^/dev/,,")
+  local mapped_lodev=$(echo "${mapped_names}" | awk -F: '{print $1}' | sed "s,^/dev/,,")
   [[ -n "${mapped_lodev}" ]] || return 0
 
   losetup -d ${mapped_lodev}
@@ -407,10 +407,10 @@ function lsdevmap() {
      | awk '{print $1}'
   } || {
     # really mapped?
-    local losetup_output=$(is_mapped ${disk_filename}) || return 0
+    local mapped_names=$(is_mapped ${disk_filename}) || return 0
 
     # still mapped
-    local mapped_lodev=$(echo "${losetup_output}" | awk -F: '{print $1}' | sed "s,^/dev/,,")
+    local mapped_lodev=$(echo "${mapped_names}" | awk -F: '{print $1}' | sed "s,^/dev/,,")
     [[ -n "${mapped_lodev}" ]] || return 0
 
     dmsetup ls | egrep ^${mapped_lodev} | awk '{print $1}'
