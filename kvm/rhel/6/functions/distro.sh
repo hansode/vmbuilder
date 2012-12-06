@@ -56,6 +56,9 @@ function add_option_distro() {
   esac
 
   # settings for the initial user
+  devel_user=${devel_user:-}
+  devel_pass=${devel_pass:-}
+
   rootpass=${rootpass:-root}
 }
 
@@ -252,10 +255,24 @@ function update_passwords() {
   printf "[INFO] Updating passwords\n"
   chroot ${chroot_dir} pwconv
   chroot ${chroot_dir} bash -c "echo root:${rootpass} | chpasswd"
+
+  [[ -z "${devel_user}" ]] || {
+    chroot ${chroot_dir} bash -c "echo ${devel_user}:${devel_pass:-${devel_user}} | chpasswd"
+  }
 }
 
 function create_initial_user() {
   local chroot_dir=$1
+
+  [[ -z "${devel_user}" ]] || {
+    local devel_group=${devel_user}
+    local devel_home=/home/${devel_user}
+
+    chroot ${chroot_dir} bash -c "getent group  ${devel_group} >/dev/null || groupadd ${devel_group}"
+    chroot ${chroot_dir} bash -c "getent passwd ${devel_user}  >/dev/null || useradd -g ${devel_group} -d ${devel_home} -s /bin/bash -m ${devel_user}"
+
+    echo "${devel_user} ALL=(ALL) NOPASSWD: ALL" >> ${chroot_dir}/etc/sudoers
+  }
 
   update_passwords ${chroot_dir}
 }
