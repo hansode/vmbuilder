@@ -362,7 +362,10 @@ function unmapptab() {
   kpartx -vd ${disk_filename}
 
   local lsdevmap_output="$(lsdevmap ${disk_filename})"
-  [[ -n "${lsdevmap_output}" ]] || return 0
+  [[ -n "${lsdevmap_output}" ]] || {
+    echo "[WARN] not mapped: ${disk_filename} (disk:${LINENO})"
+    return 0
+  }
 
   while read parted_oldmap; do
     # '2>/dev/null' means if device does not exist,
