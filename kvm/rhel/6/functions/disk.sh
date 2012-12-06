@@ -287,6 +287,15 @@ function mkptab() {
 EOS
 }
 
+function is_mapped() {
+  local disk_filename=$1 opts=${2:-}
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  local inode=$(inodeof ${disk_filename})
+  losetup -a | egrep "\]:${inode} " ${opts}
+}
+
 function mapptab() {
   #
   # Create loop devices corresponding to the partitions.
@@ -311,9 +320,8 @@ function mapptab() {
   # add map loop0p8 (253:10): 0 6144 linear /dev/loop0 1390592
   # add map loop0p9 (253:11): 0 6144 linear /dev/loop0 1398784
 
-  local inode=$(inodeof ${disk_filename})
   # already mapped?
-  losetup -a | egrep "\]:${inode} " -q && {
+  is_mapped ${disk_filename} -q && {
     echo "[WARN] already mapped: ${disk_filename} (disk:${LINENO})"
     return 0
   } || :
@@ -379,7 +387,7 @@ function unmapptab() {
   done < <(echo "${lsdevmap_output}" | sed 's,p[0-9]*$,,' | sort | uniq)
 
   # still mapped /dev/loopXX ?
-  local losetup_output=$(losetup -a | egrep "\]:${inode} ") || return 0
+  local losetup_output=$(is_mapped ${disk_filename}) || return 0
 
   # still mapped /dev/loopXX
   local mapped_lodev=$(echo "${losetup_output}" | awk -F: '{print $1}' | sed "s,^/dev/,,")
@@ -399,12 +407,7 @@ function lsdevmap() {
      | awk '{print $1}'
   } || {
     # really mapped?
-    local inode=$(inodeof ${disk_filename})
-    # /dev/loop0: [fd02]:8126769 (/path/to/file.raw)
-    # /dev/loop1: [fd02]:8126769 (/path/to/file.raw)
-
-    # unmapped?
-    local losetup_output=$(losetup -a | egrep "\]:${inode} ") || return 0
+    local losetup_output=$(is_mapped ${disk_filename}) || return 0
 
     # still mapped
     local mapped_lodev=$(echo "${losetup_output}" | awk -F: '{print $1}' | sed "s,^/dev/,,")
