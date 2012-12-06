@@ -323,7 +323,7 @@ function mapptab() {
   # already mapped?
   is_mapped ${disk_filename} -q && {
     echo "[WARN] already mapped: ${disk_filename} (disk:${LINENO})"
-    return 0
+    return 2
   } || :
 
   # not mapped
@@ -364,7 +364,7 @@ function unmapptab() {
   local lsdevmap_output="$(lsdevmap ${disk_filename})"
   [[ -n "${lsdevmap_output}" ]] || {
     echo "[WARN] not mapped: ${disk_filename} (disk:${LINENO})"
-    return 0
+    return 2
   }
 
   while read parted_oldmap; do
