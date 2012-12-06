@@ -319,8 +319,7 @@ function mapptab() {
   } || :
 
   # not mapped
-  local kpartx_output=$(kpartx -va ${disk_filename})
-  echo "${kpartx_output}"
+  kpartx -va ${disk_filename}
 
   udevadm settle
 }
