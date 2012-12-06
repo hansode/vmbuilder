@@ -49,8 +49,7 @@ function create_vm() {
   # 13) SIGPIPE
   # 15) SIGTERM
   #
-  trap 'exit 1'  HUP INT PIPE QUIT TERM
-  trap "trap_vm ${disk_filename} ${chroot_dir}" EXIT
+  trap "trap_vm ${disk_filename} ${chroot_dir}" HUP INT PIPE QUIT TERM
 
   is_dev ${disk_filename} && {
     rmmbr ${disk_filename}
