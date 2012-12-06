@@ -342,6 +342,12 @@ function unmapptab() {
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
+  # *** don't save 'lsdevmap_output' at this line ***
+  [[ -n "$(lsdevmap ${disk_filename})" ]] || {
+    echo "[WARN] not mapped: ${disk_filename} (disk:${LINENO})"
+    return 2
+  }
+
   local tries=0 max_tries=3
   while [[ "${tries}" -lt "${max_tries}" ]]; do
     kpartx -vd ${disk_filename} && break || :
@@ -362,10 +368,8 @@ function unmapptab() {
   kpartx -vd ${disk_filename}
 
   local lsdevmap_output="$(lsdevmap ${disk_filename})"
-  [[ -n "${lsdevmap_output}" ]] || {
-    echo "[WARN] not mapped: ${disk_filename} (disk:${LINENO})"
-    return 2
-  }
+  [[ -n "${lsdevmap_output}" ]] || return 0
+  echo "[WARN] still mapped: ${disk_filename} (disk:${LINENO})"
 
   while read parted_oldmap; do
     # '2>/dev/null' means if device does not exist,
