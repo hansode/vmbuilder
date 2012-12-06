@@ -386,7 +386,7 @@ function unmapptab() {
     losetup -d ${loop_device}
   done < <(echo "${lsdevmap_output}" | sed 's,p[0-9]*$,,' | sort | uniq)
 
-  # still mapped /dev/loopXX ?
+  # /dev/loopXX mapped ?
   local mapped_names=$(is_mapped ${disk_filename}) || return 0
 
   # still mapped /dev/loopXX
@@ -406,10 +406,10 @@ function lsdevmap() {
      | egrep -v "^(gpt|dos):" \
      | awk '{print $1}'
   } || {
-    # really mapped?
+    # /dev/loopXX mapped ?
     local mapped_names=$(is_mapped ${disk_filename}) || return 0
 
-    # still mapped
+    # still mapped /dev/loopXX
     local mapped_lodev=$(echo "${mapped_names}" | awk -F: '{print $1}' | sed "s,^/dev/,,")
     [[ -n "${mapped_lodev}" ]] || return 0
 
