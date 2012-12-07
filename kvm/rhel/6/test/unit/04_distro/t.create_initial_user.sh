@@ -23,7 +23,7 @@ function tearDown() {
 }
 
 function test_create_initial_user() {
-  create_initial_user ${chroot_dir} | egrep -q "^chroot ${chroot_dir} bash -c echo root:root | chpasswd"
+  create_initial_user ${chroot_dir} | egrep -q "^chroot ${chroot_dir} bash -e -c echo root:root | chpasswd"
   assertEquals $? 0
 }
 

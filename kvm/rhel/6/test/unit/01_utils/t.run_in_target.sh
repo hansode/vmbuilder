@@ -10,6 +10,8 @@
 
 ## variables
 
+declare chroot_dir=${abs_dirname}/_chroot.$$
+
 ## public functions
 
 function setUp() {
@@ -22,9 +24,9 @@ function tearDown() {
   rm -rf ${chroot_dir}
 }
 
-function test_update_passwords() {
-  update_passwords ${chroot_dir} | egrep -q "^chroot ${chroot_dir} bash -e -c echo root:root | chpasswd"
-  assertEquals $? 0
+function test_run_in_target() {
+ run_in_target ${chroot_dir} date | egrep "chroot ${chroot_dir} bash -c -e date"
+ assertEquals $? 0
 }
 
 ## shunit2
