@@ -611,8 +611,13 @@ function config_interfaces() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
-  local ifindex=0
-  local ifname=eth${ifindex}
+  install_interface ${chroot_dir} eth0
+}
+
+function install_interface() {
+  local chroot_dir=$1 ifname=${2:-eth0}
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
   local ifcfg_path=/etc/sysconfig/network-scripts/ifcfg-${ifname}
 
   printf "[INFO] Generating %s\n" ${ifcfg_path}
