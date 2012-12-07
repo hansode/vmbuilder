@@ -57,6 +57,8 @@ function add_option_hypervisor() {
   gw=${gw:-}
   dns=${dns:-}
   hostname=${hostname:-}
+
+  nictab=${nictab:-}
 }
 
 function preflight_check_hypervisor() {

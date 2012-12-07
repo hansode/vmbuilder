@@ -607,12 +607,33 @@ function config_host_and_domainname() {
   [[ -f ${chroot_dir}/etc/resolv.conf ]] && cat ${chroot_dir}/etc/resolv.conf || :
 }
 
+function nictabinfo() {
+  {
+    [[ -n "${nictab}" ]] && [[ -f "${nictab}" ]] && {
+      cat ${nictab}
+    } || {
+      cat <<-EOS
+	ifname=eth0 ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw}
+	EOS
+    }
+  } | egrep -v '^$|^#'
+}
+
 function config_interfaces() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
-  local ifindex=0
-  local ifname=eth${ifindex}
+  local line=
+  while read line; do
+    eval ${line}
+    install_interface ${chroot_dir} ${ifname}
+  done < <(nictabinfo)
+}
+
+function install_interface() {
+  local chroot_dir=$1 ifname=${2:-eth0}
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
   local ifcfg_path=/etc/sysconfig/network-scripts/ifcfg-${ifname}
 
   printf "[INFO] Generating %s\n" ${ifcfg_path}
