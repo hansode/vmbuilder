@@ -623,7 +623,11 @@ function config_interfaces() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
-  install_interface ${chroot_dir} eth0
+  local line=
+  while read line; do
+    eval ${line}
+    install_interface ${chroot_dir} ${ifname}
+  done < <(nictabinfo)
 }
 
 function install_interface() {
