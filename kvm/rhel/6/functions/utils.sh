@@ -5,7 +5,7 @@
 #
 # requires:
 #  bash
-#  pwd, stat
+#  pwd, stat, chroot
 #
 # imports:
 #
@@ -76,6 +76,13 @@ function run_cmd() {
   export LANG=C
   export LC_ALL=C
   eval $*
+}
+
+function run_in_target() {
+  local chroot_dir=$1; shift; local args="$*"
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (utils:${LINENO})" >&2; return 1; }
+
+  chroot ${chroot_dir} bash -e -c "${args}"
 }
 
 function checkroot() {
