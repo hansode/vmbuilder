@@ -1,0 +1,18 @@
+# -*-Text-file-*-
+#
+# requires:
+#  vmbuilder.sh
+#
+# description:
+#  configuring network interfaces
+#
+# usage:
+#  $ vmbuilder.sh --nictab=[FILE]
+#
+# format:
+#  + ifname=STRING ip=STRING mask=STRING net=STRING bcast=STRING gw=STRING
+#  + vmbuilder.sh ignores '^#|^$'
+#
+ifname=eth0 ip=192.0.2.10 mask=255.255.255.0 net=192.0.2.0 bcast=192.0.2.255 gw=192.0.2.1
+ifname=eth1 ip=192.0.2.11 mask=255.255.255.0 net=192.0.2.0 bcast=192.0.2.255 gw=192.0.2.1
+ifname=eth3 ip=192.0.2.13 mask=255.255.255.0 net=192.0.2.0 bcast=192.0.2.255 gw=192.0.2.1
