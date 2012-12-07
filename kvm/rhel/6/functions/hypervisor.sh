@@ -5,6 +5,7 @@
 #
 # requires:
 #  bash
+#  pwd
 #  mount, umount
 #  mkdir, rmdir
 #  rsync, sync
@@ -26,7 +27,7 @@ function add_option_hypervisor() {
   add_option_distro
 
   distro=${distro_name}-${distro_ver}_${distro_arch}
-  distro_dir=${distro_dir:-${abs_dirname}/${distro}}
+  distro_dir=${distro_dir:-$(pwd)/${distro}}
 
   max_mount_count=${max_mount_count:-37}
   interval_between_check=${interval_between_check:-180}

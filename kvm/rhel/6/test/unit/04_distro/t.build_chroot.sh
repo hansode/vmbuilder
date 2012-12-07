@@ -10,6 +10,9 @@
 
 ## variables
 
+declare distro_name=centos
+declare distro_ver=6
+
 ## public functions
 
 function setUp() {
@@ -19,8 +22,13 @@ function setUp() {
   function cleanup_distro() { echo cleanup_distro $*; }
 }
 
-function test_build_chroot() {
+function test_build_chroot_defined_chroot_dir() {
   build_chroot ${chroot_dir}
+  assertEquals $? 0
+}
+
+function test_build_chroot_undefined_chroot_dir() {
+  build_chroot
   assertEquals $? 0
 }
 
