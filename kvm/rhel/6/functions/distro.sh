@@ -7,14 +7,14 @@
 #  bash
 #  cat
 #  yum, mkdir, arch
-#  chroot, pwconv, chroot, chkconfig, grub, grub2-mkconfig, grub2-set-default
+#  pwconv, chkconfig, grub, grub2-mkconfig, grub2-set-default
 #  cp, rm, ln, touch, rsync
 #  find, egrep, sed, xargs
 #  mount, umount
 #  ls, tail
 #
 # imports:
-#  utils: is_dev, checkroot
+#  utils: is_dev, checkroot, run_in_target
 #  disk: mkdevice, mkprocdir, mount_proc, umount_nonroot, xptabinfo, mntpntuuid, get_grub_id, lsdevmap, devmap2lodev
 #
 
@@ -253,11 +253,11 @@ function update_passwords() {
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
   printf "[INFO] Updating passwords\n"
-  chroot ${chroot_dir} pwconv
-  chroot ${chroot_dir} bash -c "echo root:${rootpass} | chpasswd"
+  run_in_target ${chroot_dir} pwconv
+  run_in_target ${chroot_dir} "echo root:${rootpass} | chpasswd"
 
   [[ -z "${devel_user}" ]] || {
-    chroot ${chroot_dir} bash -c "echo ${devel_user}:${devel_pass:-${devel_user}} | chpasswd"
+    run_in_target ${chroot_dir} "echo ${devel_user}:${devel_pass:-${devel_user}} | chpasswd"
   }
 }
 
@@ -269,8 +269,8 @@ function create_initial_user() {
     local devel_group=${devel_user}
     local devel_home=/home/${devel_user}
 
-    chroot ${chroot_dir} bash -c "getent group  ${devel_group} >/dev/null || groupadd ${devel_group}"
-    chroot ${chroot_dir} bash -c "getent passwd ${devel_user}  >/dev/null || useradd -g ${devel_group} -d ${devel_home} -s /bin/bash -m ${devel_user}"
+    run_in_target ${chroot_dir} "getent group  ${devel_group} >/dev/null || groupadd ${devel_group}"
+    run_in_target ${chroot_dir} "getent passwd ${devel_user}  >/dev/null || useradd -g ${devel_group} -d ${devel_home} -s /bin/bash -m ${devel_user}"
 
     echo "${devel_user} ALL=(ALL) NOPASSWD: ALL" >> ${chroot_dir}/etc/sudoers
   }
@@ -292,8 +292,8 @@ function prevent_daemons_starting() {
 
  #local svc= dummy=
  #while read svc dummy; do
- #  chroot ${chroot_dir} chkconfig --del ${svc}
- #done < <(chroot ${chroot_dir} chkconfig --list | egrep -v :on)
+ #  run_in_target ${chroot_dir} chkconfig --del ${svc}
+ #done < <(run_in_target ${chroot_dir} chkconfig --list | egrep -v :on)
 }
 
 function preferred_grub() {
@@ -425,14 +425,14 @@ function install_bootloader() {
     grub_cmd="grub2-setup ${target_device}"
 
     install_grub2 ${chroot_dir}
-    chroot        ${chroot_dir} grub2-install ${target_device}
+    run_in_target ${chroot_dir} grub2-install ${target_device}
     ;;
   esac
 
   is_dev ${disk_filename} && {
     grub_cmd="${grub_cmd} --device-map=${chroot_dir}/${devmapfile}"
   } || {
-    grub_cmd="chroot ${chroot_dir} ${grub_cmd} --device-map=${devmapfile}"
+    grub_cmd="run_in_target ${chroot_dir} ${grub_cmd} --device-map=${devmapfile}"
   }
 
   case "$(preferred_grub)" in
@@ -500,8 +500,8 @@ function install_menu_lst_grub2() {
 
   printf "[INFO] Generating /boot/grub2/grub.cfg\n"
 
-  chroot ${chroot_dir} grub2-mkconfig -o /boot/grub2/grub.cfg
-  chroot ${chroot_dir} grub2-set-default 0
+  run_in_target ${chroot_dir} grub2-mkconfig -o /boot/grub2/grub.cfg
+  run_in_target ${chroot_dir} grub2-set-default 0
 
   mangle_grub_menu_lst_grub2 ${chroot_dir} ${disk_filename}
 

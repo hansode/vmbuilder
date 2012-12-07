@@ -23,7 +23,7 @@ function tearDown() {
 }
 
 function test_update_passwords() {
-  update_passwords ${chroot_dir} | egrep -q "^chroot ${chroot_dir} bash -c echo root:root | chpasswd"
+  update_passwords ${chroot_dir} | egrep -q "^chroot ${chroot_dir} bash -e -c echo root:root | chpasswd"
   assertEquals $? 0
 }
 
