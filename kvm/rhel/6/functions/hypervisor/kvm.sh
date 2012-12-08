@@ -127,3 +127,21 @@ function kvmof() {
 
   list_kvm | egrep -w -- "-name ${name}"
 }
+
+function info_kvm() {
+  local name=$1
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  kvmof ${name} | beautify_process_args
+  echo
+
+  local pid=$(kvmof ${name} | awk '{print $2}')
+  [[ -z "${pid}" ]] || {
+    echo
+    # 1. list kvm process fd
+    # 2. delete "total XXX"
+    # 3. order by fd number
+    ls -l /proc/${pid}/fd/ | sed -e 1d |  sort -k 9 -n
+  }
+}
