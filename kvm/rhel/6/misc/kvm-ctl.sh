@@ -13,7 +13,7 @@
 #  ../vmbuilder.sh
 #
 # import:
-#  utils: extract_args, shlog, dump_process_args
+#  utils: extract_args, shlog, beautify_process_args
 #  hypervisor: qemu_kvm_path, gen_macaddr, build_vif_opt
 #
 # usage:
@@ -58,12 +58,7 @@ function run_kvm() {
   info)
     checkroot || return 1
 
-    while read arg; do
-      case "${arg}" in
-      -*) echo -n "${arg}"  ;;
-       *) echo    " ${arg}" ;;
-      esac
-    done < <(kvmof ${name} | dump_process_args)
+    kvmof ${name} | beautify_process_args
     echo
 
     local pid=$(kvmof ${name} | awk '{print $2}')
