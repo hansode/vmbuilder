@@ -53,7 +53,7 @@ function run_kvm() {
     stop_kvm ${monitor_addr} ${monitor_port}
     ;;
   console)
-    telnet ${serial_addr} ${serial_port}
+    console_kvm ${serial_addr} ${serial_port}
     ;;
   info)
     checkroot || return 1

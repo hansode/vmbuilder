@@ -104,3 +104,11 @@ function stop_kvm() {
   cat  <&5 >/dev/null
   exec <&5-
 }
+
+function console_kvm() {
+  local serial_addr=${1:-127.0.0.1} serial_port=${2:-5555}
+  [[ -n "${serial_addr}" ]] || { echo "[ERROR] Invalid argument: serial_addr:${serial_addr} (hypervisor/kvm:${LINENO})" >&2; return 1; }
+  [[ -n "${serial_port}" ]] || { echo "[ERROR] Invalid argument: serial_port:${serial_port} (hypervisor/kvm:${LINENO})" >&2; return 1; }
+
+  telnet ${serial_addr} ${serial_port}
+}
