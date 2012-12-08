@@ -272,7 +272,7 @@ function create_initial_user() {
     run_in_target ${chroot_dir} "getent group  ${devel_group} >/dev/null || groupadd ${devel_group}"
     run_in_target ${chroot_dir} "getent passwd ${devel_user}  >/dev/null || useradd -g ${devel_group} -d ${devel_home} -s /bin/bash -m ${devel_user}"
 
-    echo "${devel_user} ALL=(ALL) NOPASSWD: ALL" >> ${chroot_dir}/etc/sudoers
+    egrep ^${devel_user} -w ${chroot_dir}/etc/sudoers || { echo "${devel_user} ALL=(ALL) NOPASSWD: ALL" >> ${chroot_dir}/etc/sudoers; }
   }
 
   update_passwords ${chroot_dir}
