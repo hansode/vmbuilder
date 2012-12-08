@@ -640,14 +640,22 @@ function install_interface() {
   local ifcfg_path=/etc/sysconfig/network-scripts/ifcfg-${ifname}
 
   printf "[INFO] Generating %s\n" ${ifcfg_path}
+  render_interface_ethernet ${chroot_dir} ${ifname} > ${chroot_dir}/${ifcfg_path}
+  cat ${chroot_dir}/${ifcfg_path}
+}
+
+function render_interface_ethernet() {
+  local chroot_dir=$1 ifname=${2:-eth0}
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
   [[ -z "${ip}" ]] && {
-    cat <<-EOS > ${chroot_dir}${ifcfg_path}
+    cat <<-EOS
 	DEVICE=${ifname}
 	BOOTPROTO=dhcp
 	ONBOOT=yes
 	EOS
   } || {
-    cat <<-EOS > ${chroot_dir}${ifcfg_path}
+    cat <<-EOS
 	DEVICE=${ifname}
 	BOOTPROTO=static
 	ONBOOT=yes
@@ -658,7 +666,6 @@ function install_interface() {
 	$([[ -z "${gw}"    ]] || echo "GATEWAY=${gw}")
 	EOS
   }
-  cat ${chroot_dir}${ifcfg_path}
 }
 
 function install_resolv_conf() {
