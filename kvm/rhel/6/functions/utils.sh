@@ -6,6 +6,7 @@
 # requires:
 #  bash
 #  pwd, stat, chroot
+#  cat, xargs, cut,sed
 #
 # imports:
 #
@@ -142,4 +143,8 @@ function inodeof() {
 function shlog() {
   echo "\$ $*"
   eval $*
+}
+
+function dump_process_args() {
+  cat | xargs echo | cut -d' ' -f9- | sed "s, ,\n,g"
 }
