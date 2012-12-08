@@ -5,7 +5,7 @@
 #
 # requires:
 #  bash
-#  pwd
+#  pwd, date
 #  mount, umount
 #  mkdir, rmdir
 #  rsync, sync
@@ -266,4 +266,28 @@ function viftabproc() {
   while read index vif_name macaddr bridge_if; do
     eval "${blk}"
   done < <(viftabinfo | cat -n)
+}
+
+function gen_macaddr() {
+  local offset=${1:-0}
+  printf "%s:%s\n" ${vendor_id:-52:54:00} $(date --date "${offset} hour ago" +%H:%M:%S)
+}
+
+function build_vif_opt() {
+  local vif_name macaddr bridge_if
+
+  viftabproc <<-'EOS'
+    local offset=$((${index} - 1))
+    local netdev_id=hostnet${offset}
+    # "addr" should be more than 0x3
+    local addr="0x$((3 + ${offset}))"
+
+    case "${macaddr}" in
+    "-") macaddr=$(gen_macaddr ${offset}) ;;
+    esac
+
+    echo \
+      -netdev tap,ifname=${vif_name},id=${netdev_id},script=,downscript= \
+      -device virtio-net-pci,netdev=${netdev_id},mac=${macaddr},bus=pci.0,addr=${addr}
+EOS
 }

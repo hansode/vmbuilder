@@ -14,7 +14,7 @@
 #
 # import:
 #  utils: extract_args, shlog
-#  hypervisor: qemu_kvm_path
+#  hypervisor: qemu_kvm_path, gen_macaddr, build_vif_opt
 #
 # usage:
 #
@@ -59,30 +59,6 @@ function register_options() {
   viftab=${viftab:-}
 
   vendor_id=${vendor_id:-52:54:00}
-}
-
-function gen_macaddr() {
-  local offset=${1:-0}
-  printf "%s:%s" ${vendor_id} $(date --date "${offset} hour ago" +%H:%M:%S)
-}
-
-function build_vif_opt() {
-  local vif_name macaddr bridge_if
-
-  viftabproc <<-'EOS'
-    local offset=$((${index} - 1))
-    local netdev_id=hostnet${offset}
-    # "addr" should be more than 0x3
-    local addr="0x$((3 + ${offset}))"
-
-    case "${macaddr}" in
-    "-") macaddr=$(gen_macaddr ${offset}) ;;
-    esac
-
-    echo \
-      -netdev tap,ifname=${vif_name},id=${netdev_id},script=,downscript= \
-      -device virtio-net-pci,netdev=${netdev_id},mac=${macaddr},bus=pci.0,addr=${addr}
-EOS
 }
 
 function kvmof() {
