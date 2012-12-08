@@ -80,6 +80,7 @@ function load_hypervisor_driver() {
   [[ -f "${driver_path}" ]] || { echo "[ERROR] no such driver: ${driver_path} (hypervisor:${LINENO})" >&2; return 1; }
 
   . ${driver_path}
+  add_option_hypervisor_${driver_name}
 }
 
 function preflight_check_hypervisor() {

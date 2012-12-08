@@ -11,6 +11,10 @@
 #  hypervisor: viftabproc
 #
 
+function add_option_hypervisor_kvm() {
+  :
+}
+
 function qemu_kvm_path() {
   local execs="/usr/libexec/qemu-kvm /usr/bin/kvm"
 
