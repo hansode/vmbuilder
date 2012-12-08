@@ -643,7 +643,10 @@ function install_interface() {
 
   iftype=$(echo ${iftype} | tr A-Z a-z)
   case ${iftype} in
-  ethernet|bridge|ovsbridge)
+  ethernet|ovsbridge)
+    ;;
+  bridge)
+    run_yum ${chroot_dir} install bridge-utils
     ;;
   *)
     echo "[ERROR] no mutch iftype: ${iftype} (distro:${LINENO})" >&2

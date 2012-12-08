@@ -14,6 +14,7 @@
 
 function setUp() {
   mkdir -p ${chroot_dir}/etc/sysconfig/network-scripts
+  function run_yum() { echo run_yum $*; }
 }
 
 function tearDown() {
