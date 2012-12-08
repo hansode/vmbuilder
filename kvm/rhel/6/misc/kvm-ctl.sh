@@ -14,6 +14,7 @@
 # import:
 #  utils: extract_args, shlog, beautify_process_args
 #  hypervisor: qemu_kvm_path, gen_macaddr, build_vif_opt, kvmof
+#              start_kvm, stop_kvm, console_kvm, info_kvm, list_kvm, dump_kvm
 #
 # usage:
 #
@@ -54,29 +55,7 @@ function run_kvm() {
     list_kvm
     ;;
   dump)
-    cat <<-EOS
-	name=${name}
-	image_format=${image_format}
-	image_file=${image_file}
-	image_path=${image_path}
-
-	brname=${brname}
-
-	kvm_path=${kvm_path}
-	kvm_opts=${kvm_opts}
-
-	mem_size=${mem_size}
-	cpu_num=${cpu_num}
-
-	vnc_addr=${vnc_addr}
-	vnc_port=${vnc_port}
-
-	monitor_addr=${monitor_addr}
-	monitor_port=${monitor_port}
-
-	serial_addr=${serial_addr}
-	serial_port=${serial_port}
-	EOS
+    dump_kvm
     ;;
   *)
     echo $"USAGE: $0 [start] OPTIONS..." >&2

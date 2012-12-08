@@ -145,3 +145,29 @@ function info_kvm() {
     ls -l /proc/${pid}/fd/ | sed -e 1d |  sort -k 9 -n
   }
 }
+
+function dump_kvm() {
+  cat <<-EOS
+	name=${name}
+	image_format=${image_format}
+	image_file=${image_file}
+	image_path=${image_path}
+
+	brname=${brname}
+
+	kvm_path=${kvm_path}
+	kvm_opts=${kvm_opts}
+
+	mem_size=${mem_size}
+	cpu_num=${cpu_num}
+
+	vnc_addr=${vnc_addr}
+	vnc_port=${vnc_port}
+
+	monitor_addr=${monitor_addr}
+	monitor_port=${monitor_port}
+
+	serial_addr=${serial_addr}
+	serial_port=${serial_port}
+	EOS
+}
