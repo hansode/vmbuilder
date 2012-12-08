@@ -35,19 +35,19 @@ function add_option_distro() {
 
   distro_name=$(get_normalized_distro_name ${distro_name})
 
-  local distro_driver_name="${distro_name}$(get_distro_major_ver ${distro_ver})"
-  case "${distro_driver_name}" in
+  local driver_name="${distro_name}$(get_distro_major_ver ${distro_ver})"
+  case "${driver_name}" in
   rhel6|centos6|sl6)
-    load_distro_driver ${distro_driver_name}
+    load_distro_driver ${driver_name}
     ;;
   rhel5|centos5)
-    load_distro_driver ${distro_driver_name}
+    load_distro_driver ${driver_name}
     ;;
   rhel4|centos4)
-    load_distro_driver ${distro_driver_name}
+    load_distro_driver ${driver_name}
     ;;
   fedora[7-9]|fedora1[0-7])
-    load_distro_driver ${distro_driver_name}
+    load_distro_driver ${driver_name}
     ;;
   *)
     echo "[ERROR] no mutch distro (distro:${LINENO})" >&2
@@ -63,14 +63,14 @@ function add_option_distro() {
 }
 
 function load_distro_driver() {
-  local distro_driver_name=$1
-  [[ -n "${distro_driver_name}" ]] || { echo "[ERROR] Invalid argument: distro_driver_name:${distro_driver_name} (distro:${LINENO})" >&2; return 1; }
+  local driver_name=$1
+  [[ -n "${driver_name}" ]] || { echo "[ERROR] Invalid argument: driver_name:${driver_name} (distro:${LINENO})" >&2; return 1; }
 
-  local distro_driver_path=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/distro/${distro_driver_name}.sh
+  local distro_driver_path=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/distro/${driver_name}.sh
   [[ -f "${distro_driver_path}" ]] || { echo "[ERROR] no such distro driver: ${distro_driver_path} (distro:${LINENO})" >&2; return 1; }
 
   . ${distro_driver_path}
-  add_option_distro_${distro_driver_name}
+  add_option_distro_${driver_name}
 }
 
 function get_normalized_distro_name() {
