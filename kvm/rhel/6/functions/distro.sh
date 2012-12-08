@@ -647,7 +647,7 @@ function install_interface() {
     {
      render_interface_${iftype} ${ifname}
      render_interface_netowrk_configuration
-    } > ${chroot_dir}/${ifcfg_path}
+    } | egrep -v '^$' > ${chroot_dir}/${ifcfg_path}
     ;;
   *)
     echo "[ERROR] no mutch iftype: ${iftype} (distro:${LINENO})" >&2
