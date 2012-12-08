@@ -6,8 +6,10 @@
 # requires:
 #  bash
 #  /usr/libexec/qemu-kvm, /usr/bin/kvm
+#  cat, ip, brctl, telnet, ps, egrep
 #
 # imports:
+#  utils: shlog
 #  hypervisor: viftabproc
 #
 
@@ -111,4 +113,9 @@ function console_kvm() {
   [[ -n "${serial_port}" ]] || { echo "[ERROR] Invalid argument: serial_port:${serial_port} (hypervisor/kvm:${LINENO})" >&2; return 1; }
 
   telnet ${serial_addr} ${serial_port}
+}
+
+function list_kvm() {
+  local kvm_path=${kvm_path:-$(qemu_kvm_path)}
+  ps -ef | egrep -w ${kvm_path} | egrep -v "egrep -w ${kvm_path}"
 }

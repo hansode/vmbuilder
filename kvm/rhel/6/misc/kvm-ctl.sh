@@ -7,8 +7,8 @@
 #  bash
 #  dirname, pwd
 #  sed, head
-#  date, seq, cat, ip, brctl
-#  telnet, ps, egrep, xargs, cut
+#  cat
+#  egrep, xargs, cut
 #  awk, ls, sort
 #  ../vmbuilder.sh
 #
@@ -76,7 +76,7 @@ function run_kvm() {
     }
     ;;
   list)
-    ps -ef | egrep -w ${kvm_path} | egrep -v "egrep -w ${kvm_path}"
+    list_kvm
     ;;
   dump)
     cat <<-EOS
