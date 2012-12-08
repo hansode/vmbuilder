@@ -270,4 +270,4 @@ function gen_macaddr() {
   printf "%s:%s\n" ${vendor_id:-52:54:00} $(date --date "${offset} hour ago" +%H:%M:%S)
 }
 
-. $(dirname ${BASH_SOURCE[0]})/hypervisor/kvm.sh
+load_hypervisor_driver kvm
