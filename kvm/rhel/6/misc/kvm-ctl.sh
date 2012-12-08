@@ -8,13 +8,12 @@
 #  dirname, pwd
 #  sed, head
 #  cat
-#  egrep, xargs, cut
 #  awk, ls, sort
 #  ../vmbuilder.sh
 #
 # import:
 #  utils: extract_args, shlog, beautify_process_args
-#  hypervisor: qemu_kvm_path, gen_macaddr, build_vif_opt
+#  hypervisor: qemu_kvm_path, gen_macaddr, build_vif_opt, kvmof
 #
 # usage:
 #
@@ -31,13 +30,6 @@ function register_options() {
 
   config_path=${config_path:-}
   name=${name:-rhel6}
-}
-
-function kvmof() {
-  local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (kvm-ctl:${LINENO})" >&2; return 1; }
-
-  list_kvm | egrep -w -- "-name ${name}"
 }
 
 function run_kvm() {

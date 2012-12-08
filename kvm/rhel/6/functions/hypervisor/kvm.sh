@@ -7,6 +7,7 @@
 #  bash
 #  /usr/libexec/qemu-kvm, /usr/bin/kvm
 #  cat, ip, brctl, telnet, ps, egrep
+#  xargs, cut
 #
 # imports:
 #  utils: shlog
@@ -118,4 +119,11 @@ function console_kvm() {
 function list_kvm() {
   local kvm_path=${kvm_path:-$(qemu_kvm_path)}
   ps -ef | egrep -w ${kvm_path} | egrep -v "egrep -w ${kvm_path}"
+}
+
+function kvmof() {
+  local name=$1
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
+
+  list_kvm | egrep -w -- "-name ${name}"
 }
