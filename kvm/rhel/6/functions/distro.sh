@@ -629,36 +629,99 @@ function config_interfaces() {
   local line=
   while read line; do
     eval ${line}
-    install_interface ${chroot_dir} ${ifname}
+    install_interface ${chroot_dir} ${ifname} ${iftype}
   done < <(nictabinfo)
 }
 
 function install_interface() {
-  local chroot_dir=$1 ifname=${2:-eth0}
+  local chroot_dir=$1 ifname=${2:-eth0} iftype=${3:-ethernet}
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
   local ifcfg_path=/etc/sysconfig/network-scripts/ifcfg-${ifname}
 
   printf "[INFO] Generating %s\n" ${ifcfg_path}
+
+  iftype=$(echo ${iftype} | tr A-Z a-z)
+  case ${iftype} in
+  ethernet|ovsbridge)
+    ;;
+  bridge)
+    run_yum ${chroot_dir} install bridge-utils
+    ;;
+  *)
+    echo "[ERROR] no mutch iftype: ${iftype} (distro:${LINENO})" >&2
+    return 1
+    ;;
+  esac
+
+  {
+    render_interface_${iftype} ${ifname}
+    render_interface_netowrk_configuration
+  } | egrep -v '^$' > ${chroot_dir}/${ifcfg_path}
+  cat ${chroot_dir}/${ifcfg_path}
+}
+
+function render_interface_netowrk_configuration() {
   [[ -z "${ip}" ]] && {
-    cat <<-EOS > ${chroot_dir}${ifcfg_path}
-	DEVICE=${ifname}
-	BOOTPROTO=dhcp
-	ONBOOT=yes
+    local bootproto
+
+    [[ -z "${bridge}" ]] && {
+      bootproto=dhcp
+    } || {
+      bootproto=none
+    }
+
+    cat <<-EOS
+	BOOTPROTO=${bootproto}
 	EOS
   } || {
-    cat <<-EOS > ${chroot_dir}${ifcfg_path}
-	DEVICE=${ifname}
+    cat <<-EOS
 	BOOTPROTO=static
-	ONBOOT=yes
 	IPADDR=${ip}
-	$([[ -z "${mask}"  ]] || echo "NETMASK=${mask}")
-	$([[ -z "${net}"   ]] || echo "NETWORK=${net}")
-	$([[ -z "${bcast}" ]] || echo "BROADCAST=${bcast}")
-	$([[ -z "${gw}"    ]] || echo "GATEWAY=${gw}")
+	$([[ -z "${mask}"   ]] || echo "NETMASK=${mask}")
+	$([[ -z "${net}"    ]] || echo "NETWORK=${net}")
+	$([[ -z "${bcast}"  ]] || echo "BROADCAST=${bcast}")
+	$([[ -z "${gw}"     ]] || echo "GATEWAY=${gw}")
 	EOS
   }
-  cat ${chroot_dir}${ifcfg_path}
+}
+
+function render_interface_ethernet() {
+  local ifname=${1:-eth0}
+
+  cat <<-EOS
+	DEVICE=${ifname}
+	TYPE=Ethernet
+	ONBOOT=yes
+	$([[ -z "${bridge}" ]] || echo "BRIDGE=${bridge}")
+	EOS
+}
+
+function render_interface_bridge() {
+  local ifname=${1:-br0}
+
+  cat <<-EOS
+	DEVICE=${ifname}
+	TYPE=Bridge
+	ONBOOT=yes
+	EOS
+}
+
+function render_interface_ovsbridge() {
+  local ifname=${1:-br0}
+
+  cat <<-EOS
+	DEVICE=${ifname}
+	TYPE=OVSBridge
+	ONBOOT=yes
+	NM_CONTROLLED=no
+	DEVICETYPE=ovs
+	OVS_EXTRA="\\
+	 set bridge     \${DEVICE} other_config:disable-in-band=true --\\
+	 set-fail-mode  \${DEVICE} secure --\\
+	 set-controller \${DEVICE} unix:/var/run/openvswitch/\${DEVICE}.controller
+	"
+	EOS
 }
 
 function install_resolv_conf() {
