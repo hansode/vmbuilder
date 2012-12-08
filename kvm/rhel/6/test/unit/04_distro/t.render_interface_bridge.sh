@@ -12,24 +12,16 @@
 
 ## public functions
 
-function setUp() {
-  mkdir -p ${chroot_dir}/etc/sysconfig/network-scripts
-}
-
-function tearDown() {
-  rm -rf ${chroot_dir}
-}
-
 ### set value
 
 function test_render_interface_bridge_br0() {
-  render_interface_bridge ${chroot_dir} br0
+  render_interface_bridge br0
   assertEquals $? 0
 }
 
 function test_render_interface_bridge_br1() {
   local ip=192.0.2.1
-  render_interface_bridge ${chroot_dir} br1
+  render_interface_bridge br1
   assertEquals $? 0
 }
 

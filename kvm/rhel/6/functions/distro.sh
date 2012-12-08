@@ -644,7 +644,7 @@ function install_interface() {
   iftype=$(echo ${iftype} | tr A-Z a-z)
   case ${iftype} in
   ethernet|bridge)
-    render_interface_${iftype} ${chroot_dir} ${ifname} > ${chroot_dir}/${ifcfg_path}
+    render_interface_${iftype} ${ifname} > ${chroot_dir}/${ifcfg_path}
     ;;
   *)
     echo "[ERROR] no mutch iftype: ${iftype} (distro:${LINENO})" >&2
@@ -672,8 +672,7 @@ function render_interface_netowrk_configuration() {
 }
 
 function render_interface_ethernet() {
-  local chroot_dir=$1 ifname=${2:-eth0}
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  local ifname=${1:-eth0}
 
   cat <<-EOS
 	DEVICE=${ifname}
@@ -686,8 +685,7 @@ function render_interface_ethernet() {
 }
 
 function render_interface_bridge() {
-  local chroot_dir=$1 ifname=${2:-br0}
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  local ifname=${1:-br0}
 
   cat <<-EOS
 	DEVICE=${ifname}
