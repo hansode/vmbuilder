@@ -37,7 +37,7 @@ function kvmof() {
   local name=$1
   [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (kvm-ctl:${LINENO})" >&2; return 1; }
 
-  $0 list | egrep -w -- "-name ${name}"
+  list_kvm | egrep -w -- "-name ${name}"
 }
 
 function run_kvm() {
