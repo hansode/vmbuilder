@@ -269,5 +269,3 @@ function gen_macaddr() {
   local offset=${1:-0}
   printf "%s:%s\n" ${vendor_id:-52:54:00} $(date --date "${offset} hour ago" +%H:%M:%S)
 }
-
-load_hypervisor_driver kvm

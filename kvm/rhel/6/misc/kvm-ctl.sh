@@ -166,6 +166,7 @@ readonly abs_dirname=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
 
 . ${abs_dirname}/../functions/utils.sh
 . ${abs_dirname}/../functions/hypervisor.sh
+. ${abs_dirname}/../functions/hypervisor/kvm.sh
 
 ### prepare
 
