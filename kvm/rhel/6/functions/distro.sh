@@ -654,17 +654,7 @@ function install_interface() {
   cat ${chroot_dir}/${ifcfg_path}
 }
 
-function render_interface_ethernet() {
-  local chroot_dir=$1 ifname=${2:-eth0}
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-
-  cat <<-EOS
-	DEVICE=${ifname}
-	TYPE=Ethernet
-	ONBOOT=yes
-	$([[ -z "${bridge}" ]] || echo "BRIDGE=${bridge}")
-	EOS
-
+function render_interface_netowrk_configuration() {
   [[ -z "${ip}" ]] && {
     cat <<-EOS
 	BOOTPROTO=dhcp
@@ -681,6 +671,20 @@ function render_interface_ethernet() {
   }
 }
 
+function render_interface_ethernet() {
+  local chroot_dir=$1 ifname=${2:-eth0}
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  cat <<-EOS
+	DEVICE=${ifname}
+	TYPE=Ethernet
+	ONBOOT=yes
+	$([[ -z "${bridge}" ]] || echo "BRIDGE=${bridge}")
+	EOS
+
+  render_interface_netowrk_configuration
+}
+
 function render_interface_bridge() {
   local chroot_dir=$1 ifname=${2:-br0}
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
@@ -691,20 +695,7 @@ function render_interface_bridge() {
 	ONBOOT=yes
 	EOS
 
-  [[ -z "${ip}" ]] && {
-    cat <<-EOS
-	BOOTPROTO=dhcp
-	EOS
-  } || {
-    cat <<-EOS
-	BOOTPROTO=static
-	IPADDR=${ip}
-	$([[ -z "${mask}"   ]] || echo "NETMASK=${mask}")
-	$([[ -z "${net}"    ]] || echo "NETWORK=${net}")
-	$([[ -z "${bcast}"  ]] || echo "BROADCAST=${bcast}")
-	$([[ -z "${gw}"     ]] || echo "GATEWAY=${gw}")
-	EOS
-  }
+  render_interface_netowrk_configuration
 }
 
 function install_resolv_conf() {
