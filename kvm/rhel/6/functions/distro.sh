@@ -629,18 +629,28 @@ function config_interfaces() {
   local line=
   while read line; do
     eval ${line}
-    install_interface ${chroot_dir} ${ifname}
+    install_interface ${chroot_dir} ${ifname} ${iftype}
   done < <(nictabinfo)
 }
 
 function install_interface() {
-  local chroot_dir=$1 ifname=${2:-eth0}
+  local chroot_dir=$1 ifname=${2:-eth0} iftype=${3:-ethernet}
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
   local ifcfg_path=/etc/sysconfig/network-scripts/ifcfg-${ifname}
 
   printf "[INFO] Generating %s\n" ${ifcfg_path}
-  render_interface_ethernet ${chroot_dir} ${ifname} > ${chroot_dir}/${ifcfg_path}
+
+  iftype=$(echo ${iftype} | tr A-Z a-z)
+  case ${iftype} in
+  ethernet)
+    render_interface_${iftype} ${chroot_dir} ${ifname} > ${chroot_dir}/${ifcfg_path}
+    ;;
+  *)
+    echo "[ERROR] no mutch iftype: ${iftype} (distro:${LINENO})" >&2
+    return 1
+    ;;
+  esac
   cat ${chroot_dir}/${ifcfg_path}
 }
 
@@ -651,12 +661,14 @@ function render_interface_ethernet() {
   [[ -z "${ip}" ]] && {
     cat <<-EOS
 	DEVICE=${ifname}
+	TYPE=Ethernet
 	BOOTPROTO=dhcp
 	ONBOOT=yes
 	EOS
   } || {
     cat <<-EOS
 	DEVICE=${ifname}
+	TYPE=Ethernet
 	BOOTPROTO=static
 	ONBOOT=yes
 	IPADDR=${ip}
