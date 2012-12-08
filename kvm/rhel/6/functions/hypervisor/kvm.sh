@@ -93,3 +93,14 @@ function start_kvm() {
     [[ -z "${bridge_if}" ]] || shlog brctl addif ${bridge_if} ${vif_name}
 EOS
 }
+
+function stop_kvm() {
+  local monitor_addr=${1:-127.0.0.1} monitor_port=${2:-4444}
+  [[ -n "${monitor_addr}" ]] || { echo "[ERROR] Invalid argument: monitor_addr:${monitor_addr} (hypervisor/kvm:${LINENO})" >&2; return 1; }
+  [[ -n "${monitor_port}" ]] || { echo "[ERROR] Invalid argument: monitor_port:${monitor_port} (hypervisor/kvm:${LINENO})" >&2; return 1; }
+
+  exec 5<>/dev/tcp/${monitor_addr}/${monitor_port}
+  echo quit >&5
+  cat  <&5 >/dev/null
+  exec <&5-
+}

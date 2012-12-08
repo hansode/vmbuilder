@@ -50,10 +50,7 @@ function run_kvm() {
     start_kvm ${name}
     ;;
   stop)
-    exec 5<>/dev/tcp/${monitor_addr}/${monitor_port}
-    echo quit >&5
-    cat  <&5 >/dev/null
-    exec <&5-
+    stop_kvm ${monitor_addr} ${monitor_port}
     ;;
   console)
     telnet ${serial_addr} ${serial_port}
