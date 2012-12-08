@@ -13,7 +13,7 @@
 #  ../vmbuilder.sh
 #
 # import:
-#  utils: extract_args, shlog
+#  utils: extract_args, shlog, dump_process_args
 #  hypervisor: qemu_kvm_path, gen_macaddr, build_vif_opt
 #
 # usage:
@@ -63,7 +63,7 @@ function run_kvm() {
       -*) echo -n "${arg}"  ;;
        *) echo    " ${arg}" ;;
       esac
-    done < <(kvmof ${name} | xargs echo | cut -d' ' -f9- | sed "s, ,\n,g")
+    done < <(kvmof ${name} | dump_process_args)
     echo
 
     local pid=$(kvmof ${name} | awk '{print $2}')
