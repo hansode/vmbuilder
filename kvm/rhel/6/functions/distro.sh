@@ -644,16 +644,17 @@ function install_interface() {
   iftype=$(echo ${iftype} | tr A-Z a-z)
   case ${iftype} in
   ethernet|bridge|ovsbridge)
-    {
-     render_interface_${iftype} ${ifname}
-     render_interface_netowrk_configuration
-    } | egrep -v '^$' > ${chroot_dir}/${ifcfg_path}
     ;;
   *)
     echo "[ERROR] no mutch iftype: ${iftype} (distro:${LINENO})" >&2
     return 1
     ;;
   esac
+
+  {
+    render_interface_${iftype} ${ifname}
+    render_interface_netowrk_configuration
+  } | egrep -v '^$' > ${chroot_dir}/${ifcfg_path}
   cat ${chroot_dir}/${ifcfg_path}
 }
 
