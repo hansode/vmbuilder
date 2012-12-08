@@ -266,7 +266,7 @@ function create_initial_user() {
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
   [[ -z "${devel_user}" ]] || {
-    printf "[INFO] Creating user: %s %s\n" ${devel_user}
+    printf "[INFO] Creating user: %s\n" ${devel_user}
 
     local devel_group=${devel_user}
     local devel_home=/home/${devel_user}
