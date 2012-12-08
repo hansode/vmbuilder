@@ -26,6 +26,7 @@ function setUp() {
   function mount_proc() { echo mount_proc $*; }
   function mount_dev() { echo mount_dev $*; }
   function mount_sys() { echo mount_sys $*; }
+  function create_initial_user() { echo create_initial_user $*; }
   function configure_networking() { echo configure_networking $*; }
   function configure_mounting() { echo configure_mounting $*; }
   function configure_keepcache() { echo configure_keepcache $*; }
