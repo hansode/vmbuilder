@@ -266,6 +266,8 @@ function create_initial_user() {
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
   [[ -z "${devel_user}" ]] || {
+    printf "[INFO] Creating user: %s %s\n" ${devel_user}
+
     local devel_group=${devel_user}
     local devel_home=/home/${devel_user}
 
@@ -551,7 +553,8 @@ function configure_os() {
   #  should decide where the better place is distro or hypervisor or both.
   #  so far following three functions are defined in distro.
   prevent_daemons_starting ${chroot_dir}
-  create_initial_user      ${chroot_dir}
+  # moved to hypervisor in order to use cached distro dir
+ #create_initial_user      ${chroot_dir}
   set_timezone             ${chroot_dir}
 
   install_resolv_conf      ${chroot_dir}

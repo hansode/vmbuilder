@@ -235,6 +235,9 @@ function install_os() {
   # need to mount /sys to install grub2
   mount_sys            ${chroot_dir}
 
+  # moved from distro in order to use cached distro dir
+  create_initial_user  ${chroot_dir}
+
   configure_networking ${chroot_dir}
   configure_mounting   ${chroot_dir} ${disk_filename}
   configure_keepcache  ${chroot_dir} ${keepcache}
