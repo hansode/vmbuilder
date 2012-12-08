@@ -25,7 +25,7 @@ function tearDown() {
 }
 
 function test_run_in_target() {
- run_in_target ${chroot_dir} date | egrep "chroot ${chroot_dir} bash -c -e date"
+ run_in_target ${chroot_dir} date | egrep "chroot ${chroot_dir} bash -e -c date"
  assertEquals $? 0
 }
 
