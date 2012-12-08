@@ -97,6 +97,7 @@ function register_options() {
 
   distro_name=${distro_name:-centos}
   distro_ver=${distro_ver:-6}
+  hypervisor=${hypervisor:-kvm}
 }
 
 ### environment variables
