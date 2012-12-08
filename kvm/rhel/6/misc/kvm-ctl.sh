@@ -30,35 +30,7 @@ function register_options() {
   [[ -z "${debug}" ]] || set -x
 
   config_path=${config_path:-}
-
   name=${name:-rhel6}
-
-  image_format=${image_format:-raw}
-  image_file=${image_file:-${name}.${image_format}}
-  image_path=${image_path:-${image_file}}
-
-  brname=${brname:-br0}
-
-  kvm_path=${kvm_path:-$(qemu_kvm_path)}
-  kvm_opts=${kvm_opts:-}
-
-  mem_size=${mem_size:-1024}
-  cpu_num=${cpu_num:-1}
-
-  vnc_addr=${vnc_addr:-0.0.0.0}
-  vnc_port=${vnc_port:-1001}
-  vnc_keymap=${vnc_keymap:-en-us} # [ en-us | ja ]
-
-  monitor_addr=${monitor_addr:-127.0.0.1}
-  monitor_port=${monitor_port:-4444}
-
-  serial_addr=${serial_addr:-127.0.0.1}
-  serial_port=${serial_port:-5555}
-
-  vif_num=${vif_num:-1}
-  viftab=${viftab:-}
-
-  vendor_id=${vendor_id:-52:54:00}
 }
 
 function kvmof() {
@@ -178,4 +150,5 @@ cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
 [[ -f "${config_path}" ]] && load_config ${config_path} || :
 register_options
+add_option_hypervisor_kvm
 run_kvm ${cmd}
