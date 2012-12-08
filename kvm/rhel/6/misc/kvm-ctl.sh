@@ -31,6 +31,7 @@ function register_options() {
 
   config_path=${config_path:-}
   name=${name:-rhel6}
+  hypervisor=kvm
 }
 
 function run_kvm() {
@@ -72,7 +73,6 @@ readonly abs_dirname=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
 
 . ${abs_dirname}/../functions/utils.sh
 . ${abs_dirname}/../functions/hypervisor.sh
-. ${abs_dirname}/../functions/hypervisor/kvm.sh
 
 ### prepare
 
@@ -84,5 +84,5 @@ cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
 [[ -f "${config_path}" ]] && load_config ${config_path} || :
 register_options
-add_option_hypervisor_kvm
+add_option_hypervisor
 run_kvm ${cmd}
