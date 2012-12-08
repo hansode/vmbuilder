@@ -31,6 +31,11 @@ function register_options() {
   distro_ver=${distro_ver:-6}
 }
 
+### environment variables
+
+export LANG=C
+export LC_ALL=C
+
 ### read-only variables
 
 readonly abs_dirname=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
