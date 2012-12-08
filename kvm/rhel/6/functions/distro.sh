@@ -643,7 +643,7 @@ function install_interface() {
 
   iftype=$(echo ${iftype} | tr A-Z a-z)
   case ${iftype} in
-  ethernet)
+  ethernet|bridge)
     render_interface_${iftype} ${chroot_dir} ${ifname} > ${chroot_dir}/${ifcfg_path}
     ;;
   *)
@@ -673,7 +673,32 @@ function render_interface_ethernet() {
     cat <<-EOS
 	BOOTPROTO=static
 	IPADDR=${ip}
-	$([[ -z "${bridge}" ]] || echo "BRIDGE=${bridge}")
+	$([[ -z "${mask}"   ]] || echo "NETMASK=${mask}")
+	$([[ -z "${net}"    ]] || echo "NETWORK=${net}")
+	$([[ -z "${bcast}"  ]] || echo "BROADCAST=${bcast}")
+	$([[ -z "${gw}"     ]] || echo "GATEWAY=${gw}")
+	EOS
+  }
+}
+
+function render_interface_bridge() {
+  local chroot_dir=$1 ifname=${2:-br0}
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  cat <<-EOS
+	DEVICE=${ifname}
+	TYPE=Bridge
+	ONBOOT=yes
+	EOS
+
+  [[ -z "${ip}" ]] && {
+    cat <<-EOS
+	BOOTPROTO=dhcp
+	EOS
+  } || {
+    cat <<-EOS
+	BOOTPROTO=static
+	IPADDR=${ip}
 	$([[ -z "${mask}"   ]] || echo "NETMASK=${mask}")
 	$([[ -z "${net}"    ]] || echo "NETWORK=${net}")
 	$([[ -z "${bcast}"  ]] || echo "BROADCAST=${bcast}")

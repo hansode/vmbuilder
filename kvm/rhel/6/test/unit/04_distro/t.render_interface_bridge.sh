@@ -22,18 +22,14 @@ function tearDown() {
 
 ### set value
 
-function test_install_interface_eth0() {
-  install_interface ${chroot_dir} eth0
+function test_render_interface_bridge_br0() {
+  render_interface_bridge ${chroot_dir} br0
   assertEquals $? 0
 }
 
-function test_install_interface_eth1() {
-  install_interface ${chroot_dir} eth1
-  assertEquals $? 0
-}
-
-function test_install_interface_br0() {
-  install_interface ${chroot_dir} br0 bridge
+function test_render_interface_bridge_br1() {
+  local ip=192.0.2.1
+  render_interface_bridge ${chroot_dir} br1
   assertEquals $? 0
 }
 
