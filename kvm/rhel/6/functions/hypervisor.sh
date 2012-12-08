@@ -5,13 +5,12 @@
 #
 # requires:
 #  bash
-#  pwd
+#  pwd, date
 #  mount, umount
 #  mkdir, rmdir
 #  rsync, sync
 #  egrep
 #  setarch
-#  /usr/libexec/qemu-kvm, /usr/bin/kvm
 #  cat, mv, chmod
 #
 # imports:
@@ -59,6 +58,29 @@ function add_option_hypervisor() {
   hostname=${hostname:-}
 
   nictab=${nictab:-}
+  viftab=${viftab:-}
+
+  hypervisor=${hypervisor:-}
+  case "${hypervisor}" in
+  kvm)
+    load_hypervisor_driver ${hypervisor}
+    ;;
+  *)
+    echo "[ERROR] no mutch hypervisor (hypervisor:${LINENO})" >&2
+    return 1
+    ;;
+  esac
+}
+
+function load_hypervisor_driver() {
+  local driver_name=$1
+  [[ -n "${driver_name}" ]] || { echo "[ERROR] Invalid argument: driver_name:${driver_name} (hypervisor:${LINENO})" >&2; return 1; }
+
+  local driver_path=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/hypervisor/${driver_name}.sh
+  [[ -f "${driver_path}" ]] || { echo "[ERROR] no such driver: ${driver_path} (hypervisor:${LINENO})" >&2; return 1; }
+
+  . ${driver_path}
+  add_option_hypervisor_${driver_name}
 }
 
 function preflight_check_hypervisor() {
@@ -228,14 +250,34 @@ function install_os() {
 
 ##
 
-function qemu_kvm_path() {
-  local execs="/usr/libexec/qemu-kvm /usr/bin/kvm"
+function viftabinfo() {
+  # format:
+  #  [vif_name] [macaddr] [bridge_if]
 
-  local command_path=
-  for exe in ${execs}; do
-    [[ -x "${exe}" ]] && command_path=${exe} || :
-  done
+  {
+    [[ -n "${viftab}" ]] && [[ -f "${viftab}" ]] && {
+      cat ${viftab}
+    } || {
+      local vif_name=${name:-rhel6}-${monitor_port:-4444}
+      for i in $(seq 1 ${vif_num}); do
+        local offset=$((${i} - 1)) suffix=
+        [[ "${offset}" == 0 ]] && suffix= || suffix=.${offset}
+        echo "${vif_name}${suffix} - ${brname:-br0}"
+      done
+    }
+  } | egrep -v '^$|^#'
+}
 
-  [[ -n "${command_path}" ]] || { echo "[ERROR] command not found: ${execs} (hypervisor:${LINENO})." >&2; return 1; }
-  echo ${command_path}
+function viftabproc() {
+  local blk="$(cat)"
+
+  local index vif_name macaddr bridge_if
+  while read index vif_name macaddr bridge_if; do
+    eval "${blk}"
+  done < <(viftabinfo | cat -n)
+}
+
+function gen_macaddr() {
+  local offset=${1:-0}
+  printf "%s:%s\n" ${vendor_id:-52:54:00} $(date --date "${offset} hour ago" +%H:%M:%S)
 }
