@@ -27,8 +27,14 @@ function test_render_interface_ethernet_eth0() {
   assertEquals $? 0
 }
 
-function test_render_interface_ethernet_eth0() {
+function test_render_interface_ethernet_eth1() {
   render_interface_ethernet ${chroot_dir} eth1
+  assertEquals $? 0
+}
+
+function test_render_interface_ethernet_eth0_br0() {
+  local bridge=br0
+  render_interface_ethernet ${chroot_dir} eth0
   assertEquals $? 0
 }
 

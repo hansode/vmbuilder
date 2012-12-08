@@ -664,6 +664,7 @@ function render_interface_ethernet() {
 	TYPE=Ethernet
 	BOOTPROTO=dhcp
 	ONBOOT=yes
+	$([[ -z "${bridge}"  ]] || echo "BRIDGE=${bridge}")
 	EOS
   } || {
     cat <<-EOS
@@ -672,10 +673,11 @@ function render_interface_ethernet() {
 	BOOTPROTO=static
 	ONBOOT=yes
 	IPADDR=${ip}
-	$([[ -z "${mask}"  ]] || echo "NETMASK=${mask}")
-	$([[ -z "${net}"   ]] || echo "NETWORK=${net}")
-	$([[ -z "${bcast}" ]] || echo "BROADCAST=${bcast}")
-	$([[ -z "${gw}"    ]] || echo "GATEWAY=${gw}")
+	$([[ -z "${bridge}"  ]] || echo "BRIDGE=${bridge}")
+	$([[ -z "${mask}"    ]] || echo "NETMASK=${mask}")
+	$([[ -z "${net}"     ]] || echo "NETWORK=${net}")
+	$([[ -z "${bcast}"   ]] || echo "BROADCAST=${bcast}")
+	$([[ -z "${gw}"      ]] || echo "GATEWAY=${gw}")
 	EOS
   }
 }
