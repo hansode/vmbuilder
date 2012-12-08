@@ -59,6 +59,17 @@ function add_option_hypervisor() {
 
   nictab=${nictab:-}
   viftab=${viftab:-}
+
+  hypervisor=${hypervisor:-}
+  case "${hypervisor}" in
+  kvm)
+    load_hypervisor_driver ${hypervisor}
+    ;;
+  *)
+    echo "[ERROR] no mutch hypervisor (hypervisor:${LINENO})" >&2
+    return 1
+    ;;
+  esac
 }
 
 function load_hypervisor_driver() {
