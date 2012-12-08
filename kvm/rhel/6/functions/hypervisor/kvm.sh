@@ -48,7 +48,7 @@ function qemu_kvm_path() {
     [[ -x "${exe}" ]] && command_path=${exe} || :
   done
 
-  [[ -n "${command_path}" ]] || { echo "[ERROR] command not found: ${execs} (hypervisor:${LINENO})." >&2; return 1; }
+  [[ -n "${command_path}" ]] || { echo "[ERROR] command not found: ${execs} (hypervisor/kvm:${LINENO})." >&2; return 1; }
   echo ${command_path}
 }
 
@@ -68,5 +68,28 @@ function build_vif_opt() {
     echo \
       -netdev tap,ifname=${vif_name},id=${netdev_id},script=,downscript= \
       -device virtio-net-pci,netdev=${netdev_id},mac=${macaddr},bus=pci.0,addr=${addr}
+EOS
+}
+
+function start_kvm() {
+  local name=${1}
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  shlog ${kvm_path} ${kvm_opts} \
+   -name     ${name} \
+   -m        ${mem_size} \
+   -smp      ${cpu_num} \
+   -vnc      ${vnc_addr}:${vnc_port} \
+   -k        ${vnc_keymap} \
+   -drive    file=${image_path},media=disk,boot=on,index=0,cache=none \
+   -monitor  telnet:${monitor_addr}:${monitor_port},server,nowait \
+   -serial   telnet:${serial_addr}:${serial_port},server,nowait \
+   $(build_vif_opt ${vif_num}) \
+   -daemonize
+
+  viftabproc <<'EOS'
+    shlog ip link set ${vif_name} up
+    [[ -z "${bridge_if}" ]] || shlog brctl addif ${bridge_if} ${vif_name}
 EOS
 }

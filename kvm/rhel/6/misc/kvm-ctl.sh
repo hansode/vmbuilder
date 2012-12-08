@@ -47,24 +47,7 @@ function run_kvm() {
     ${abs_dirname}/../vmbuilder.sh --config-path=${config_path}
     ;;
   start)
-    checkroot || return 1
-
-    shlog ${kvm_path} ${kvm_opts} \
-     -name     ${name} \
-     -m        ${mem_size} \
-     -smp      ${cpu_num} \
-     -vnc      ${vnc_addr}:${vnc_port} \
-     -k        ${vnc_keymap} \
-     -drive    file=${image_path},media=disk,boot=on,index=0,cache=none \
-     -monitor  telnet:${monitor_addr}:${monitor_port},server,nowait \
-     -serial   telnet:${serial_addr}:${serial_port},server,nowait \
-     $(build_vif_opt ${vif_num}) \
-     -daemonize
-
-    viftabproc <<'EOS'
-      shlog ip link set ${vif_name} up
-      [[ -z "${bridge_if}" ]] || shlog brctl addif ${bridge_if} ${vif_name}
-EOS
+    start_kvm ${name}
     ;;
   stop)
     exec 5<>/dev/tcp/${monitor_addr}/${monitor_port}
