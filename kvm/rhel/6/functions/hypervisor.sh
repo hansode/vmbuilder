@@ -61,6 +61,16 @@ function add_option_hypervisor() {
   viftab=${viftab:-}
 }
 
+function load_hypervisor_driver() {
+  local driver_name=$1
+  [[ -n "${driver_name}" ]] || { echo "[ERROR] Invalid argument: driver_name:${driver_name} (hypervisor:${LINENO})" >&2; return 1; }
+
+  local driver_path=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/hypervisor/${driver_name}.sh
+  [[ -f "${driver_path}" ]] || { echo "[ERROR] no such driver: ${driver_path} (hypervisor:${LINENO})" >&2; return 1; }
+
+  . ${driver_path}
+}
+
 function preflight_check_hypervisor() {
   :
 }
