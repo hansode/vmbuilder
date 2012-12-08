@@ -659,8 +659,16 @@ function install_interface() {
 
 function render_interface_netowrk_configuration() {
   [[ -z "${ip}" ]] && {
+    local bootproto
+
+    [[ -z "${bridge}" ]] && {
+      bootproto=dhcp
+    } || {
+      bootproto=none
+    }
+
     cat <<-EOS
-	BOOTPROTO=dhcp
+	BOOTPROTO=${bootproto}
 	EOS
   } || {
     cat <<-EOS
