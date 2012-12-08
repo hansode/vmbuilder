@@ -644,7 +644,10 @@ function install_interface() {
   iftype=$(echo ${iftype} | tr A-Z a-z)
   case ${iftype} in
   ethernet|bridge)
-    render_interface_${iftype} ${ifname} > ${chroot_dir}/${ifcfg_path}
+    {
+     render_interface_${iftype} ${ifname}
+     render_interface_netowrk_configuration
+    } > ${chroot_dir}/${ifcfg_path}
     ;;
   *)
     echo "[ERROR] no mutch iftype: ${iftype} (distro:${LINENO})" >&2
@@ -680,8 +683,6 @@ function render_interface_ethernet() {
 	ONBOOT=yes
 	$([[ -z "${bridge}" ]] || echo "BRIDGE=${bridge}")
 	EOS
-
-  render_interface_netowrk_configuration
 }
 
 function render_interface_bridge() {
@@ -692,8 +693,6 @@ function render_interface_bridge() {
 	TYPE=Bridge
 	ONBOOT=yes
 	EOS
-
-  render_interface_netowrk_configuration
 }
 
 function install_resolv_conf() {
