@@ -13,7 +13,7 @@
 #  ../vmbuilder.sh
 #
 # import:
-#  utils: extract_args
+#  utils: extract_args, shlog
 #  hypervisor: qemu_kvm_path
 #
 # usage:
@@ -64,33 +64,6 @@ function register_options() {
 function gen_macaddr() {
   local offset=${1:-0}
   printf "%s:%s" ${vendor_id} $(date --date "${offset} hour ago" +%H:%M:%S)
-}
-
-function viftabinfo() {
-  # format:
-  #  [vif_name] [macaddr] [bridge_if]
-
-  {
-    [[ -n "${viftab}" ]] && [[ -f "${viftab}" ]] && {
-      cat ${viftab}
-    } || {
-      local vif_name=${name}-${monitor_port}
-      for i in $(seq 1 ${vif_num}); do
-        local offset=$((${i} - 1)) suffix=
-        [[ "${offset}" == 0 ]] && suffix= || suffix=.${offset}
-        echo "${vif_name}${suffix} - ${brname}"
-      done
-    }
-  } | egrep -v '^$|^#'
-}
-
-function viftabproc() {
-  local blk="$(cat)"
-
-  local index vif_name macaddr bridge_if
-  while read index vif_name macaddr bridge_if; do
-    eval "${blk}"
-  done < <(viftabinfo | cat -n)
 }
 
 function build_vif_opt() {

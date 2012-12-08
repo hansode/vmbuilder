@@ -59,6 +59,7 @@ function add_option_hypervisor() {
   hostname=${hostname:-}
 
   nictab=${nictab:-}
+  viftab=${viftab:-}
 }
 
 function preflight_check_hypervisor() {
@@ -238,4 +239,31 @@ function qemu_kvm_path() {
 
   [[ -n "${command_path}" ]] || { echo "[ERROR] command not found: ${execs} (hypervisor:${LINENO})." >&2; return 1; }
   echo ${command_path}
+}
+
+function viftabinfo() {
+  # format:
+  #  [vif_name] [macaddr] [bridge_if]
+
+  {
+    [[ -n "${viftab}" ]] && [[ -f "${viftab}" ]] && {
+      cat ${viftab}
+    } || {
+      local vif_name=${name:-rhel6}-${monitor_port:-4444}
+      for i in $(seq 1 ${vif_num}); do
+        local offset=$((${i} - 1)) suffix=
+        [[ "${offset}" == 0 ]] && suffix= || suffix=.${offset}
+        echo "${vif_name}${suffix} - ${brname:-br0}"
+      done
+    }
+  } | egrep -v '^$|^#'
+}
+
+function viftabproc() {
+  local blk="$(cat)"
+
+  local index vif_name macaddr bridge_if
+  while read index vif_name macaddr bridge_if; do
+    eval "${blk}"
+  done < <(viftabinfo | cat -n)
 }
