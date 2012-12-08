@@ -658,26 +658,26 @@ function render_interface_ethernet() {
   local chroot_dir=$1 ifname=${2:-eth0}
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
-  [[ -z "${ip}" ]] && {
-    cat <<-EOS
+  cat <<-EOS
 	DEVICE=${ifname}
 	TYPE=Ethernet
-	BOOTPROTO=dhcp
 	ONBOOT=yes
-	$([[ -z "${bridge}"  ]] || echo "BRIDGE=${bridge}")
+	$([[ -z "${bridge}" ]] || echo "BRIDGE=${bridge}")
+	EOS
+
+  [[ -z "${ip}" ]] && {
+    cat <<-EOS
+	BOOTPROTO=dhcp
 	EOS
   } || {
     cat <<-EOS
-	DEVICE=${ifname}
-	TYPE=Ethernet
 	BOOTPROTO=static
-	ONBOOT=yes
 	IPADDR=${ip}
-	$([[ -z "${bridge}"  ]] || echo "BRIDGE=${bridge}")
-	$([[ -z "${mask}"    ]] || echo "NETMASK=${mask}")
-	$([[ -z "${net}"     ]] || echo "NETWORK=${net}")
-	$([[ -z "${bcast}"   ]] || echo "BROADCAST=${bcast}")
-	$([[ -z "${gw}"      ]] || echo "GATEWAY=${gw}")
+	$([[ -z "${bridge}" ]] || echo "BRIDGE=${bridge}")
+	$([[ -z "${mask}"   ]] || echo "NETMASK=${mask}")
+	$([[ -z "${net}"    ]] || echo "NETWORK=${net}")
+	$([[ -z "${bcast}"  ]] || echo "BROADCAST=${bcast}")
+	$([[ -z "${gw}"     ]] || echo "GATEWAY=${gw}")
 	EOS
   }
 }
