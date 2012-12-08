@@ -138,3 +138,8 @@ function inodeof() {
 
   stat --format=%i ${filepath}
 }
+
+function shlog() {
+  echo "\$ $*"
+  eval $*
+}

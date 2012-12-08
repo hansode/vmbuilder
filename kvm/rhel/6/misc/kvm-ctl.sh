@@ -66,11 +66,6 @@ function gen_macaddr() {
   printf "%s:%s" ${vendor_id} $(date --date "${offset} hour ago" +%H:%M:%S)
 }
 
-function shlog() {
-  echo "\$ $*"
-  eval $*
-}
-
 function viftabinfo() {
   # format:
   #  [vif_name] [macaddr] [bridge_if]
