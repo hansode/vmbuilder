@@ -643,7 +643,7 @@ function install_interface() {
 
   iftype=$(echo ${iftype} | tr A-Z a-z)
   case ${iftype} in
-  ethernet|bridge)
+  ethernet|bridge|ovsbridge)
     {
      render_interface_${iftype} ${ifname}
      render_interface_netowrk_configuration
@@ -692,6 +692,23 @@ function render_interface_bridge() {
 	DEVICE=${ifname}
 	TYPE=Bridge
 	ONBOOT=yes
+	EOS
+}
+
+function render_interface_ovsbridge() {
+  local ifname=${1:-br0}
+
+  cat <<-EOS
+	DEVICE=${ifname}
+	TYPE=OVSBridge
+	ONBOOT=yes
+	NM_CONTROLLED=no
+	DEVICETYPE=ovs
+	OVS_EXTRA="\\
+	 set bridge     \${DEVICE} other_config:disable-in-band=true --\\
+	 set-fail-mode  \${DEVICE} secure --\\
+	 set-controller \${DEVICE} unix:/var/run/openvswitch/\${DEVICE}.controller
+	"
 	EOS
 }
 
