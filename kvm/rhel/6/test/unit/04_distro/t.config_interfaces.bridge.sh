@@ -21,6 +21,8 @@ function setUp() {
 	ifname=eth0 bridge=br0
 	ifname=br0 ip=192.0.2.10 mask=255.255.255.0 net=192.0.2.0 bcast=192.0.2.255 gw=192.0.2.1 iftype=bridge
 	EOS
+
+  function run_yum() { echo run_yum $*; }
 }
 
 function tearDown() {
