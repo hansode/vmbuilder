@@ -628,8 +628,11 @@ function config_interfaces() {
 
   local line=
   while read line; do
-    eval ${line}
-    install_interface ${chroot_dir} ${ifname} ${iftype}
+    (
+      set -e
+      eval ${line}
+      install_interface ${chroot_dir} ${ifname} ${iftype}
+    )
   done < <(nictabinfo)
 }
 
