@@ -34,7 +34,7 @@ function register_options() {
   hypervisor=kvm
 }
 
-function run_kvm() {
+function controll_kvm() {
   case "$1" in
   build)
     # kind of virt-install
@@ -85,4 +85,4 @@ cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 [[ -f "${config_path}" ]] && load_config ${config_path} || :
 register_options
 add_option_hypervisor
-run_kvm ${cmd}
+controll_kvm ${cmd}
