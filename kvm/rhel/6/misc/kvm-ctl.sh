@@ -35,7 +35,10 @@ function register_options() {
 }
 
 function controll_kvm() {
-  case "$1" in
+  local cmd=$1
+  [[ -n "${cmd}" ]] || { echo "[ERROR] Invalid argument: cmd:${cmd} (kvm-ctl.sh:${LINENO})" >&2; return 1; }
+
+  case "${cmd}" in
   build)
     # kind of virt-install
     ${abs_dirname}/../vmbuilder.sh --config-path=${config_path}
@@ -80,7 +83,7 @@ extract_args $*
 
 ### main
 
-cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
+declare cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
 [[ -f "${config_path}" ]] && load_config ${config_path} || :
 register_options
