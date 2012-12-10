@@ -191,7 +191,7 @@ function install_firstboot() {
 	    fi
 	    touch /root/firstboot_done
 	fi
-	exit 0
+	touch /var/lock/subsys/local
 	EOS
   chmod 755 ${chroot_dir}/etc/rc.d/rc.local
 }
