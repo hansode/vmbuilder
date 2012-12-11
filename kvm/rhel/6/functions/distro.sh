@@ -55,6 +55,7 @@ function add_option_distro() {
     ;;
   esac
 
+  addpkg=${addpkg:-}
   nictab=${nictab:-}
 
   # settings for the initial user
@@ -379,6 +380,12 @@ function install_extras() {
   local chroot_dir=$1
 
   run_yum ${chroot_dir} install openssh openssh-clients openssh-server rpm yum curl dhclient passwd vim-minimal
+}
+
+function install_addedpkg() {
+  local chroot_dir=$1
+
+  [[ -z ${addpkg} ]] || run_yum ${chroot_dir} install ${addpkg}
 }
 
 function erase_selinux() {
