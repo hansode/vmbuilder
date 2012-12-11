@@ -16,6 +16,7 @@ function setUp() {
   mkdir -p ${chroot_dir}
 
   function chroot() { echo chroot $*; }
+  function update_passwords() { echo update_passwords $*; }
 }
 
 function tearDown() {
@@ -23,8 +24,13 @@ function tearDown() {
 }
 
 function test_create_initial_user() {
-  create_initial_user ${chroot_dir} | egrep -q "^chroot ${chroot_dir} bash -e -c echo root:root | chpasswd"
+  create_initial_user ${chroot_dir}
   assertEquals $? 0
+}
+
+function test_create_initial_user_no_opts() {
+  create_initial_user
+  assertNotEquals $? 0
 }
 
 ## shunit2
