@@ -10,29 +10,22 @@
 
 ## variables
 
-declare lodev=loop0
-declare _lsdevmaps="${lodev}p1
-${lodev}p2
-${lodev}p3
-"
-
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename} ${totalsize} 2>/dev/null
+  mkdisk  ${disk_filename} ${totalsize} 2>/dev/null
+  mkptab  ${disk_filename}
+  mapptab ${disk_filename}
 }
 
 function tearDown() {
-  rm -f ${disk_filename}
+  unmapptab ${disk_filename}
+  rm -f     ${disk_filename}
 }
 
 function test_devmap2lodev() {
-  assertEquals $(lsdevmap ${disk_filename} | devmap2lodev) /dev/${lodev}
+  lsdevmap ${disk_filename} | devmap2lodev | egrep ^/dev/
   assertEquals $? 0
-}
-
-function test_hoge() {
-  assertEquals $(lsdevmap ${disk_filename} | devmap2lodev) /dev/${lodev}
 }
 
 ## shunit2
