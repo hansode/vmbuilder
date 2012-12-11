@@ -34,7 +34,14 @@ declare raw=${disk_filename}
 
 ### public functions
 
+function additional_tearDown() {
+  :
+  # abstract
+}
+
 function tearDown() {
   rm -rf ${chroot_dir}
   rm -f ${disk_filename}
+
+  additional_tearDown
 }
