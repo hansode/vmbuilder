@@ -234,7 +234,8 @@ function install_os() {
   mount_sys            ${chroot_dir}
 
   # moved from distro in order to use cached distro dir
-  create_initial_user  ${chroot_dir}
+  create_initial_user     ${chroot_dir}
+  install_authorized_keys ${chroot_dir}
 
   configure_networking ${chroot_dir}
   configure_mounting   ${chroot_dir} ${disk_filename}
