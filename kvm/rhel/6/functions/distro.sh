@@ -55,6 +55,8 @@ function add_option_distro() {
     ;;
   esac
 
+  nictab=${nictab:-}
+
   # settings for the initial user
   devel_user=${devel_user:-}
   devel_pass=${devel_pass:-}

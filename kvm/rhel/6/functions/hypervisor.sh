@@ -55,7 +55,6 @@ function add_option_hypervisor() {
   dns=${dns:-}
   hostname=${hostname:-}
 
-  nictab=${nictab:-}
   viftab=${viftab:-}
 
   hypervisor=${hypervisor:-}
