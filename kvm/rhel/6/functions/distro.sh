@@ -60,6 +60,9 @@ function add_option_distro() {
   devel_pass=${devel_pass:-}
 
   rootpass=${rootpass:-root}
+
+  ssh_key=${ssh_key:-}
+  ssh_user_key=${ssh_user_key:-}
 }
 
 function load_distro_driver() {
@@ -282,6 +285,26 @@ function create_initial_user() {
   }
 
   update_passwords ${chroot_dir}
+}
+
+function install_authorized_keys() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  [[ -f "${ssh_key}" ]] && {
+    printf "[INFO] Installing authorized_keys %s\n" /root/.ssh/authorized_keys
+    mkdir -m 0700 ${chroot_dir}/root/.ssh
+    rsync -a ${ssh_key} ${chroot_dir}/root/.ssh/authorized_keys
+    chmod 0644 ${chroot_dir}/root/.ssh/authorized_keys
+  } || :
+
+  [[ -f "${ssh_user_key}" && -n "${devel_user}" ]] && {
+    printf "[INFO] Installing authorized_keys %s\n" /home/${devel_user}/.ssh/authorized_keys
+    mkdir -m 0700 ${chroot_dir}/home/${devel_user}/.ssh
+    rsync -a ${ssh_user_key} ${chroot_dir}/home/${devel_user}/.ssh/authorized_keys
+    chmod 0644  ${chroot_dir}/home/${devel_user}/.ssh/authorized_keys
+    run_in_target ${chroot_dir} "chown -R ${devel_user}:${devel_user} /home/${devel_user}/.ssh/"
+  } || :
 }
 
 function set_timezone() {
