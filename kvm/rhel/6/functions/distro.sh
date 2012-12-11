@@ -382,7 +382,7 @@ function install_extras() {
   run_yum ${chroot_dir} install openssh openssh-clients openssh-server rpm yum curl dhclient passwd vim-minimal
 }
 
-function install_addedpkg() {
+function install_addedpkgs() {
   local chroot_dir=$1
 
   [[ -z ${addpkg} ]] || run_yum ${chroot_dir} install ${addpkg}

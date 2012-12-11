@@ -33,7 +33,7 @@ function setUp() {
   function configure_keepcache() { echo configure_keepcache $*; }
   function install_kernel() { echo install_kernel $*; }
   function install_bootloader() { echo install_bootloader $*; }
-  function install_addedpkg() { echo install_addedpkg $*; }
+  function install_addedpkgs() { echo install_addedpkgs $*; }
   function run_copy()       { echo run_copy       $*; }
   function run_execscript() { echo run_execscript $*; }
 }

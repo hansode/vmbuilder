@@ -16,7 +16,7 @@
 # imports:
 #  utils: checkroot
 #  disk: xptabproc, mntpnt2path
-#  distro: add_option_distro, preflight_check_distro, install_kernel, install_bootloader, install_addedpkg, mount_proc
+#  distro: add_option_distro, preflight_check_distro, install_kernel, install_bootloader, install_addedpkgs, mount_proc
 #          create_initial_user, install_authorized_keys
 #          mount_dev, mount_sys, configure_networking, configure_mounting, configure_keepcache
 #
@@ -242,7 +242,7 @@ function install_os() {
   configure_keepcache  ${chroot_dir} ${keepcache}
   install_kernel       ${chroot_dir}
   install_bootloader   ${chroot_dir} ${disk_filename}
-  install_addedpkg     ${chroot_dir}
+  install_addedpkgs    ${chroot_dir}
   run_copy             ${chroot_dir} ${copy}
   run_execscript       ${chroot_dir} ${execscript}
   install_firstboot    ${chroot_dir} ${firstboot}
