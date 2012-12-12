@@ -17,6 +17,7 @@ declare distro_ver=6
 ## public functions
 
 function setUp() {
+  add_option_disk
   add_option_distro
   add_option_hypervisor
   [[ -d ${distro_dir} ]] || build_chroot ${distro_dir}

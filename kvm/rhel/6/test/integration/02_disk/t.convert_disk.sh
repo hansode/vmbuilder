@@ -15,6 +15,7 @@ declare dest_filename=${disk_filename%%."$(get_suffix ${disk_filename})"}
 ## public functions
 
 function setUp() {
+  add_option_disk
   mkdisk   ${disk_filename} ${totalsize} 2>/dev/null
   mkptab   ${disk_filename}
   mapptab  ${disk_filename}

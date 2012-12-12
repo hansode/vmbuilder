@@ -27,19 +27,6 @@ function add_option_hypervisor() {
   distro=${distro_name}-${distro_ver}_${distro_arch}
   distro_dir=${distro_dir:-$(pwd)/${distro}}
 
-  max_mount_count=${max_mount_count:-37}
-  interval_between_check=${interval_between_check:-180}
-
-  rootsize=${rootsize:-4096}
-  bootsize=${bootsize:-0}
-  optsize=${optsize:-0}
-  swapsize=${swapsize:-1024}
-  homesize=${homesize:-0}
-  usrsize=${usrsize:-0}
-  varsize=${varsize:-0}
-  tmpsize=${tmpsize:-0}
-
-  xpart=${xpart:-}
   copy=${copy:-}
   execscript=${execscript:-}
   firstboot=${firstboot:-}
