@@ -25,3 +25,5 @@ declare rootsize=800
 declare swapsize=0
 declare optsize=0
 declare totalsize=$((${rootsize} + ${swapsize} + ${optsize}))
+
+declare hypervisor=kvm

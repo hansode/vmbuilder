@@ -56,6 +56,7 @@ function add_option_distro() {
   esac
 
   addpkg=${addpkg:-}
+  epel_uri=${epel_uri:-}
   nictab=${nictab:-}
 
   # settings for the initial user
@@ -385,7 +386,15 @@ function install_extras() {
 function install_addedpkgs() {
   local chroot_dir=$1
 
-  [[ -z ${addpkg} ]] || run_yum ${chroot_dir} install ${addpkg}
+  [[ -z "${addpkg}" ]] || run_yum ${chroot_dir} install ${addpkg}
+}
+
+function install_epel() {
+  local chroot_dir=$1
+
+  # need to periodically update uri
+  # ex) http://ftp.riken.jp/Linux/fedora/epel/6/i386/epel-release-6-7.noarch.rpm
+  [[ -z "${epel_uri}" ]] || run_in_target ${chroot_dir} yum install -y ${epel_uri}
 }
 
 function erase_selinux() {
