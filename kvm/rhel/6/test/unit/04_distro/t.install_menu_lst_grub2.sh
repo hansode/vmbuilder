@@ -13,7 +13,7 @@
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename} ${totalsize}
+  mkdisk ${disk_filename} $(sum_disksize)
   mkdir -p ${chroot_dir}/boot/grub2
   touch    ${chroot_dir}/boot/grub2/grub.cfg
 

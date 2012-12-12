@@ -24,7 +24,6 @@ declare disk_filename=${abs_dirname}/_disk.$$.raw
 declare rootsize=800
 declare swapsize=0
 declare optsize=0
-declare totalsize=$((${rootsize} + ${swapsize} + ${optsize}))
 
 declare hypervisor=kvm
 
@@ -50,7 +49,7 @@ function setUp() {
   add_option_hypervisor
   [[ -d ${distro_dir} ]] || build_chroot ${distro_dir}
 
-  mkdisk   ${disk_filename} ${totalsize}
+  mkdisk   ${disk_filename} $(sum_disksize)
   mkptab   ${disk_filename}
   mapptab  ${disk_filename}
   mkfsdisk ${disk_filename} ext4

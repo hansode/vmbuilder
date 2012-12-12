@@ -17,7 +17,7 @@ declare distro_dir=${abs_dirname}/_distro.$$
 function setUp() {
   mkdir -p ${distro_dir}
 
-  mkdisk ${disk_filename} ${totalsize}
+  mkdisk ${disk_filename} $(sum_disksize)
   mkptab ${disk_filename}
   mapptab ${disk_filename}
   mkfsdisk ${disk_filename} ext4

@@ -16,7 +16,7 @@ declare dest_filename=${disk_filename%%."$(get_suffix ${disk_filename})"}
 
 function setUp() {
   add_option_disk
-  mkdisk   ${disk_filename} ${totalsize} 2>/dev/null
+  mkdisk   ${disk_filename} $(sum_disksize) 2>/dev/null
   mkptab   ${disk_filename}
   mapptab  ${disk_filename}
   mkfsdisk ${disk_filename} ext4

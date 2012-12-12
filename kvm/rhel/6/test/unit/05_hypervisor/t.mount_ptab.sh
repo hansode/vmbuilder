@@ -13,7 +13,7 @@
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename} ${totalsize}
+  mkdisk ${disk_filename} $(sum_disksize)
   mkptab ${disk_filename}
   mapptab ${disk_filename}
   mkfsdisk ${disk_filename} ext4

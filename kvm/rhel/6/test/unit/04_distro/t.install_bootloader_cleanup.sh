@@ -13,7 +13,7 @@
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename} ${totalsize}
+  mkdisk ${disk_filename} $(sum_disksize)
 
   local tmpdir=/tmp/vmbuilder-grub
   mkdir -p ${chroot_dir}${tmpdir}
