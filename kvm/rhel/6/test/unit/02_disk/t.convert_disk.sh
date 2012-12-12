@@ -16,7 +16,7 @@ function setUp() {
   touch ${disk_filename}
 
   function VBoxManage() { echo VBoxManage $*; }
-  function qemu-img()   { echo qemu-img   $*; }
+  function qemu_img_path() { echo qemu_img_path $*; }
 }
 
 function tearDown() {

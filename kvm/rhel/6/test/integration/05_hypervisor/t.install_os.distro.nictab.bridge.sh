@@ -10,12 +10,12 @@
 
 ### nictab
 
-function test_create_vm_nictab() {
+function test_install_os_nictab() {
   local nictab=${abs_dirname}/../../../nictab.bridge.txt.example
 
   (
     set -e
-    create_vm ${disk_filename} ${chroot_dir}
+    install_os ${chroot_dir} ${distro_dir} ${disk_filename}
   )
   assertEquals $? 0
 }

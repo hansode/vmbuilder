@@ -59,6 +59,15 @@ function add_option_distro() {
   epel_uri=${epel_uri:-}
   nictab=${nictab:-}
 
+  #domain=${domain:-}
+  ip=${ip:-}
+  mask=${mask:-}
+  net=${net:-}
+  bcast=${bcast:-}
+  gw=${gw:-}
+  dns=${dns:-}
+  hostname=${hostname:-}
+
   # settings for the initial user
   devel_user=${devel_user:-}
   devel_pass=${devel_pass:-}

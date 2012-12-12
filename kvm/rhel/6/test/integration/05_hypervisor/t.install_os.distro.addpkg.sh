@@ -11,16 +11,14 @@
 
 ### variables
 
-declare pubkey_file=${abs_dirname}/pubkey.$$
-
 ### functions
 
-function test_create_vm_distro_addpkg() {
+function test_install_os_distro_addpkg() {
   local addpkg="kpartx parted"
 
   (
     set -e
-    create_vm ${disk_filename} ${chroot_dir}
+    install_os ${chroot_dir} ${distro_dir} ${disk_filename}
   )
   assertEquals $? 0
 }

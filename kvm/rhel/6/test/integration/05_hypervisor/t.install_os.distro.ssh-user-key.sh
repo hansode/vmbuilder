@@ -15,7 +15,7 @@ declare pubkey_file=${abs_dirname}/pubkey.$$
 
 ### functions
 
-function setUp() {
+function additional_setUp() {
   ssh-keygen -N "" -f ${pubkey_file}
 }
 
@@ -24,13 +24,13 @@ function additional_tearDown() {
   rm -f ${pubkey_file}.pub
 }
 
-function test_create_vm_distro_ssh_user_key() {
+function test_install_os_distro_ssh_user_key() {
   local devel_user=vmbuilder
   local ssh_user_key=${pubkey_file}
 
   (
     set -e
-    create_vm ${disk_filename} ${chroot_dir}
+    install_os ${chroot_dir} ${distro_dir} ${disk_filename}
   )
   assertEquals $? 0
 }
