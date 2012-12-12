@@ -13,7 +13,7 @@
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename} ${totalsize} 2>/dev/null
+  mkdisk ${disk_filename} $(sum_disksize) 2>/dev/null
   parted --script ${disk_filename} mklabel msdos
 }
 
@@ -39,34 +39,34 @@ function test_mkpart_with_parttype_offset() {
 }
 
 function test_mkpart_with_parttype_offset_size() {
-  mkpart ${disk_filename} primary 0 ${totalsize}
+  mkpart ${disk_filename} primary 0 $(sum_disksize)
   assertEquals $? 0
 }
 
 ### without default options
 
 function test_mkpart_with_primary_offset0_totalsize_ext2() {
-  mkpart ${disk_filename} primary 0 ${totalsize} ext2
+  mkpart ${disk_filename} primary 0 $(sum_disksize) ext2
   assertEquals $? 0
 }
 
 function test_mkpart_with_primary_offset1_totalsize_ext2() {
-  mkpart ${disk_filename} primary 1 ${totalsize} ext2
+  mkpart ${disk_filename} primary 1 $(sum_disksize) ext2
   assertEquals $? 0
 }
 
 function test_mkpart_with_primary_offset0_totalsize_swap() {
-  mkpart ${disk_filename} primary 0 ${totalsize} swap
+  mkpart ${disk_filename} primary 0 $(sum_disksize) swap
   assertEquals $? 0
 }
 
 function test_mkpart_with_primary_offset1_totalsize_swap() {
-  mkpart ${disk_filename} primary 1 ${totalsize} swap
+  mkpart ${disk_filename} primary 1 $(sum_disksize) swap
   assertEquals $? 0
 }
 
 function test_mkpart_with_primary_offset0_totalsize_unknown() {
-  mkpart ${disk_filename} primary 0 ${totalsize} unknown
+  mkpart ${disk_filename} primary 0 $(sum_disksize) unknown
   assertNotEquals $? 0
 }
 
@@ -76,12 +76,12 @@ function test_mkpart_with_primary_offset0_size0_ext2() {
 }
 
 function test_mkpart_with_extended_offset0_totalsize_ext2() {
-  mkpart ${disk_filename} extended 0 ${totalsize} ext2
+  mkpart ${disk_filename} extended 0 $(sum_disksize) ext2
   assertNotEquals $? 0
 }
 
 function test_mkpart_with_logical_offset0_totalsize_ext2() {
-  mkpart ${disk_filename} logical 0 ${totalsize} ext2
+  mkpart ${disk_filename} logical 0 $(sum_disksize) ext2
   assertNotEquals $? 0
 }
 

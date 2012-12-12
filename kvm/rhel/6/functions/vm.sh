@@ -10,7 +10,7 @@
 # imports:
 #  utils: is_dev, checkroot
 #  mbr: rmmbr
-#  disk: xptabinfo, mkdisk, mkptab, mapptab, mkfsdisk, unmapptab
+#  disk: sum_disksize, mkdisk, mkptab, mapptab, mkfsdisk, unmapptab
 #  distro: build_chroot, preferred_filesystem
 #  hypervisor: preflight_check_hypervisor, install_os, umount_ptab
 #
@@ -57,7 +57,7 @@ function create_vm() {
     rmmbr ${disk_filename}
   } || {
     [[ -f "${disk_filename}" ]] && rm -f ${disk_filename}
-    local totalsize=$(xptabinfo | awk 'BEGIN {sum = 0} {sum += $2} END {print sum}')
+    local totalsize=$(sum_disksize)
     printf "[INFO] Creating disk image: \"%s\" of size: %dMB\n" ${disk_filename} ${totalsize}
     mkdisk ${disk_filename} ${totalsize}
   }

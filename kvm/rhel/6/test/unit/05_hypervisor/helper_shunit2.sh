@@ -24,4 +24,3 @@ declare disk_filename=${abs_dirname}/_disk.$$.raw
 declare rootsize=8
 declare swapsize=8
 declare optsize=8
-declare totalsize=$((${rootsize} + ${swapsize} + ${optsize}))

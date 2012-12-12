@@ -13,7 +13,7 @@
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename} ${totalsize}
+  mkdisk ${disk_filename} $(sum_disksize)
   mkdir -p ${chroot_dir}/etc
   mkptab ${disk_filename}
   mapptab ${disk_filename}

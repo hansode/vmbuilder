@@ -8,22 +8,20 @@
 
 . ./helper_shunit2.sh
 
-## variables
-
-## public functions
-
 function setUp() {
-  mkdisk ${disk_filename} $(sum_disksize) 2>/dev/null
-  mkptab ${disk_filename}
-  mapptab ${disk_filename}
+  add_option_disk
 }
 
 function tearDown() {
   rm -f ${disk_filename}
 }
 
-function test_unmapptab() {
-  unmapptab ${disk_filename}
+### xpart
+
+function test_mkdisk_xpart() {
+  local xpart=${abs_dirname}/../../../xpart.txt.example
+
+  mkdisk ${disk_filename} $(sum_disksize)
   assertEquals $? 0
 }
 

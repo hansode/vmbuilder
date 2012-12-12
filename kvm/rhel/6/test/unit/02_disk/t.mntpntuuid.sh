@@ -13,7 +13,7 @@
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename} ${totalsize} 2>/dev/null
+  mkdisk ${disk_filename} $(sum_disksize) 2>/dev/null
   mkptab ${disk_filename}
   mapptab ${disk_filename}
   checkroot || return 1

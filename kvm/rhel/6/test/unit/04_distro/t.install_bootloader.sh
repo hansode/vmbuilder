@@ -13,7 +13,7 @@
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename} ${totalsize}
+  mkdisk ${disk_filename} $(sum_disksize)
   mkdir -p ${chroot_dir}/tmp/vmbuilder-grub
 
   function is_dev() { echo is_dev $*; }

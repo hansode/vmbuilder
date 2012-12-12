@@ -22,7 +22,7 @@ function test_mkdisk_size_zero() {
 }
 
 function test_mkdisk_size_non_zero() {
-  mkdisk ${disk_filename} ${totalsize}
+  mkdisk ${disk_filename} $(sum_disksize)
   assertEquals $? 0
 }
 

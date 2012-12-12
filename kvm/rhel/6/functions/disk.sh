@@ -155,6 +155,10 @@ function xptabproc() {
   done < <(xptabinfo)
 }
 
+function sum_disksize() {
+  xptabinfo | awk 'BEGIN {sum = 0} {sum += $2} END {print sum}'
+}
+
 function mkpart() {
   #
   # Adds partition to the disk image (does not mkfs or anything like that)
