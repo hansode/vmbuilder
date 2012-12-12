@@ -34,15 +34,6 @@ function add_option_hypervisor() {
 
   chroot_dir=${chroot_dir:-/tmp/tmp$(date +%s)}
 
-  #domain=${domain:-}
-  ip=${ip:-}
-  mask=${mask:-}
-  net=${net:-}
-  bcast=${bcast:-}
-  gw=${gw:-}
-  dns=${dns:-}
-  hostname=${hostname:-}
-
   viftab=${viftab:-}
 
   hypervisor=${hypervisor:-}
