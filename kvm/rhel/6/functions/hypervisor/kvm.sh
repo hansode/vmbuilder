@@ -107,10 +107,52 @@ function setup_bridge_and_vif() {
 EOS
 }
 
+function render_kvm_runscript() {
+  local name=$1
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
+
+  cat <<-EOS
+	#!/bin/sh -e
+	#execute kvm command
+	#
+	name=${name}
+	brname=${brname}
+	mem_size=${mem_size}
+	cpu_num=${cpu_num}
+	vnc_addr=${vnc_addr}
+	vnc_port=${vnc_port}
+	monitor_addr=${monitor_addr}
+	monitor_port=${monitor_port}
+	serial_addr=${serial_addr}
+	serial_port=${serial_port}
+	#
+	EOS
+
+  (
+    # set non extracted value
+    name='${name}'
+    brname='${brname}'
+    mem_size='${mem_size}'
+    cpu_num='${cpu_num}'
+    vnc_addr='${vnc_addr}'
+    vnc_port='${vnc_port}'
+    monitor_port='${monitor_port}'
+    monitor_port='${monitor_port}'
+    serial_addr='${serial_addr}'
+    serial_port='${serial_port}'
+
+    # dry run
+    function shlog() { echo $*; }
+    function checkroot() { echo checkroot $* >/dev/null; }
+
+    start_kvm ${name}
+  )
+}
+
 ## controll kvm process
 
 function start_kvm() {
-  local name=${1}
+  local name=$1
   [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
