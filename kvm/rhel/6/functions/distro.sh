@@ -746,6 +746,7 @@ function configure_networking() {
 	EOS
   config_host_and_domainname ${chroot_dir}
   config_interfaces          ${chroot_dir}
+  config_routing             ${chroot_dir}
 
   local udev_70_persistent_net_path=${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
   printf "[INFO] Unsetting udev 70-persistent-net.rules\n"
