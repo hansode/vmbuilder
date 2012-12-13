@@ -1,0 +1,19 @@
+# -*-Text-file-*-
+#
+# requires:
+#  vmbuilder.sh
+#
+# description:
+#  configuring routing
+#
+# usage:
+#  $ vmbuilder.sh --routetab=[FILE]
+#
+# format:
+#  + vmbuilder.sh ignores '^#|^$'
+#
+ifname=eth0 gw=192.0.1.1
+ifname=eth0 cidr=192.0.2.0/24 gw=192.0.2.1
+ifname=eth0 cidr=192.0.3.0/24 gw=192.0.3.1
+ifname=eth0 cidr=192.0.4.0/24 gw=192.0.4.1
+ifname=eth0 cidr=192.0.5.0/24 gw=192.0.5.1
