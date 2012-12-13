@@ -790,6 +790,7 @@ function configure_console() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
+  printf "[INFO] Configuring console\n"
   [[ -f ${chroot_dir}/etc/sysconfig/init ]] && {
     sed -i "s,^ACTIVE_CONSOLES=.*,ACTIVE_CONSOLES=\"/dev/tty[1-6] /dev/ttyS0\"", ${chroot_dir}/etc/sysconfig/init
   } || :
