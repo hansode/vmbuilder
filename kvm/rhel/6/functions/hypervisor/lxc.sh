@@ -28,7 +28,7 @@ function add_option_hypervisor_lxc() {
 
   vendor_id=${vendor_id:-52:54:00}
 
-  rootfs_dir=${rootfs_dir:-$(pwd)/rootfs}
+  rootfs_path=${rootfs_path:-$(pwd)/rootfs}
 }
 
 function render_lxc_config() {
@@ -42,11 +42,11 @@ function render_lxc_config() {
 	lxc.network.name = eth0
 	lxc.network.mtu = 1500
 	lxc.network.hwaddr = $(gen_macaddr)
-	lxc.rootfs = ${rootfs_dir}
+	lxc.rootfs = ${rootfs_path}
 
-	lxc.mount.entry = devpts ${rootfs_dir}/dev/pts                devpts  gid=5,mode=620  0 0
-	lxc.mount.entry = proc   ${rootfs_dir}/proc                   proc    defaults        0 0
-	lxc.mount.entry = sysfs  ${rootfs_dir}/sys                    sysfs   defaults        0 0
+	lxc.mount.entry = devpts ${rootfs_path}/dev/pts                devpts  gid=5,mode=620  0 0
+	lxc.mount.entry = proc   ${rootfs_path}/proc                   proc    defaults        0 0
+	lxc.mount.entry = sysfs  ${rootfs_path}/sys                    sysfs   defaults        0 0
 	
 	# /dev/null and zero
 	lxc.cgroup.devices.allow = c 1:3 rwm
