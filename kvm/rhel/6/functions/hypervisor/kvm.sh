@@ -98,6 +98,15 @@ function build_kvm_opts() {
    -daemonize
 }
 
+function setup_bridge_and_vif() {
+  checkroot || return 1
+
+  viftabproc <<'EOS'
+    shlog ip link set ${vif_name} up
+    [[ -z "${bridge_if}" ]] || shlog brctl addif ${bridge_if} ${vif_name}
+EOS
+}
+
 ## controll kvm process
 
 function start_kvm() {
@@ -106,11 +115,7 @@ function start_kvm() {
   checkroot || return 1
 
   shlog ${kvm_path} $(build_kvm_opts)
-
-  viftabproc <<'EOS'
-    shlog ip link set ${vif_name} up
-    [[ -z "${bridge_if}" ]] || shlog brctl addif ${bridge_if} ${vif_name}
-EOS
+  setup_bridge_and_vif
 }
 
 function stop_kvm() {
