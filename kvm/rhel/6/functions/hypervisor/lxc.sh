@@ -12,6 +12,8 @@
 #
 
 function add_option_hypervisor_lxc() {
+  name=${name:-rhel6}
+
   image_format=${image_format:-raw}
   image_file=${image_file:-${name}.${image_format}}
   image_path=${image_path:-${image_file}}
@@ -40,7 +42,7 @@ function render_lxc_config() {
 	#if $mac
 	lxc.network.hwaddr = $(gen_macaddr)
 	#end if
-	lxc.rootfs = $destdir/rootfs
+	lxc.rootfs = $(pwd)/rootfs
 	
 	# /dev/null and zero
 	lxc.cgroup.devices.allow = c 1:3 rwm
@@ -66,10 +68,30 @@ function render_lxc_config() {
 ## controll lxc process
 
 function start_lxc() {
-  echo start_lxc
-  render_lxc_config
+  local name=$1
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  local lxc_config_path=$(pwd)/lxc.conf
+
+  render_lxc_config > ${lxc_config_path}
+  shlog lxc-create -f ${lxc_config_path} -n ${name}
+ #shlog lxc-start -n %s -d -l DEBUG -o %s/%s.log 3<&- 4<&- 6<&-", [ctx.inst[:uuid], ctx.inst_data_dir, ctx.inst[:uuid]])
 }
 
 function stop_lxc() {
-  echo start_lxc
+  local name=$1
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  shlog lxc-stop -n ${name}
+  shlog lxc-destroy -n ${name}
+}
+
+function info_lxc() {
+  local name=$1
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/lxc:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  shlog lxc-info --name ${name}
 }

@@ -48,6 +48,9 @@ function controll_lxc() {
   stop)
     stop_lxc ${name}
     ;;
+  info)
+    info_lxc ${name}
+    ;;
   *)
     echo $"USAGE: $0 [start] OPTIONS..." >&2
     return 2

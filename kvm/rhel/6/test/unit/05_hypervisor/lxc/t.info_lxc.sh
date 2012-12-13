@@ -19,8 +19,8 @@ function setUp() {
   function shlog() { echo shlog $*; }
 }
 
-function test_stop_lxc() {
-  stop_lxc vmbuilder
+function test_info_lxc() {
+  info_lxc vmbuilder
   assertEquals $? 0
 }
 
