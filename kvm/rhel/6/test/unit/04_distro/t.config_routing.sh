@@ -31,7 +31,7 @@ ifname=eth1 net=10.1.4.0 mask=255.255.255.192 gw=10.1.4.254
 ifname=eth2 net=10.2.5.0 mask=255.255.0.0 gw=10.0.5.1
 EOS
 
-  function add_routing() { echo add_routing $*; }
+  function install_routing() { echo install_routing $*; }
 }
 
 function tearDown() {

@@ -921,7 +921,20 @@ function config_routing() {
     (
       set -e
       eval ${line}
-      add_routing ${chroot_dir} ${ifname}
+      install_routing ${chroot_dir} ${ifname}
     )
   done < <(routetabinfo)
+}
+
+function install_routing() {
+  local chroot_dir=$1 ifname=$2
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -n "${ifname}" ]] || { echo "[ERROR] Invalid argument: ifname:${ifname} (distro:${LINENO})" >&2; return 1; }
+
+  local route_path=/etc/sysconfig/network-scripts/route-${ifname}
+
+  printf "[INFO] Generating %s\n" ${route_path}
+
+  render_routing ${ifname} | egrep -v '^$' >> ${chroot_dir}/${route_path}
+  cat ${chroot_dir}/${route_path}
 }
