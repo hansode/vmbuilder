@@ -78,6 +78,11 @@ function build_vif_opt() {
 EOS
 }
 
+function build_drive_opt() {
+  echo \
+    -drive file=${image_path},media=disk,boot=on,index=0,cache=none
+}
+
 function build_kvm_opts() {
   echo \
    ${kvm_opts} \
@@ -86,9 +91,9 @@ function build_kvm_opts() {
    -smp      ${cpu_num} \
    -vnc      ${vnc_addr}:${vnc_port} \
    -k        ${vnc_keymap} \
-   -drive    file=${image_path},media=disk,boot=on,index=0,cache=none \
    -monitor  telnet:${monitor_addr}:${monitor_port},server,nowait \
    -serial   telnet:${serial_addr}:${serial_port},server,nowait \
+   $(build_drive_opt) \
    $(build_vif_opt ${vif_num}) \
    -daemonize
 }
