@@ -38,7 +38,7 @@ function add_option_hypervisor() {
 
   hypervisor=${hypervisor:-}
   case "${hypervisor}" in
-  kvm)
+  kvm|lxc)
     load_hypervisor_driver ${hypervisor}
     ;;
   *)
