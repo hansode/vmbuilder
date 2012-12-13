@@ -903,3 +903,11 @@ function render_interface_ovsbridge() {
 	"
 	EOS
 }
+
+## routing configuration
+
+function routetabinfo() {
+  [[ -n "${routetab}" && -f "${routetab}" ]] || return 0
+
+  egrep -v '^$|^#' ${routetab}
+}
