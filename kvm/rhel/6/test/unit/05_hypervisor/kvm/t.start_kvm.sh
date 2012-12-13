@@ -14,8 +14,9 @@
 
 function setUp() {
   add_option_hypervisor_kvm
+
   function shlog() { echo shlog $*; }
-  function checkroot() { echo checkroot *; }
+  function checkroot() { echo checkroot $*; }
 }
 
 function test_start_kvm_no_opts() {
