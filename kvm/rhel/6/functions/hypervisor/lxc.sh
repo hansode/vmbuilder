@@ -27,10 +27,47 @@ function add_option_hypervisor_lxc() {
   vendor_id=${vendor_id:-52:54:00}
 }
 
+function render_lxc_config() {
+	cat <<-EOS
+	lxc.utsname = ${hostname:-localhost}
+	lxc.tty = 6
+	lxc.pts = 1024
+	lxc.network.type = veth
+	lxc.network.flags = up
+	lxc.network.link = ${brname}
+	lxc.network.name = eth0
+	lxc.network.mtu = 1500
+	#if $mac
+	lxc.network.hwaddr = $(gen_macaddr)
+	#end if
+	lxc.rootfs = $destdir/rootfs
+	
+	# /dev/null and zero
+	lxc.cgroup.devices.allow = c 1:3 rwm
+	lxc.cgroup.devices.allow = c 1:5 rwm
+	
+	# consoles
+	lxc.cgroup.devices.allow = c 5:1 rwm
+	lxc.cgroup.devices.allow = c 5:0 rwm
+	lxc.cgroup.devices.allow = c 4:0 rwm
+	lxc.cgroup.devices.allow = c 4:1 rwm
+	
+	# /dev/{,u}random
+	lxc.cgroup.devices.allow = c 1:9 rwm
+	lxc.cgroup.devices.allow = c 1:8 rwm
+	lxc.cgroup.devices.allow = c 136:* rwm
+	lxc.cgroup.devices.allow = c 5:2 rwm
+	
+	# rtc
+	lxc.cgroup.devices.allow = c 254:0 rwm
+	EOS
+}
+
 ## controll lxc process
 
 function start_lxc() {
   echo start_lxc
+  render_lxc_config
 }
 
 function stop_lxc() {
