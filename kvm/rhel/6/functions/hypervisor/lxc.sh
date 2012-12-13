@@ -86,7 +86,7 @@ function lxc_start() {
   [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
-  shlog lxc-start -n ${name} -l DEBUG -o $(pwd)/lxc.log
+  shlog lxc-start -n ${name} -d -l DEBUG -o $(pwd)/lxc.log
 }
 
 function lxc_stop() {
