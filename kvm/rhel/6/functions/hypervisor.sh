@@ -18,7 +18,7 @@
 #  disk: xptabproc, mntpnt2path
 #  distro: add_option_distro, preflight_check_distro, install_kernel, install_bootloader, install_epel, install_addedpkgs, mount_proc
 #          create_initial_user, install_authorized_keys
-#          mount_dev, mount_sys, configure_networking, configure_mounting, configure_keepcache
+#          mount_dev, mount_sys, configure_networking, configure_mounting, configure_keepcache, configure_console
 #
 
 ## depending on global variables
@@ -218,6 +218,7 @@ function install_os() {
   configure_networking ${chroot_dir}
   configure_mounting   ${chroot_dir} ${disk_filename}
   configure_keepcache  ${chroot_dir} ${keepcache}
+  configure_console    ${chroot_dir}
   install_kernel       ${chroot_dir}
   install_bootloader   ${chroot_dir} ${disk_filename}
   install_epel         ${chroot_dir}
