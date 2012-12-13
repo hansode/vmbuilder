@@ -19,8 +19,9 @@ function setUp() {
   function shlog() { echo shlog $*; }
 }
 
-function test_start_lxc() {
-  start_lxc vmbuilder
+function test_lxc_info() {
+  lxc_info vmbuilder
+  assertEquals $? 0
 }
 
 ## shunit2
