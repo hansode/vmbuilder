@@ -58,8 +58,9 @@ function add_option_distro() {
   addpkg=${addpkg:-}
   epel_uri=${epel_uri:-}
   nictab=${nictab:-}
+  routetab=${routetab:-}
 
-  #domain=${domain:-}
+ #domain=${domain:-}
   ip=${ip:-}
   mask=${mask:-}
   net=${net:-}
@@ -88,6 +89,8 @@ function load_distro_driver() {
   . ${distro_driver_path}
   add_option_distro_${driver_name}
 }
+
+## distro info
 
 function get_normalized_distro_name() {
   local distro_name=$1
@@ -166,6 +169,8 @@ function distroinfo() {
 	EOS
 }
 
+## chroot distro tree
+
 function build_chroot() {
   add_option_distro
   preflight_check_distro
@@ -178,6 +183,24 @@ function build_chroot() {
   bootstrap      ${chroot_dir}
   configure_os   ${chroot_dir}
   cleanup_distro ${chroot_dir}
+}
+
+function cleanup_distro() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  find   ${chroot_dir}/var/log/ -type f | xargs rm
+  rm -rf ${chroot_dir}/tmp/*
+}
+
+## bootstrap
+
+function trap_distro() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  umount_nonroot ${chroot_dir}
+  [[ -d "${chroot_dir}" ]] && rm -rf ${chroot_dir}
 }
 
 function bootstrap() {
@@ -202,7 +225,36 @@ function bootstrap() {
   umount_nonroot ${chroot_dir}
 }
 
-## unit functions
+## os configuration
+
+function configure_os() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  mount_proc               ${chroot_dir}
+  mount_dev                ${chroot_dir}
+
+  # TODO
+  #  should use configure_selinux,
+  #  but configure_selinux has an issue which don't allow logging in by root without erasing selinux.
+ #configure_selinux        ${chroot_dir} ${selinux}
+  erase_selinux            ${chroot_dir}
+
+  # TODO
+  #  should decide where the better place is distro or hypervisor or both.
+  #  so far following three functions are defined in distro.
+  prevent_daemons_starting ${chroot_dir}
+  # moved to hypervisor in order to use cached distro dir
+ #create_initial_user      ${chroot_dir}
+  set_timezone             ${chroot_dir}
+
+  install_resolv_conf      ${chroot_dir}
+  install_extras           ${chroot_dir}
+  umount_nonroot           ${chroot_dir}
+}
+
+## yum
 
 function repofile() {
   local reponame=$1 baseurl="$2" gpgkey="$3" keepcache=${4:-0}
@@ -258,11 +310,106 @@ function run_yum() {
   rm -f ${repofile}
 }
 
+function configure_keepcache() {
+  local chroot_dir=$1 keepcache=${2:-0}
+  [[ -a "${chroot_dir}/etc/yum.conf" ]] || { echo "[ERROR] file not found: ${chroot_dir}/etc/yum.conf (distro:${LINENO})" >&2; return 1; }
+
+  case "${keepcache}" in
+  [01]) ;;
+  *)    keepcache=0 ;;
+  esac
+
+  printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
+  egrep -q ^keepcache= ${chroot_dir}/etc/yum.conf || {
+    echo keepcache=${keepcache} >> ${chroot_dir}/etc/yum.conf
+  } || {
+    sed -i "s,^keepcache=.*,keepcache=${keepcache}," ${chroot_dir}/etc/yum.conf
+  }
+
+  egrep ^keepcache= ${chroot_dir}/etc/yum.conf
+}
+
+## other system configuration
+
+function configure_selinux() {
+  local chroot_dir=$1 selinux=${2:-disabled}
+  [[ -a "${chroot_dir}/etc/sysconfig/selinux" ]] || return 0
+
+  case "${selinux}" in
+  enforcing|permissive|disabled)
+    ;;
+  *)
+    echo "[ERROR] unknown SELINUX value: ${selinux} (distro:${LINENO})" >&2
+    return 1
+    ;;
+  esac
+  printf "[INFO] Setting /etc/sysconfig/selinux: SELINUX=%s\n" ${selinux}
+  sed -i "s/^\(SELINUX=\).*/\1${selinux}/"  ${chroot_dir}/etc/sysconfig/selinux
+  egrep ^SELINUX= ${chroot_dir}/etc/sysconfig/selinux
+}
+
+function set_timezone() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  printf "[INFO] Setting /etc/localtime\n"
+  cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
+}
+
+function prevent_daemons_starting() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+ #local svc= dummy=
+ #while read svc dummy; do
+ #  run_in_target ${chroot_dir} chkconfig --del ${svc}
+ #done < <(run_in_target ${chroot_dir} chkconfig --list | egrep -v :on)
+}
+
+## mounting
+
 function configure_mounting() {
   local chroot_dir=$1 disk_filename=$2
 
   install_fstab ${chroot_dir} ${disk_filename}
 }
+
+function preferred_filesystem() {
+  echo ${preferred_filesystem:-ext3}
+}
+
+function install_fstab() {
+  local chroot_dir=$1 disk_filename=$2
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  printf "[INFO] Overwriting /etc/fstab\n"
+  {
+  local default_filesystem=$(preferred_filesystem)
+  xptabproc <<'EOS'
+    case "${mountpoint}" in
+    /boot) fstype=${default_filesystem} dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
+    root)  fstype=${default_filesystem} dumpopt=1 fsckopt=1 mountpath=/             ;;
+    swap)  fstype=swap                  dumpopt=0 fsckopt=0 mountpath=${mountpoint} ;;
+    /opt)  fstype=${default_filesystem} dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
+    /home) fstype=${default_filesystem} dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
+    *)     fstype=${default_filesystem} dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
+    esac
+    uuid=$(mntpntuuid ${disk_filename} ${mountpoint})
+    printf "UUID=%s %s\t%s\tdefaults\t%s %s\n" ${uuid} ${mountpath} ${fstype} ${dumpopt} ${fsckopt}
+EOS
+  cat <<-_EOS_
+	tmpfs                   /dev/shm                tmpfs   defaults        0 0
+	devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
+	sysfs                   /sys                    sysfs   defaults        0 0
+	proc                    /proc                   proc    defaults        0 0
+	_EOS_
+  } > ${chroot_dir}/etc/fstab
+  cat ${chroot_dir}/etc/fstab
+}
+
+## unix user
 
 function update_passwords() {
   local chroot_dir=$1
@@ -320,58 +467,7 @@ function install_authorized_keys() {
   } || :
 }
 
-function set_timezone() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-
-  printf "[INFO] Setting /etc/localtime\n"
-  cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
-}
-
-function prevent_daemons_starting() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-
- #local svc= dummy=
- #while read svc dummy; do
- #  run_in_target ${chroot_dir} chkconfig --del ${svc}
- #done < <(run_in_target ${chroot_dir} chkconfig --list | egrep -v :on)
-}
-
-function preferred_grub() {
-  echo ${preferred_grub:-grub}
-}
-
-function install_grub() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-
-  local grub_distro_name=
-  for grub_distro_name in redhat unknown; do
-    grub_src_dir=${chroot_dir}/usr/share/grub/${basearch}-${grub_distro_name}
-    [[ -d "${grub_src_dir}" ]] || continue
-    rsync -a ${grub_src_dir}/ ${chroot_dir}/boot/grub/
-  done
-}
-
-function install_grub2() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-
-  # fedora >= 16 should be used not grub but grub2
-  run_yum ${chroot_dir} install grub2
-}
-
-function preferred_initrd() {
-  echo ${preferred_initrd:-initramfs}
-}
-
-function verify_kernel_installation() {
-  local chroot_dir=$1
-
-  ls ${chroot_dir}/boot/vmlinuz-*             || { echo "[ERROR] vmlinuz not found (distro:${LINENO})" >&2; return 1; }
-  ls ${chroot_dir}/boot/$(preferred_initrd)-* || { echo "[ERROR] $(preferred_initrd) not found (distro:${LINENO})" >&2; return 1; }
-}
+## package configuration
 
 function install_kernel() {
   local chroot_dir=$1
@@ -412,6 +508,46 @@ function erase_selinux() {
   run_yum ${chroot_dir} erase selinux*
 }
 
+## kernel configuration
+
+function preferred_initrd() {
+  echo ${preferred_initrd:-initramfs}
+}
+
+function verify_kernel_installation() {
+  local chroot_dir=$1
+
+  ls ${chroot_dir}/boot/vmlinuz-*             || { echo "[ERROR] vmlinuz not found (distro:${LINENO})" >&2; return 1; }
+  ls ${chroot_dir}/boot/$(preferred_initrd)-* || { echo "[ERROR] $(preferred_initrd) not found (distro:${LINENO})" >&2; return 1; }
+}
+
+## grub configuration
+
+function preferred_grub() {
+  echo ${preferred_grub:-grub}
+}
+
+function install_grub() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  local grub_distro_name=
+  for grub_distro_name in redhat unknown; do
+    grub_src_dir=${chroot_dir}/usr/share/grub/${basearch}-${grub_distro_name}
+    [[ -d "${grub_src_dir}" ]] || continue
+    rsync -a ${grub_src_dir}/ ${chroot_dir}/boot/grub/
+  done
+}
+
+function install_grub2() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  # fedora >= 16 should be used not grub but grub2
+  run_yum ${chroot_dir} install grub2
+}
+
+## bootloader configuration
 
 function install_bootloader_cleanup() {
   local chroot_dir=$1 disk_filename=$2
@@ -508,6 +644,8 @@ function install_bootloader() {
   install_bootloader_cleanup ${chroot_dir} ${disk_filename}
 }
 
+## grub_menu_list configuration
+
 function install_menu_lst() {
   local chroot_dir=$1 disk_filename=$2
   [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
@@ -589,31 +727,14 @@ function mangle_grub_menu_lst_grub2() {
   sed -i "s,quiet rhgb,," ${chroot_dir}/boot/grub2/grub.cfg
 }
 
-function configure_os() {
+## networking configuration
+
+function install_resolv_conf() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-  checkroot || return 1
 
-  mount_proc               ${chroot_dir}
-  mount_dev                ${chroot_dir}
-
-  # TODO
-  #  should use configure_selinux,
-  #  but configure_selinux has an issue which don't allow logging in by root without erasing selinux.
- #configure_selinux        ${chroot_dir} ${selinux}
-  erase_selinux            ${chroot_dir}
-
-  # TODO
-  #  should decide where the better place is distro or hypervisor or both.
-  #  so far following three functions are defined in distro.
-  prevent_daemons_starting ${chroot_dir}
-  # moved to hypervisor in order to use cached distro dir
- #create_initial_user      ${chroot_dir}
-  set_timezone             ${chroot_dir}
-
-  install_resolv_conf      ${chroot_dir}
-  install_extras           ${chroot_dir}
-  umount_nonroot           ${chroot_dir}
+  cat <<-EOS > ${chroot_dir}/etc/resolv.conf
+	nameserver 8.8.8.8
+	EOS
 }
 
 function configure_networking() {
@@ -663,6 +784,8 @@ function config_host_and_domainname() {
   }
   [[ -f ${chroot_dir}/etc/resolv.conf ]] && cat ${chroot_dir}/etc/resolv.conf || :
 }
+
+## nic configuration
 
 function nictabinfo() {
   {
@@ -779,101 +902,4 @@ function render_interface_ovsbridge() {
 	 set-controller \${DEVICE} unix:/var/run/openvswitch/\${DEVICE}.controller
 	"
 	EOS
-}
-
-function install_resolv_conf() {
-  local chroot_dir=$1
-
-  cat <<-EOS > ${chroot_dir}/etc/resolv.conf
-	nameserver 8.8.8.8
-	EOS
-}
-
-function install_fstab() {
-  local chroot_dir=$1 disk_filename=$2
-  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
-  checkroot || return 1
-
-  printf "[INFO] Overwriting /etc/fstab\n"
-  {
-  local default_filesystem=$(preferred_filesystem)
-  xptabproc <<'EOS'
-    case "${mountpoint}" in
-    /boot) fstype=${default_filesystem} dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
-    root)  fstype=${default_filesystem} dumpopt=1 fsckopt=1 mountpath=/             ;;
-    swap)  fstype=swap                  dumpopt=0 fsckopt=0 mountpath=${mountpoint} ;;
-    /opt)  fstype=${default_filesystem} dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
-    /home) fstype=${default_filesystem} dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
-    *)     fstype=${default_filesystem} dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
-    esac
-    uuid=$(mntpntuuid ${disk_filename} ${mountpoint})
-    printf "UUID=%s %s\t%s\tdefaults\t%s %s\n" ${uuid} ${mountpath} ${fstype} ${dumpopt} ${fsckopt}
-EOS
-  cat <<-_EOS_
-	tmpfs                   /dev/shm                tmpfs   defaults        0 0
-	devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
-	sysfs                   /sys                    sysfs   defaults        0 0
-	proc                    /proc                   proc    defaults        0 0
-	_EOS_
-  } > ${chroot_dir}/etc/fstab
-  cat ${chroot_dir}/etc/fstab
-}
-
-function configure_keepcache() {
-  local chroot_dir=$1 keepcache=${2:-0}
-  [[ -a "${chroot_dir}/etc/yum.conf" ]] || { echo "[ERROR] file not found: ${chroot_dir}/etc/yum.conf (distro:${LINENO})" >&2; return 1; }
-
-  case "${keepcache}" in
-  [01]) ;;
-  *)    keepcache=0 ;;
-  esac
-
-  printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
-  egrep -q ^keepcache= ${chroot_dir}/etc/yum.conf || {
-    echo keepcache=${keepcache} >> ${chroot_dir}/etc/yum.conf
-  } || {
-    sed -i "s,^keepcache=.*,keepcache=${keepcache}," ${chroot_dir}/etc/yum.conf
-  }
-
-  egrep ^keepcache= ${chroot_dir}/etc/yum.conf
-}
-
-function configure_selinux() {
-  local chroot_dir=$1 selinux=${2:-disabled}
-  [[ -a "${chroot_dir}/etc/sysconfig/selinux" ]] || return 0
-
-  case "${selinux}" in
-  enforcing|permissive|disabled)
-    ;;
-  *)
-    echo "[ERROR] unknown SELINUX value: ${selinux} (distro:${LINENO})" >&2
-    return 1
-    ;;
-  esac
-  printf "[INFO] Setting /etc/sysconfig/selinux: SELINUX=%s\n" ${selinux}
-  sed -i "s/^\(SELINUX=\).*/\1${selinux}/"  ${chroot_dir}/etc/sysconfig/selinux
-  egrep ^SELINUX= ${chroot_dir}/etc/sysconfig/selinux
-}
-
-function cleanup_distro() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-
-  find   ${chroot_dir}/var/log/ -type f | xargs rm
-  rm -rf ${chroot_dir}/tmp/*
-}
-
-function preferred_filesystem() {
-  echo ${preferred_filesystem:-ext3}
-}
-
-##
-
-function trap_distro() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-
-  umount_nonroot ${chroot_dir}
-  [[ -d "${chroot_dir}" ]] && rm -rf ${chroot_dir}
 }
