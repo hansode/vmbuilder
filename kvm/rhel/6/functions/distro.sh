@@ -786,6 +786,17 @@ function config_host_and_domainname() {
   [[ -f ${chroot_dir}/etc/resolv.conf ]] && cat ${chroot_dir}/etc/resolv.conf || :
 }
 
+function configure_console() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  [[ -f ${chroot_dir}/etc/sysconfig/init ]] && {
+    sed -i "s,^ACTIVE_CONSOLES=.*,ACTIVE_CONSOLES=\"/dev/tty[1-6] /dev/ttyS0\"", ${chroot_dir}/etc/sysconfig/init
+  } || :
+
+  egrep -w "^ttyS0" ${chroot_dir}/etc/securetty || { echo ttyS0 >>  ${chroot_dir}/etc/securetty; }
+}
+
 ## nic configuration
 
 function nictabinfo() {
