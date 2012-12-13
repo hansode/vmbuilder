@@ -76,7 +76,7 @@ function start_lxc() {
 
   render_lxc_config > ${lxc_config_path}
   shlog lxc-create -f ${lxc_config_path} -n ${name}
- #shlog lxc-start -n %s -d -l DEBUG -o %s/%s.log 3<&- 4<&- 6<&-", [ctx.inst[:uuid], ctx.inst_data_dir, ctx.inst[:uuid]])
+  shlog lxc-start -n ${name} -l DEBUG
 }
 
 function stop_lxc() {
