@@ -43,6 +43,8 @@ function add_option_hypervisor_kvm() {
   vendor_id=${vendor_id:-52:54:00}
 }
 
+## command path
+
 function qemu_kvm_path() {
   local execs="/usr/libexec/qemu-kvm /usr/bin/kvm"
 
@@ -54,6 +56,8 @@ function qemu_kvm_path() {
   [[ -n "${command_path}" ]] || { echo "[ERROR] command not found: ${execs} (hypervisor/kvm:${LINENO})." >&2; return 1; }
   echo ${command_path}
 }
+
+## command builder
 
 function build_vif_opt() {
   local vif_name macaddr bridge_if
@@ -74,27 +78,86 @@ function build_vif_opt() {
 EOS
 }
 
-function start_kvm() {
-  local name=${1}
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
-  checkroot || return 1
+function build_drive_opt() {
+  echo \
+    -drive file=${image_path},media=disk,boot=on,index=0,cache=none
+}
 
-  shlog ${kvm_path} ${kvm_opts} \
+function build_kvm_opts() {
+  echo \
+   ${kvm_opts} \
    -name     ${name} \
    -m        ${mem_size} \
    -smp      ${cpu_num} \
    -vnc      ${vnc_addr}:${vnc_port} \
    -k        ${vnc_keymap} \
-   -drive    file=${image_path},media=disk,boot=on,index=0,cache=none \
    -monitor  telnet:${monitor_addr}:${monitor_port},server,nowait \
    -serial   telnet:${serial_addr}:${serial_port},server,nowait \
+   $(build_drive_opt) \
    $(build_vif_opt ${vif_num}) \
    -daemonize
+}
+
+function setup_bridge_and_vif() {
+  checkroot || return 1
 
   viftabproc <<'EOS'
     shlog ip link set ${vif_name} up
     [[ -z "${bridge_if}" ]] || shlog brctl addif ${bridge_if} ${vif_name}
 EOS
+}
+
+function render_kvm_runscript() {
+  local name=$1
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
+
+  cat <<-EOS
+	#!/bin/sh -e
+	#execute kvm command
+	#
+	name=${name}
+	brname=${brname}
+	mem_size=${mem_size}
+	cpu_num=${cpu_num}
+	vnc_addr=${vnc_addr}
+	vnc_port=${vnc_port}
+	monitor_addr=${monitor_addr}
+	monitor_port=${monitor_port}
+	serial_addr=${serial_addr}
+	serial_port=${serial_port}
+	#
+	EOS
+
+  (
+    # set non extracted value
+    name='${name}'
+    brname='${brname}'
+    mem_size='${mem_size}'
+    cpu_num='${cpu_num}'
+    vnc_addr='${vnc_addr}'
+    vnc_port='${vnc_port}'
+    monitor_port='${monitor_port}'
+    monitor_port='${monitor_port}'
+    serial_addr='${serial_addr}'
+    serial_port='${serial_port}'
+
+    # dry run
+    function shlog() { echo $*; }
+    function checkroot() { echo checkroot $* >/dev/null; }
+
+    start_kvm ${name}
+  )
+}
+
+## controll kvm process
+
+function start_kvm() {
+  local name=$1
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  shlog ${kvm_path} $(build_kvm_opts)
+  setup_bridge_and_vif
 }
 
 function stop_kvm() {

@@ -58,6 +58,9 @@ function controll_kvm() {
   list)
     list_kvm
     ;;
+  render-runscript)
+    render_kvm_runscript ${name}
+    ;;
   dump)
     dump_kvm
     ;;

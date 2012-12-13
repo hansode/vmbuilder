@@ -14,18 +14,17 @@
 
 function setUp() {
   add_option_hypervisor_kvm
-
-  function shlog() { echo shlog $*; }
-  function checkroot() { echo checkroot $*; }
 }
 
-function test_start_kvm_no_opts() {
-  start_kvm
+function test_render_kvm_runscript() {
+  render_kvm_runscript
   assertNotEquals $? 0
 }
 
-function test_start_kvm_set_opts() {
-  start_kvm vmbuilder
+function test_render_kvm_runscript_set_name() {
+  local name=vmbuilder
+
+  render_kvm_runscript ${name}
   assertEquals $? 0
 }
 
