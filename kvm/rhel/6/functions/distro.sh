@@ -911,3 +911,17 @@ function routetabinfo() {
 
   egrep -v '^$|^#' ${routetab}
 }
+
+function config_routing() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  local line=
+  while read line; do
+    (
+      set -e
+      eval ${line}
+      add_routing ${chroot_dir} ${ifname}
+    )
+  done < <(routetabinfo)
+}
