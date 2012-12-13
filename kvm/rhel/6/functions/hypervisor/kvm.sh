@@ -43,6 +43,8 @@ function add_option_hypervisor_kvm() {
   vendor_id=${vendor_id:-52:54:00}
 }
 
+## command path
+
 function qemu_kvm_path() {
   local execs="/usr/libexec/qemu-kvm /usr/bin/kvm"
 
@@ -54,6 +56,8 @@ function qemu_kvm_path() {
   [[ -n "${command_path}" ]] || { echo "[ERROR] command not found: ${execs} (hypervisor/kvm:${LINENO})." >&2; return 1; }
   echo ${command_path}
 }
+
+## command builder
 
 function build_vif_opt() {
   local vif_name macaddr bridge_if
@@ -74,12 +78,9 @@ function build_vif_opt() {
 EOS
 }
 
-function start_kvm() {
-  local name=${1}
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
-  checkroot || return 1
-
-  shlog ${kvm_path} ${kvm_opts} \
+function build_kvm_opts() {
+  echo \
+   ${kvm_opts} \
    -name     ${name} \
    -m        ${mem_size} \
    -smp      ${cpu_num} \
@@ -90,6 +91,16 @@ function start_kvm() {
    -serial   telnet:${serial_addr}:${serial_port},server,nowait \
    $(build_vif_opt ${vif_num}) \
    -daemonize
+}
+
+## controll kvm process
+
+function start_kvm() {
+  local name=${1}
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  shlog ${kvm_path} $(build_kvm_opts)
 
   viftabproc <<'EOS'
     shlog ip link set ${vif_name} up
