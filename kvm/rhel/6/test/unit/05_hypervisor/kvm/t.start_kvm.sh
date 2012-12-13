@@ -15,6 +15,7 @@
 function setUp() {
   add_option_hypervisor_kvm
   function shlog() { echo shlog $*; }
+  function checkroot() { echo checkroot *; }
 }
 
 function test_start_kvm_no_opts() {
@@ -22,7 +23,7 @@ function test_start_kvm_no_opts() {
   assertNotEquals $? 0
 }
 
-function test_start_kvm_set_vif_num() {
+function test_start_kvm_set_opts() {
   start_kvm vmbuilder
   assertEquals $? 0
 }
