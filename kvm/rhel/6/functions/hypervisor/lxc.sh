@@ -35,7 +35,7 @@ function render_lxc_config() {
 	cat <<-EOS
 	lxc.utsname = ${hostname:-localhost}
 	lxc.tty = 6
-	lxc.pts = 1024
+	#lxc.pts = 1024
 	lxc.network.type = veth
 	lxc.network.flags = up
 	lxc.network.link = ${brname}
@@ -44,7 +44,7 @@ function render_lxc_config() {
 	lxc.network.hwaddr = $(gen_macaddr)
 	lxc.rootfs = ${rootfs_path}
 
-	lxc.mount.entry = devpts ${rootfs_path}/dev/pts                devpts  gid=5,mode=620  0 0
+	#lxc.mount.entry = devpts ${rootfs_path}/dev/pts                devpts  gid=5,mode=620  0 0
 	lxc.mount.entry = proc   ${rootfs_path}/proc                   proc    defaults        0 0
 	lxc.mount.entry = sysfs  ${rootfs_path}/sys                    sysfs   defaults        0 0
 	
