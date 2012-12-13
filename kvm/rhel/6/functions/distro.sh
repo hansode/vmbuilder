@@ -938,3 +938,27 @@ function install_routing() {
   render_routing ${ifname} | egrep -v '^$' >> ${chroot_dir}/${route_path}
   cat ${chroot_dir}/${route_path}
 }
+
+function render_routing() {
+  local ifname=$1
+  [[ -n "${ifname}" ]] || { echo "[ERROR] Invalid argument: ifname:${ifname} (distro:${LINENO})" >&2; return 1; }
+
+  # ip command arguments format
+  # - default X.X.X.X dev interface
+  # - X.X.X.X/X via X.X.X.X dev interface
+
+  case "${cidr}" in
+  "")
+    # gw=x.x.x.x ifname=ethX
+    cat <<-EOS
+	default ${gw} dev ${ifname}
+	EOS
+	;;
+  *)
+    # cidr=x.x.x.x/x gw=x.x.x.x ifname=ethX
+    cat <<-EOS
+	${cidr} via ${gw} dev ${ifname}
+	EOS
+	;;
+  esac
+}
