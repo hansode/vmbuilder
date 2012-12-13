@@ -16,8 +16,9 @@ function setUp() {
   mkdir -p ${chroot_dir}/etc/sysconfig/
   mkdir -p ${chroot_dir}/etc/udev/rules.d
 
-  function config_host_and_domainname() { :; }
-  function config_interfaces() { :; }
+  function config_host_and_domainname() { echo config_host_and_domainname $* ; }
+  function config_interfaces() { echo config_interfaces $* ; }
+  function config_routing() { echo config_routing $* ; }
 }
 
 function tearDown() {

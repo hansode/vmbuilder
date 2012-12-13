@@ -746,6 +746,7 @@ function configure_networking() {
 	EOS
   config_host_and_domainname ${chroot_dir}
   config_interfaces          ${chroot_dir}
+  config_routing             ${chroot_dir}
 
   local udev_70_persistent_net_path=${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
   printf "[INFO] Unsetting udev 70-persistent-net.rules\n"
@@ -902,4 +903,63 @@ function render_interface_ovsbridge() {
 	 set-controller \${DEVICE} unix:/var/run/openvswitch/\${DEVICE}.controller
 	"
 	EOS
+}
+
+## routing configuration
+
+function routetabinfo() {
+  [[ -n "${routetab}" && -f "${routetab}" ]] || return 0
+
+  egrep -v '^$|^#' ${routetab}
+}
+
+function config_routing() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  local line=
+  while read line; do
+    (
+      set -e
+      eval ${line}
+      install_routing ${chroot_dir} ${ifname}
+    )
+  done < <(routetabinfo)
+}
+
+function install_routing() {
+  local chroot_dir=$1 ifname=$2
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -n "${ifname}" ]] || { echo "[ERROR] Invalid argument: ifname:${ifname} (distro:${LINENO})" >&2; return 1; }
+
+  local route_path=/etc/sysconfig/network-scripts/route-${ifname}
+
+  printf "[INFO] Generating %s\n" ${route_path}
+
+  render_routing ${ifname} | egrep -v '^$' >> ${chroot_dir}/${route_path}
+  cat ${chroot_dir}/${route_path}
+}
+
+function render_routing() {
+  local ifname=$1
+  [[ -n "${ifname}" ]] || { echo "[ERROR] Invalid argument: ifname:${ifname} (distro:${LINENO})" >&2; return 1; }
+
+  # ip command arguments format
+  # - default X.X.X.X dev interface
+  # - X.X.X.X/X via X.X.X.X dev interface
+
+  case "${cidr}" in
+  "")
+    # gw=x.x.x.x ifname=ethX
+    cat <<-EOS
+	default ${gw} dev ${ifname}
+	EOS
+	;;
+  *)
+    # cidr=x.x.x.x/x gw=x.x.x.x ifname=ethX
+    cat <<-EOS
+	${cidr} via ${gw} dev ${ifname}
+	EOS
+	;;
+  esac
 }

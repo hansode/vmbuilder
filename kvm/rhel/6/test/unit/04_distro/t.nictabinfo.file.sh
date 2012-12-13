@@ -15,8 +15,8 @@
 ## public functions
 
 function test_nictabinfo_file() {
-  nictab=${abs_dirname}/../../../nictab.txt.example
-  assertEquals $(nictabinfo | wc -l) 3
+  local nictab=${abs_dirname}/../../../nictab.txt.example
+  assertEquals "$(nictabinfo | wc -l)" "$(egrep -v '^$|^#' ${nictab} | wc -l)"
 }
 
 ## shunit2
