@@ -790,7 +790,7 @@ function config_host_and_domainname() {
 
 function nictabinfo() {
   {
-    [[ -n "${nictab}" ]] && [[ -f "${nictab}" ]] && {
+    [[ -n "${nictab}" && -f "${nictab}" ]] && {
       cat ${nictab}
     } || {
       cat <<-EOS
