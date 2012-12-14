@@ -41,10 +41,12 @@ function render_lxc_config() {
 	lxc.network.link = ${brname}
 	lxc.network.name = eth0
 	lxc.network.mtu = 1500
-	#if $mac
 	lxc.network.hwaddr = $(gen_macaddr)
-	#end if
 	lxc.rootfs = ${rootfs_dir}
+
+	lxc.mount.entry = devpts ${rootfs_dir}/dev/pts                devpts  gid=5,mode=620  0 0
+	lxc.mount.entry = proc   ${rootfs_dir}/proc                   proc    defaults        0 0
+	lxc.mount.entry = sysfs  ${rootfs_dir}/sys                    sysfs   defaults        0 0
 	
 	# /dev/null and zero
 	lxc.cgroup.devices.allow = c 1:3 rwm
@@ -55,7 +57,7 @@ function render_lxc_config() {
 	lxc.cgroup.devices.allow = c 5:0 rwm
 	lxc.cgroup.devices.allow = c 4:0 rwm
 	lxc.cgroup.devices.allow = c 4:1 rwm
-	
+
 	# /dev/{,u}random
 	lxc.cgroup.devices.allow = c 1:9 rwm
 	lxc.cgroup.devices.allow = c 1:8 rwm
