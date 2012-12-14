@@ -31,6 +31,7 @@ function setUp() {
   function configure_networking() { echo configure_networking $*; }
   function configure_mounting() { echo configure_mounting $*; }
   function configure_keepcache() { echo configure_keepcache $*; }
+  function configure_console() { echo configure_console $*; }
   function install_kernel() { echo install_kernel $*; }
   function install_bootloader() { echo install_bootloader $*; }
   function install_epel() { echo install_epel $*; }
