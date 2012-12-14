@@ -10,6 +10,7 @@
 #
 # import:
 #  utils: extract_args
+#  disk: add_option_disk
 #  hypervisor: mount_ptab, umount_ptab
 #
 # usage:
@@ -72,4 +73,5 @@ cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
 [[ -f "${config_path}" ]] && load_config ${config_path} || :
 register_options
+add_option_disk
 ptab_mounter ${cmd}
