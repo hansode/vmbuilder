@@ -11,7 +11,7 @@
 ### xpart
 
 function test_create_vm_xpart() {
-  local xpart=${abs_dirname}/../../../xpart.txt.example
+  local xpart=${abs_dirname}/../../../examples/xpart.txt.example
 
   (
     set -e

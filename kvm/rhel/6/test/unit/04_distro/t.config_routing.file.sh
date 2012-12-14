@@ -10,7 +10,7 @@
 
 ## variables
 
-declare routetab=${abs_dirname}/../../../routetab.txt.example
+declare routetab=${abs_dirname}/../../../examples/routetab.txt.example
 
 ## public functions
 

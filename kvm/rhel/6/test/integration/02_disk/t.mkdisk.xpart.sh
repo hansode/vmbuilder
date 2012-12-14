@@ -19,7 +19,7 @@ function tearDown() {
 ### xpart
 
 function test_mkdisk_xpart() {
-  local xpart=${abs_dirname}/../../../xpart.txt.example
+  local xpart=${abs_dirname}/../../../examples/xpart.txt.example
 
   mkdisk ${disk_filename} $(sum_disksize)
   assertEquals $? 0
