@@ -15,6 +15,7 @@
 function setUp() {
   mkdir -p ${chroot_dir}/etc
   function chroot() { echo chroot $*; }
+  function mkdevice() { echo mkdevice $*; }
   function prevent_udev_starting() { echo prevent_udev_starting $*; }
   function reconfigure_fstab() { echo reconfigure_fstab $*; }
   function reconfigure_mtab() { echo reconfigure_mtab $*; }
