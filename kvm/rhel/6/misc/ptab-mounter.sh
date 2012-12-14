@@ -7,6 +7,7 @@
 #  bash
 #  dirname, pwd
 #  sed, head
+#  egrep
 #
 # import:
 #  utils: extract_args
@@ -45,6 +46,9 @@ function ptab_mounter() {
     umount) ${1}_ptab               ${mntpnt_path} ;;
     esac
 
+    ;;
+  ls)
+    mount | egrep ${mntpnt_path}
     ;;
   *)
     echo "[ERROR] no such command: ${1}" >&2
