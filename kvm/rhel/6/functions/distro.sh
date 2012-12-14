@@ -260,6 +260,9 @@ function configure_container() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
+  # make sure to make device files & directories at post install phase
+  mkdevice              ${chroot_dir}
+
   prevent_udev_starting ${chroot_dir}
   reconfigure_fstab     ${chroot_dir}
   reconfigure_mtab      ${chroot_dir}
