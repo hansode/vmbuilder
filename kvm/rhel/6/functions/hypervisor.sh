@@ -190,7 +190,7 @@ function sync_os() {
 }
 
 function install_os() {
-  local chroot_dir=$1 distro_dir=$2 disk_filename=$3 keepcache=${4:-0} execscript=$5
+  local chroot_dir=$1 distro_dir=$2 disk_filename=$3 execscript=$4
   [[ -d "${chroot_dir}"    ]] && { echo "[ERROR] already exists: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
   [[ -d "${distro_dir}"    ]] || { echo "[ERROR] no such directory: ${distro_dir} (hypervisor:${LINENO})" >&2; return 1; }
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
@@ -217,7 +217,7 @@ function install_os() {
 
   configure_networking ${chroot_dir}
   configure_mounting   ${chroot_dir} ${disk_filename}
-  configure_keepcache  ${chroot_dir} ${keepcache}
+  configure_keepcache  ${chroot_dir} ${keepcache:-0}
   configure_console    ${chroot_dir}
   install_kernel       ${chroot_dir}
   install_bootloader   ${chroot_dir} ${disk_filename}
