@@ -217,7 +217,7 @@ function install_os() {
 
   configure_networking ${chroot_dir}
   configure_mounting   ${chroot_dir} ${disk_filename}
-  configure_keepcache  ${chroot_dir} ${keepcache:-0}
+  configure_keepcache  ${chroot_dir}
   configure_console    ${chroot_dir}
   install_kernel       ${chroot_dir}
   install_bootloader   ${chroot_dir} ${disk_filename}
