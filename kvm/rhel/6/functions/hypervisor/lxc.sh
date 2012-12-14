@@ -27,6 +27,8 @@ function add_option_hypervisor_lxc() {
   viftab=${viftab:-}
 
   vendor_id=${vendor_id:-52:54:00}
+
+  rootfs_dir=${rootfs_dir:-$(pwd)/rootfs}
 }
 
 function render_lxc_config() {
@@ -42,7 +44,7 @@ function render_lxc_config() {
 	#if $mac
 	lxc.network.hwaddr = $(gen_macaddr)
 	#end if
-	lxc.rootfs = $(pwd)/rootfs
+	lxc.rootfs = ${rootfs_dir}
 	
 	# /dev/null and zero
 	lxc.cgroup.devices.allow = c 1:3 rwm
