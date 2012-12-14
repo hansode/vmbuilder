@@ -15,7 +15,7 @@
 ## public functions
 
 function test_routetabinfo_file() {
-  local routetab=${abs_dirname}/../../../routetab.txt.example
+  local routetab=${abs_dirname}/../../../examples/routetab.txt.example
   assertEquals "$(routetabinfo | wc -l)" "$(egrep -v '^$|^#' ${routetab} | wc -l)"
 }
 
