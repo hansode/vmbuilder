@@ -112,3 +112,11 @@ function lxc_info() {
 
   shlog lxc-info --name ${name}
 }
+
+function lxc_console() {
+  local name=$1
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/lxc:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  shlog lxc-console --name ${name}
+}
