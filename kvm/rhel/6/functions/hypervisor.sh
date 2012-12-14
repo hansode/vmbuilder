@@ -193,13 +193,21 @@ function install_os() {
   local chroot_dir=$1 distro_dir=$2 disk_filename=$3
   [[ -d "${chroot_dir}"    ]] && { echo "[ERROR] already exists: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
   [[ -d "${distro_dir}"    ]] || { echo "[ERROR] no such directory: ${distro_dir} (hypervisor:${LINENO})" >&2; return 1; }
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -n "${disk_filename}" ]] && {
+    # needs disk
+    [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
+  } || {
+    # diskless
+    printf "[INFO] Diskless mode\n"
+  }
   # install_kernel depends on distro_name.
   [[ -n "${distro_name}"   ]] || { echo "[ERROR] Invalid argument: distro_name:${distro_name} (hypervisor:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   mkdir -p ${chroot_dir}
-  mount_ptab ${disk_filename} ${chroot_dir}
+  [[ -z "${disk_filename}" ]] || {
+    mount_ptab ${disk_filename} ${chroot_dir}
+  }
 
   printf "[DEBUG] Installing OS to %s\n" ${chroot_dir}
   # ${distro_dir} -> ${chroot_dir}
@@ -216,19 +224,27 @@ function install_os() {
   install_authorized_keys ${chroot_dir}
 
   configure_networking ${chroot_dir}
-  configure_mounting   ${chroot_dir} ${disk_filename}
+  [[ -z "${disk_filename}" ]] || {
+    configure_mounting ${chroot_dir} ${disk_filename}
+  }
   configure_keepcache  ${chroot_dir}
   configure_console    ${chroot_dir}
   install_kernel       ${chroot_dir}
-  install_bootloader   ${chroot_dir} ${disk_filename}
+  [[ -z "${disk_filename}" ]] || {
+    install_bootloader ${chroot_dir} ${disk_filename}
+  }
   install_epel         ${chroot_dir}
   install_addedpkgs    ${chroot_dir}
   run_copy             ${chroot_dir} ${copy}
   run_execscript       ${chroot_dir} ${execscript}
   install_firstboot    ${chroot_dir} ${firstboot}
 
-  umount_ptab          ${chroot_dir}
-  rmdir                ${chroot_dir}
+  [[ -z "${disk_filename}" ]] || {
+    umount_ptab    ${chroot_dir}
+    rmdir          ${chroot_dir}
+  } || {
+    umount_nonroot ${chroot_dir}
+  }
 }
 
 ##
