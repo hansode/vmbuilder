@@ -67,16 +67,22 @@ function render_lxc_config() {
 
 ## controll lxc process
 
-function lxc_start() {
+function lxc_create() {
   local name=$1
   [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   local lxc_config_path=$(pwd)/lxc.conf
-
   render_lxc_config > ${lxc_config_path}
   shlog lxc-create -f ${lxc_config_path} -n ${name}
-  shlog lxc-start -n ${name} -l DEBUG
+}
+
+function lxc_start() {
+  local name=$1
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  shlog lxc-start -n ${name} -l DEBUG -o $(pwd)/lxc.log
 }
 
 function lxc_stop() {
@@ -85,6 +91,13 @@ function lxc_stop() {
   checkroot || return 1
 
   shlog lxc-stop -n ${name}
+}
+
+function lxc_destroy() {
+  local name=$1
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
   shlog lxc-destroy -n ${name}
 }
 

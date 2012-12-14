@@ -14,7 +14,7 @@
 # import:
 #  utils: extract_args, shlog, beautify_process_args
 #  hypervisor: gen_macaddr
-#              lxc_start, lxc_stop
+#              lxc_create, lxc_start, lxc_stop, lxc_destroy, lxc_info
 #
 # usage:
 #
@@ -42,14 +42,8 @@ function controll_lxc() {
     # kind of virt-install
     ${abs_dirname}/../vmbuilder.sh --config-path=${config_path}
     ;;
-  start)
-    lxc_start ${name}
-    ;;
-  stop)
-    lxc_stop ${name}
-    ;;
-  info)
-    lxc_info ${name}
+  create|start|stop|destroy|info)
+    lxc_${cmd} ${name}
     ;;
   *)
     echo $"USAGE: $0 [start] OPTIONS..." >&2
