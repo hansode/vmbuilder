@@ -1015,3 +1015,71 @@ function render_routing() {
 	;;
   esac
 }
+
+## detector
+
+function detect_distro() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  # * /etc/lsb-release
+  # DISTRIB_ID=Ubuntu
+  # DISTRIB_RELEASE=10.04
+  # DISTRIB_CODENAME=lucid
+  # DISTRIB_DESCRIPTION="Ubuntu 10.04.3 LTS"
+  #
+  # * /etc/redhat-release
+  # CentOS release 5.6 (Final)
+  # CentOS Linux release 6.0 (Final)
+  # Red Hat Enterprise Linux Server release 6.0 (Santiago)
+  # Scientific Linux release 6.0 (Carbon)
+
+  local DISTRIB_ID=
+  local DISTRIB_RELEASE=
+  local DISTRIB_FLAVOR=
+
+  if [[ -f "${chroot_dir}/etc/redhat-release" ]]; then
+    # rhel
+    DISTRIB_FLAVOR=RedHat
+    if [[ -f "${chroot_dir}/etc/centos-release" ]]; then
+      DISTRIB_ID=CentOS
+    elif [[ -f "${chroot_dir}/etc/fedora-release" ]]; then
+      DISTRIB_ID=Fedora
+    else
+      # rhel, scientific
+      case "$(sed 's,Linux .*,,; s, ,,g' ${chroot_dir}/etc/redhat-release)" in
+      Scientific)
+        DISTRIB_ID=Scientific
+        ;;
+      RedHatEnterprise)
+        DISTRIB_ID=RHEL
+        ;;
+      CentOS*)
+        # 5.x
+        DISTRIB_ID=CentOS
+        ;;
+      *)
+        DISTRIB_ID=Unknown
+        ;;
+      esac
+    fi
+    DISTRIB_RELEASE=$(sed -e 's/.*release \(.*\) .*/\1/' ${chroot_dir}/etc/redhat-release)
+  elif [[ -f "${chroot_dir}/etc/debian_version" ]]; then
+    # debian
+    DISTRIB_FLAVOR=Debian
+    if [[ -f "${chroot_dir}/etc/lsb-release" ]]; then
+      . ${chroot_dir}/etc/lsb-release
+    else
+      DISTRIB_ID=Debian
+    fi
+  else
+    # others
+    DISTRIB_ID=Unknown
+  fi
+
+  cat <<-EOS
+	DISTRIB_FLAVOR=${DISTRIB_FLAVOR}
+	DISTRIB_ID=${DISTRIB_ID}
+	DISTRIB_RELEASE=${DISTRIB_RELEASE}
+	EOS
+}
