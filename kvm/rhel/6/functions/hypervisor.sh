@@ -190,7 +190,7 @@ function sync_os() {
 }
 
 function install_os() {
-  local chroot_dir=$1 distro_dir=$2 disk_filename=$3 execscript=$4
+  local chroot_dir=$1 distro_dir=$2 disk_filename=$3
   [[ -d "${chroot_dir}"    ]] && { echo "[ERROR] already exists: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
   [[ -d "${distro_dir}"    ]] || { echo "[ERROR] no such directory: ${distro_dir} (hypervisor:${LINENO})" >&2; return 1; }
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }

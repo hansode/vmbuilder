@@ -70,7 +70,7 @@ function create_vm() {
 
   mkfsdisk ${disk_filename} $(preferred_filesystem)
 
-  install_os ${chroot_dir} ${distro_dir} ${disk_filename} ${execscript}
+  install_os ${chroot_dir} ${distro_dir} ${disk_filename}
 
   is_dev ${disk_filename} || {
     printf "[INFO] Deleting loop devices\n"
