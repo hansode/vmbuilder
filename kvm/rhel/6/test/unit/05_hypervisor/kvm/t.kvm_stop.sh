@@ -14,16 +14,11 @@
 
 function setUp() {
   add_option_hypervisor_kvm
-  function telnet() { echo telnet $*; }
 }
 
-function test_console_kvm_no_opts() {
-  console_kvm
-  assertEquals $? 0
-}
-
-function test_console_kvm_set_bindaddr() {
-  console_kvm 127.0.0.1 5556
+function test_kvm_stop() {
+  # connect to local tcp/22
+  kvm_stop 127.0.0.1 22
   assertEquals $? 0
 }
 

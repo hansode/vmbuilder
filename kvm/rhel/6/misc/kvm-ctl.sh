@@ -14,7 +14,7 @@
 # import:
 #  utils: extract_args, shlog, beautify_process_args
 #  hypervisor: qemu_kvm_path, gen_macaddr, build_vif_opt, kvmof
-#              start_kvm, stop_kvm, console_kvm, info_kvm, list_kvm, dump_kvm
+#              kvm_start, kvm_stop, kvm_console, kvm_info, kvm_list, kvm_dump
 #
 # usage:
 #
@@ -44,25 +44,25 @@ function controll_kvm() {
     ${abs_dirname}/../vmbuilder.sh --config-path=${config_path}
     ;;
   start)
-    start_kvm ${name}
+    kvm_start ${name}
     ;;
   stop)
-    stop_kvm ${monitor_addr} ${monitor_port}
+    kvm_stop ${monitor_addr} ${monitor_port}
     ;;
   console)
-    console_kvm ${serial_addr} ${serial_port}
+    kvm_console ${serial_addr} ${serial_port}
     ;;
   info)
-    info_kvm ${name}
+    kvm_info ${name}
     ;;
   list)
-    list_kvm
+    kvm_list
     ;;
   render-runscript)
     render_kvm_runscript ${name}
     ;;
   dump)
-    dump_kvm
+    kvm_dump
     ;;
   *)
     echo $"USAGE: $0 [start] OPTIONS..." >&2
