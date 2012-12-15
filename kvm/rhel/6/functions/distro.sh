@@ -408,14 +408,18 @@ function install_fstab() {
     uuid=$(mntpntuuid ${disk_filename} ${mountpoint})
     printf "UUID=%s %s\t%s\tdefaults\t%s %s\n" ${uuid} ${mountpath} ${fstype} ${dumpopt} ${fsckopt}
 EOS
+  render_fstab
+  } > ${chroot_dir}/etc/fstab
+  cat ${chroot_dir}/etc/fstab
+}
+
+function render_fstab() {
   cat <<-_EOS_
 	tmpfs                   /dev/shm                tmpfs   defaults        0 0
 	devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
 	sysfs                   /sys                    sysfs   defaults        0 0
 	proc                    /proc                   proc    defaults        0 0
 	_EOS_
-  } > ${chroot_dir}/etc/fstab
-  cat ${chroot_dir}/etc/fstab
 }
 
 ## unix user

@@ -4,7 +4,7 @@
 #  Hypervisor lxc
 #
 # requires:
-#  bash
+#  bash, sed, cat, tee
 #
 # imports:
 #  utils: shlog
@@ -29,6 +29,29 @@ function add_option_hypervisor_lxc() {
   vendor_id=${vendor_id:-52:54:00}
 
   rootfs_path=${rootfs_path:-$(pwd)/rootfs}
+}
+
+function configure_hypervisor() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] no such directory: ${chroot_dir} (hypervisor/lxc:${LINENO})" >&2; return 1; }
+
+  echo "[INFO] ***** Configuring lxc-specific *****"
+
+  prevent_udev_starting ${chroot_dir}
+
+  cat <<-'_EOS_' | tee ${chroot_dir}/etc/fstab
+	tmpfs                   /dev/shm                tmpfs   defaults        0 0
+	devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
+	sysfs                   /sys                    sysfs   defaults        0 0
+	proc                    /proc                   proc    defaults        0 0
+	#none                   /proc/sys/fs/binfmt_misc binfmt_misc defaults   0 0
+	_EOS_
+
+  [[ -f ${chroot_dir}/etc/mtab ]] && rm -f  ${chroot_dir}/etc/mtab || :
+  run_in_target ${chroot_dir} ln -fs /proc/mounts /etc/mtab
+
+ #run_in_target ${chroot_dir} chkconfig udev-post off
+ #run_in_target ${chroot_dir} chkconfig network on
 }
 
 function render_lxc_config() {
