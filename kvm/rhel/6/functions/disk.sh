@@ -53,19 +53,35 @@ function mkdevice() {
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (disk:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
-  mkdir ${chroot_dir}/dev
-  mkdir ${chroot_dir}/sys
+  while read name mode; do
+    mkdir -m ${mode} ${chroot_dir}${name}
+  done < <(cat <<-EOS | egrep -v '^#|^$'
+	# common
+	/dev      755
+	/sys      755
+	# container
+	/dev/pts  755
+	/dev/shm 1777
+	EOS
+	)
+
   while read name mode type major minor; do
     [[ -a ${chroot_dir}/dev/${name} ]] || \
       mknod -m ${mode} ${chroot_dir}/dev/${name} ${type} ${major} ${minor}
-  done < <(cat <<-EOS
-	console 600 c 5 1
+  done < <(cat <<-EOS | egrep -v '^#|^$'
+	# common
 	null    666 c 1 3
+	zero    666 c 1 5
 	tty1    620 c 4 1
 	tty2    620 c 4 2
 	tty3    620 c 4 3
 	tty4    620 c 4 4
-	zero    666 c 1 5
+	console 600 c 5 1
+	# container
+	full    666 c 1 7
+	random  666 c 1 8
+	urandom 666 c 1 9
+	ptmx    666 c 5 2
 	EOS
 	)
 }

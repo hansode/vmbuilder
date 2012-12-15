@@ -17,6 +17,7 @@ function setUp() {
 }
 
 function tearDown() {
+  ls -lR ${chroot_dir}
   rm -rf ${chroot_dir}
 }
 
