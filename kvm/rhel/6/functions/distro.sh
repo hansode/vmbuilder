@@ -14,8 +14,8 @@
 #  ls, tail
 #
 # imports:
-#  utils: is_dev, checkroot, run_in_target
-#  disk: mkdevice, mkprocdir, mount_proc, umount_nonroot, xptabinfo, mntpntuuid, get_grub_id, lsdevmap, devmap2lodev
+#  utils: checkroot, run_in_target
+#  disk: is_dev, mkdevice, mkprocdir, mount_proc, umount_nonroot, xptabinfo, mntpntuuid, get_grub_id, lsdevmap, devmap2lodev
 #
 
 ## depending on global variables

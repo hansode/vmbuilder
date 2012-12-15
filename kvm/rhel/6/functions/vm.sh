@@ -8,9 +8,9 @@
 #  rm
 #
 # imports:
-#  utils: is_dev, checkroot
+#  utils: checkroot
 #  mbr: rmmbr
-#  disk: sum_disksize, mkdisk, mkptab, mapptab, mkfsdisk, unmapptab
+#  disk: is_dev, sum_disksize, mkdisk, mkptab, mapptab, mkfsdisk, unmapptab
 #  distro: build_chroot, preferred_filesystem
 #  hypervisor: preflight_check_hypervisor, install_os, umount_ptab
 #

@@ -96,48 +96,11 @@ function checkroot() {
   } || :
 }
 
-function is_dev() {
-  local disk_filename=$1
-  # do not use "-a" in this case.
-  [[ -n "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (utils:${LINENO})" >&2; return 1; }
-
-  case "${disk_filename}" in
-  /dev/*) return 0 ;;
-       *) return 1 ;;
-  esac
-}
-
-function is_dmdev() {
-  local disk_filename=$1
-  # do not use "-a" in this case.
-  [[ -n "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (utils:${LINENO})" >&2; return 1; }
-
-  disk_filename=$(extract_path ${disk_filename})
-
-  case "${disk_filename}" in
-  /dev/dm-[0-9]*) return 0 ;;
-               *) return 1 ;;
-  esac
-}
-
-function get_suffix() {
-  [[ -n "${1}" ]] || { echo "[ERROR] Invalid argument: empty (disk:${LINENO})" >&2; return 1; }
-
-  echo ${1##*.}
-}
-
 function load_config() {
   local config_path=$1
   [[ -a "${config_path}" ]] || { echo "[ERROR] file not found: ${config_path} (utils:${LINENO})" >&2; return 1; }
 
   . ${config_path}
-}
-
-function inodeof() {
-  local filepath=$1
-  [[ -a "${filepath}" ]] || { echo "[ERROR] file not found: ${filepath} (utils:${LINENO})" >&2; return 1; }
-
-  stat --format=%i ${filepath}
 }
 
 function shlog() {
