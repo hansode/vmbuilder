@@ -14,10 +14,12 @@
 
 function setUp() {
   add_option_hypervisor_kvm
+  function egrep() { echo egrep $*; }
 }
 
-function test_dump_kvm() {
-  dump_kvm
+function test_kvm_list() {
+  # connect to local tcp/22
+  kvm_list
   assertEquals $? 0
 }
 

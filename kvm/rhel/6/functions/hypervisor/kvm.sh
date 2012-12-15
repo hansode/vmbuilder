@@ -151,7 +151,7 @@ function render_kvm_runscript() {
 
 ## controll kvm process
 
-function start_kvm() {
+function kvm_start() {
   local name=$1
   [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
   checkroot || return 1
@@ -160,7 +160,7 @@ function start_kvm() {
   setup_bridge_and_vif
 }
 
-function stop_kvm() {
+function kvm_stop() {
   local monitor_addr=${1:-127.0.0.1} monitor_port=${2:-4444}
   [[ -n "${monitor_addr}" ]] || { echo "[ERROR] Invalid argument: monitor_addr:${monitor_addr} (hypervisor/kvm:${LINENO})" >&2; return 1; }
   [[ -n "${monitor_port}" ]] || { echo "[ERROR] Invalid argument: monitor_port:${monitor_port} (hypervisor/kvm:${LINENO})" >&2; return 1; }
@@ -171,7 +171,7 @@ function stop_kvm() {
   exec <&5-
 }
 
-function console_kvm() {
+function kvm_console() {
   local serial_addr=${1:-127.0.0.1} serial_port=${2:-5555}
   [[ -n "${serial_addr}" ]] || { echo "[ERROR] Invalid argument: serial_addr:${serial_addr} (hypervisor/kvm:${LINENO})" >&2; return 1; }
   [[ -n "${serial_port}" ]] || { echo "[ERROR] Invalid argument: serial_port:${serial_port} (hypervisor/kvm:${LINENO})" >&2; return 1; }
@@ -179,7 +179,7 @@ function console_kvm() {
   telnet ${serial_addr} ${serial_port}
 }
 
-function list_kvm() {
+function kvm_list() {
   local kvm_path=${kvm_path:-$(qemu_kvm_path)}
   ps -ef | egrep -w ${kvm_path} | egrep -v "egrep -w ${kvm_path}"
 }
@@ -188,10 +188,10 @@ function kvmof() {
   local name=$1
   [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
 
-  list_kvm | egrep -w -- "-name ${name}"
+  kvm_list | egrep -w -- "-name ${name}"
 }
 
-function info_kvm() {
+function kvm_info() {
   local name=$1
   [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
   checkroot || return 1
@@ -209,7 +209,7 @@ function info_kvm() {
   }
 }
 
-function dump_kvm() {
+function kvm_dump() {
   cat <<-EOS
 	name=${name}
 	image_format=${image_format}

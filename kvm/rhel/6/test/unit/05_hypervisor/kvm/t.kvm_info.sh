@@ -37,13 +37,13 @@ l-wx------ 1 root root 64 Dec  8 14:51 8 -> pipe:[16602]
 lrwx------ 1 root root 64 Dec  8 14:51 9 -> /dev/net/tun"; }
 }
 
-function test_info_kvm_no_opts() {
-  info_kvm
+function test_kvm_info_no_opts() {
+  kvm_info
   assertNotEquals $? 0
 }
 
-function test_info_kvm_known() {
-  info_kvm rhel6
+function test_kvm_info_known() {
+  kvm_info rhel6
   assertEquals $? 0
 }
 

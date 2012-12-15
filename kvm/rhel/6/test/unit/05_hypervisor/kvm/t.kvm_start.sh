@@ -19,13 +19,13 @@ function setUp() {
   function checkroot() { echo checkroot $*; }
 }
 
-function test_start_kvm_no_opts() {
-  start_kvm
+function test_kvm_start_no_opts() {
+  kvm_start
   assertNotEquals $? 0
 }
 
-function test_start_kvm_set_opts() {
-  start_kvm vmbuilder
+function test_kvm_start_set_opts() {
+  kvm_start vmbuilder
   assertEquals $? 0
 }
 
