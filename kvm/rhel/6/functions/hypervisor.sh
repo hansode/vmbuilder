@@ -38,7 +38,7 @@ function add_option_hypervisor() {
 
   hypervisor=${hypervisor:-}
   case "${hypervisor}" in
-  kvm|lxc)
+  kvm|lxc|openvz)
     printf "[INFO] Hypervisor: %s\n" ${hypervisor}
     load_hypervisor_driver ${hypervisor}
     ;;
