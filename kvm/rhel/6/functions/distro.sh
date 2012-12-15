@@ -422,6 +422,13 @@ function render_fstab() {
 	_EOS_
 }
 
+function reconfigure_mtab() {
+  local chroot_dir=$1
+
+  [[ -f ${chroot_dir}/etc/mtab ]] && rm -f ${chroot_dir}/etc/mtab || :
+  run_in_target ${chroot_dir} ln -fs /proc/mounts /etc/mtab
+}
+
 ## unix user
 
 function update_passwords() {
