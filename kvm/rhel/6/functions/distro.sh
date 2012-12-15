@@ -254,6 +254,18 @@ function configure_os() {
   umount_nonroot           ${chroot_dir}
 }
 
+## container
+
+function configure_container() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  prevent_udev_starting ${chroot_dir}
+  reconfigure_fstab     ${chroot_dir}
+  reconfigure_mtab      ${chroot_dir}
+}
+
+
 ## yum
 
 function repofile() {
@@ -366,6 +378,15 @@ function prevent_daemons_starting() {
  #done < <(run_in_target ${chroot_dir} chkconfig --list | egrep -v :on)
 }
 
+function prevent_udev_starting() {
+  local chroot_dir=$1
+
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  sed -i 's,/sbin/start_udev,#\0,' \
+    ${chroot_dir}/etc/rc.sysinit   \
+    ${chroot_dir}/etc/rc.d/rc.sysinit
+}
+
 ## mounting
 
 function configure_mounting() {
@@ -399,14 +420,33 @@ function install_fstab() {
     uuid=$(mntpntuuid ${disk_filename} ${mountpoint})
     printf "UUID=%s %s\t%s\tdefaults\t%s %s\n" ${uuid} ${mountpath} ${fstype} ${dumpopt} ${fsckopt}
 EOS
+  render_fstab
+  } > ${chroot_dir}/etc/fstab
+  cat ${chroot_dir}/etc/fstab
+}
+
+function render_fstab() {
   cat <<-_EOS_
 	tmpfs                   /dev/shm                tmpfs   defaults        0 0
 	devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
 	sysfs                   /sys                    sysfs   defaults        0 0
 	proc                    /proc                   proc    defaults        0 0
 	_EOS_
-  } > ${chroot_dir}/etc/fstab
-  cat ${chroot_dir}/etc/fstab
+}
+
+function reconfigure_fstab() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  render_fstab ${chroot_dir} | tee ${chroot_dir}/etc/fstab
+}
+
+function reconfigure_mtab() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  [[ -f ${chroot_dir}/etc/mtab ]] && rm -f ${chroot_dir}/etc/mtab || :
+  run_in_target ${chroot_dir} ln -fs /proc/mounts /etc/mtab
 }
 
 ## unix user

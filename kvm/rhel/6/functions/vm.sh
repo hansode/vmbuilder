@@ -42,6 +42,19 @@ function create_vm() {
   [[ -d "${distro_dir}" ]] || build_chroot ${distro_dir}
 
   local disk_filename=${raw}
+  [[ -z "${disk_filename}" ]] && {
+    create_vm_tree ${rootfs_path}
+  } || {
+    create_vm_disk ${disk_filename}
+  }
+
+  printf "[INFO] Complete!\n"
+}
+
+function create_vm_disk() {
+  local disk_filename=$1
+  [[ -a "${disk_filename}" ]] && { echo "[WARN] already exists: ${disk_filename} (vm:${LINENO})"; } || :
+  checkroot || return 1
 
   # via $ trap -l
   #
@@ -78,5 +91,13 @@ function create_vm() {
   }
 
   printf "[INFO] Generated => %s\n" ${disk_filename}
-  printf "[INFO] Complete!\n"
+}
+
+function create_vm_tree() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] && { echo "[WARN] ${chroot_dir} already exists (vm:${LINENO})"; } || :
+  checkroot || return 1
+
+  install_os ${chroot_dir} ${distro_dir}
+  printf "[INFO] Built => %s\n" ${chroot_dir}
 }

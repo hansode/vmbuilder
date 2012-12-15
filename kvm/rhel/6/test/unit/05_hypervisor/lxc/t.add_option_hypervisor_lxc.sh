@@ -12,17 +12,8 @@
 
 ## public functions
 
-function setUp() {
-  mkdir ${chroot_dir}
-}
-
-function tearDown() {
-  ls -lR ${chroot_dir}
-  rm -rf ${chroot_dir}
-}
-
-function test_mkdevice() {
-  mkdevice ${chroot_dir}
+function test_add_option_hypervisor_lxc() {
+  add_option_hypervisor_lxc
   assertEquals $? 0
 }
 

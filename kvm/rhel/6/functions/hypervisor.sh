@@ -38,7 +38,8 @@ function add_option_hypervisor() {
 
   hypervisor=${hypervisor:-}
   case "${hypervisor}" in
-  kvm)
+  kvm|lxc)
+    printf "[INFO] Hypervisor: %s\n" ${hypervisor}
     load_hypervisor_driver ${hypervisor}
     ;;
   *)
@@ -189,6 +190,14 @@ function sync_os() {
   sync
 }
 
+function configure_hypervisor() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] no such directory: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+
+  # should be implemented in hypervisor-specific function file.
+  :
+}
+
 function install_os() {
   local chroot_dir=$1 distro_dir=$2 disk_filename=$3
   [[ -d "${chroot_dir}"    ]] && { echo "[ERROR] already exists: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
@@ -229,6 +238,7 @@ function install_os() {
   }
   configure_keepcache  ${chroot_dir}
   configure_console    ${chroot_dir}
+  configure_hypervisor ${chroot_dir}
   install_kernel       ${chroot_dir}
   [[ -z "${disk_filename}" ]] || {
     install_bootloader ${chroot_dir} ${disk_filename}

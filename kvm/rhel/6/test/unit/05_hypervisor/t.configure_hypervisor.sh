@@ -13,16 +13,15 @@
 ## public functions
 
 function setUp() {
-  mkdir ${chroot_dir}
+  mkdir -p ${chroot_dir}
 }
 
 function tearDown() {
-  ls -lR ${chroot_dir}
   rm -rf ${chroot_dir}
 }
 
-function test_mkdevice() {
-  mkdevice ${chroot_dir}
+function test_configure_hypervisor() {
+  configure_hypervisor ${chroot_dir}
   assertEquals $? 0
 }
 

@@ -13,16 +13,16 @@
 ## public functions
 
 function setUp() {
-  mkdir ${chroot_dir}
+  mkdir -p ${chroot_dir}/etc
+  function chroot() { echo chroot $*; }
 }
 
 function tearDown() {
-  ls -lR ${chroot_dir}
   rm -rf ${chroot_dir}
 }
 
-function test_mkdevice() {
-  mkdevice ${chroot_dir}
+function test_configure_fstab() {
+  reconfigure_fstab ${chroot_dir}
   assertEquals $? 0
 }
 

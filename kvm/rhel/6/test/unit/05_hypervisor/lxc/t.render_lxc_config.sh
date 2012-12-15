@@ -13,16 +13,11 @@
 ## public functions
 
 function setUp() {
-  mkdir ${chroot_dir}
+  add_option_hypervisor_lxc
 }
 
-function tearDown() {
-  ls -lR ${chroot_dir}
-  rm -rf ${chroot_dir}
-}
-
-function test_mkdevice() {
-  mkdevice ${chroot_dir}
+function test_render_lxc_config() {
+  render_lxc_config
   assertEquals $? 0
 }
 

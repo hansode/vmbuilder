@@ -13,16 +13,14 @@
 ## public functions
 
 function setUp() {
-  mkdir ${chroot_dir}
+  add_option_hypervisor_lxc
+
+  function checkroot() { echo checkroot $*; }
+  function shlog() { echo shlog $*; }
 }
 
-function tearDown() {
-  ls -lR ${chroot_dir}
-  rm -rf ${chroot_dir}
-}
-
-function test_mkdevice() {
-  mkdevice ${chroot_dir}
+function test_lxc_info() {
+  lxc_info vmbuilder
   assertEquals $? 0
 }
 
