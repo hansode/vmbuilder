@@ -21,7 +21,7 @@ function tearDown() {
   rm -rf ${chroot_dir}
 }
 
-function test_configure_mounting() {
+function test_configure_mtab() {
   reconfigure_mtab ${chroot_dir}
   assertEquals $? 0
 }
