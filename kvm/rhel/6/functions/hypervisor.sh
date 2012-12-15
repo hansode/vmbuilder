@@ -32,6 +32,9 @@ function add_option_hypervisor() {
   firstboot=${firstboot:-}
   raw=${raw:-./${distro}.raw}
 
+  rootfs_dir=${rootfs_dir:-./rootfs}
+  diskless=${diskless:-}
+
   chroot_dir=${chroot_dir:-/tmp/tmp$(date +%s)}
 
   viftab=${viftab:-}
@@ -202,7 +205,7 @@ function install_os() {
   local chroot_dir=$1 distro_dir=$2 disk_filename=$3
   [[ -d "${chroot_dir}"    ]] && { echo "[ERROR] already exists: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
   [[ -d "${distro_dir}"    ]] || { echo "[ERROR] no such directory: ${distro_dir} (hypervisor:${LINENO})" >&2; return 1; }
-  [[ -n "${disk_filename}" ]] && {
+  [[ -z "${diskless}" ]] && {
     # needs disk
     [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
   } || {
@@ -214,7 +217,7 @@ function install_os() {
   checkroot || return 1
 
   mkdir -p ${chroot_dir}
-  [[ -z "${disk_filename}" ]] || {
+  [[ -n "${diskless}" ]] || {
     mount_ptab ${disk_filename} ${chroot_dir}
   }
 
@@ -233,14 +236,14 @@ function install_os() {
   install_authorized_keys ${chroot_dir}
 
   configure_networking ${chroot_dir}
-  [[ -z "${disk_filename}" ]] || {
+  [[ -n "${diskless}" ]] || {
     configure_mounting ${chroot_dir} ${disk_filename}
   }
   configure_keepcache  ${chroot_dir}
   configure_console    ${chroot_dir}
   configure_hypervisor ${chroot_dir}
   install_kernel       ${chroot_dir}
-  [[ -z "${disk_filename}" ]] || {
+  [[ -n "${diskless}" ]] || {
     install_bootloader ${chroot_dir} ${disk_filename}
   }
   install_epel         ${chroot_dir}
@@ -249,11 +252,11 @@ function install_os() {
   run_execscript       ${chroot_dir} ${execscript}
   install_firstboot    ${chroot_dir} ${firstboot}
 
-  [[ -z "${disk_filename}" ]] || {
+  [[ -n "${diskless}" ]] && {
+    umount_nonroot ${chroot_dir}
+  } || {
     umount_ptab    ${chroot_dir}
     rmdir          ${chroot_dir}
-  } || {
-    umount_nonroot ${chroot_dir}
   }
 }
 

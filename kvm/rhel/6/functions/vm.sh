@@ -42,11 +42,10 @@ function create_vm() {
   [[ -d "${distro_dir}" ]] || build_chroot ${distro_dir}
 
   local disk_filename=${raw}
-  [[ -z "${disk_filename}" ]] && {
-    create_vm_tree ${rootfs_path}
-  } || {
-    create_vm_disk ${disk_filename}
-  }
+  case "${diskless}" in
+  1) create_vm_tree ${rootfs_dir}    ;;
+  *) create_vm_disk ${disk_filename} ;;
+  esac
 
   printf "[INFO] Complete!\n"
 }
