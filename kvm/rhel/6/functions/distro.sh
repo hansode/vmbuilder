@@ -14,7 +14,7 @@
 #  ls, tail
 #
 # imports:
-#  utils: checkroot, run_in_target
+#  utils: checkroot, run_in_target, expand_path
 #  disk: is_dev, mkdevice, mkprocdir, mount_proc, umount_nonroot, xptabinfo, mntpntuuid, get_grub_id, lsdevmap, devmap2lodev
 #
 
@@ -315,7 +315,7 @@ function run_yum() {
    -c ${repofile} \
    --disablerepo='*' \
    --enablerepo="${reponame}" \
-   --installroot=${chroot_dir} \
+   --installroot=$(expand_path ${chroot_dir}) \
    -y \
    $*
 

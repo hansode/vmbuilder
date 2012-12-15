@@ -15,7 +15,7 @@
 
 function setUp() {
   mkdir -p ${chroot_dir}
-  function run_yum() { echo run_yum $*; }
+  function yum() { echo yum $*; }
 }
 
 function tearDown() {
@@ -24,7 +24,7 @@ function tearDown() {
 
 function test_run_yum_distro_name_empty() {
   run_yum ${chroot_dir} help
-  assertEquals $? 0
+  assertNotEquals $? 0
 }
 
 function test_run_yum_distro_name_exists_help() {
