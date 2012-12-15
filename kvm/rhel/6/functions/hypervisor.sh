@@ -32,6 +32,9 @@ function add_option_hypervisor() {
   firstboot=${firstboot:-}
   raw=${raw:-./${distro}.raw}
 
+  rootfs_dir=${rootfs_dir:-./rootfs}
+  diskless=${diskless:-}
+
   chroot_dir=${chroot_dir:-/tmp/tmp$(date +%s)}
 
   viftab=${viftab:-}
