@@ -42,6 +42,8 @@ function tearDown() {
 
 function test_install_os_diskless() {
   local distro_name=centos
+  local diskless=1
+
   install_os ${chroot_dir} ${distro_dir}
   assertEquals $? 0
 }
