@@ -38,6 +38,15 @@ function test_extract_args_underbar_to_hyphen() {
   assertEquals "${k_e_y_1}" "value1"
 }
 
+function test_extract_args_commands_simple_opts() {
+  local opts="--overwrite --diskless --disk-less"
+
+  extract_args ${opts}
+
+  assertEquals "${overwrite}" "1"
+  assertEquals "${diskless}" "1"
+  assertEquals "${disk_less}" "1"
+}
 
 ## shunit2
 
