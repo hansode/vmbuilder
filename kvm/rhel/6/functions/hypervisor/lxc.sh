@@ -4,11 +4,11 @@
 #  Hypervisor lxc
 #
 # requires:
-#  bash, sed, cat, tee
+#  bash, cat
 #
 # imports:
 #  utils: shlog
-#  hypervisor: viftabproc
+#  hypervisor: configure_container, viftabproc
 #
 
 function add_option_hypervisor_lxc() {
