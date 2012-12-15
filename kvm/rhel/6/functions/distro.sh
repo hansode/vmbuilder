@@ -254,6 +254,18 @@ function configure_os() {
   umount_nonroot           ${chroot_dir}
 }
 
+## container
+
+function configure_container() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  prevent_udev_starting ${chroot_dir}
+  reconfigure_fstab     ${chroot_dir}
+  reconfigure_mtab      ${chroot_dir}
+}
+
+
 ## yum
 
 function repofile() {
