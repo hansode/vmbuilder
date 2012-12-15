@@ -21,6 +21,10 @@ function extract_args() {
       value=${arg##--*=}
       eval "${key}=\"${value}\""
       ;;
+    --*)
+      key=${arg##--}; key=${key//-/_}
+      eval "${key}=1"
+      ;;
     *)
       CMD_ARGS="${CMD_ARGS} ${arg}"
       ;;
