@@ -366,6 +366,15 @@ function prevent_daemons_starting() {
  #done < <(run_in_target ${chroot_dir} chkconfig --list | egrep -v :on)
 }
 
+function prevent_udev_starting() {
+  local chroot_dir=$1
+
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  sed -i 's,/sbin/start_udev,#\0,' \
+    ${chroot_dir}/etc/rc.sysinit   \
+    ${chroot_dir}/etc/rc.d/rc.sysinit
+}
+
 ## mounting
 
 function configure_mounting() {
