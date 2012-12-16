@@ -93,7 +93,8 @@ function mkdevice() {
   checkroot || return 1
 
   while read name mode; do
-    mkdir -m ${mode} ${chroot_dir}${name}
+    [[ -d "${chroot_dir}${name}" ]] || \
+      mkdir -m ${mode} ${chroot_dir}${name}
   done < <(cat <<-EOS | egrep -v '^#|^$'
 	# common
 	/dev      755

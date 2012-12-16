@@ -11,7 +11,7 @@
 ### nictab
 
 function test_install_os_nictab() {
-  local nictab=${abs_dirname}/../../../nictab.bridge.txt.example
+  local nictab=${abs_dirname}/../../../examples/nictab.bridge.txt.example
 
   (
     set -e
