@@ -19,6 +19,7 @@ function setUp() {
   touch ${chroot_dir}/boot/initramfs-$$
 
   function mntpntuuid() { echo ASDF-ASDF-ASDF; }
+  function chroot() { echo chroot $*; }
 }
 
 function tearDown() {

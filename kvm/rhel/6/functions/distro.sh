@@ -73,7 +73,7 @@ function add_option_distro() {
   devel_user=${devel_user:-}
   devel_pass=${devel_pass:-}
 
-  rootpass=${rootpass:-root}
+  rootpass=${rootpass:-}
 
   ssh_key=${ssh_key:-}
   ssh_user_key=${ssh_user_key:-}
@@ -460,7 +460,7 @@ function update_passwords() {
 
   printf "[INFO] Updating passwords\n"
   run_in_target ${chroot_dir} pwconv
-  run_in_target ${chroot_dir} "echo root:${rootpass} | chpasswd"
+  run_in_target ${chroot_dir} "echo root:${rootpass:-root} | chpasswd"
 
   [[ -z "${devel_user}" ]] || {
     run_in_target ${chroot_dir} "echo ${devel_user}:${devel_pass:-${devel_user}} | chpasswd"
@@ -728,6 +728,8 @@ function install_menu_lst_grub() {
   cd ${chroot_dir}/boot/grub
   ln -fs grub.conf menu.lst
   cd - >/dev/null
+
+  run_in_target ${chroot_dir} ln -fs /boot/grub/grub.conf /etc/grub.conf
 }
 
 function install_menu_lst_grub2() {
