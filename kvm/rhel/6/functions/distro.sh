@@ -5,7 +5,7 @@
 #
 # requires:
 #  bash
-#  cat
+#  cat, curl
 #  yum, mkdir, arch
 #  pwconv, chkconfig, grub, grub2-mkconfig, grub2-set-default
 #  cp, rm, ln, touch, rsync
@@ -512,6 +512,8 @@ function install_authorized_keys() {
 
 ## package configuration
 
+### vanilla kernel
+
 function install_kernel() {
   local chroot_dir=$1
 
@@ -524,6 +526,7 @@ function install_kernel() {
   run_yum ${chroot_dir} install kernel
   verify_kernel_installation ${chroot_dir}
 }
+
 
 function install_extras() {
   local chroot_dir=$1
@@ -549,6 +552,25 @@ function erase_selinux() {
   local chroot_dir=$1
 
   run_yum ${chroot_dir} erase selinux*
+}
+
+### openvz kernel
+
+function install_vzkernel() {
+  local chroot_dir=$1
+
+  [[ -f ${chroot_dir}/etc/yum.repos.d/openvz.repo ]] || {
+    curl http://download.openvz.org/openvz.repo -o ${chroot_dir}/etc/yum.repos.d/openvz.repo
+  }
+
+  run_in_target ${chroot_dir} yum install -y vzkernel
+  verify_kernel_installation ${chroot_dir}
+}
+
+function install_vzutils() {
+  local chroot_dir=$1
+
+  run_in_target ${chroot_dir} yum install -y vzctl vzquota
 }
 
 ## kernel configuration
