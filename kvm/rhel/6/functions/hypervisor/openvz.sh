@@ -29,6 +29,21 @@ function configure_hypervisor() {
 
 ##
 
+function next_ctid() {
+  local vz_conf_dir=${1:-/etc/vz/conf}
+
+  local curid=$(ls ${vz_conf_dir}/ | egrep "^[0-9]*.conf$" | sort -r | head -1 | sed 's,\.conf$,,')
+
+  case "${curid}" in
+  ""|[0-9]|[0-9][0-9]|100)
+    echo 101
+    ;;
+  *)
+    echo $((${curid} + 1))
+    ;;
+  esac
+}
+
 function render_openvz_config() {
   cat <<'EOS'
 #  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
