@@ -17,6 +17,9 @@ function add_option_hypervisor_openvz() {
   image_format=${image_format:-raw}
   image_file=${image_file:-${name}.${image_format}}
   image_path=${image_path:-${image_file}}
+
+  vzconf_path=${vzconf_path:-}
+  vzconf_dir=${vzconf_dir:-}
 }
 
 function configure_hypervisor() {
@@ -109,9 +112,14 @@ function openvz_create() {
   [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/openvz:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
-  local openvz_config_path=$(pwd)/openvz.conf
-  render_openvz_config > ${openvz_config_path}
- #shlog vzctl create -f ${openvz_config_path} -n ${name}
+  VEID=$(next_ctid)
+  . ${vzconf_path:-/etc/vz/vz.conf}
+
+  [[ -d "${VE_ROOT}"    ]] || mkdir -p ${VE_ROOT}
+  [[ -d "${VE_PRIVATE}" ]] || mkdir -p ${VE_PRIVATE}
+
+  render_openvz_config > ${vzconf_dir:-/etc/vz/conf}/${VEID}.conf
+  shlog vzctl set ${VEID} --name ${name} --save
 }
 
 function openvz_start() {
