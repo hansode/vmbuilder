@@ -21,8 +21,118 @@ function add_option_hypervisor_openvz() {
 
 function configure_hypervisor() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] no such directory: ${chroot_dir} (hypervisor/lxc:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] no such directory: ${chroot_dir} (hypervisor/openvz:${LINENO})" >&2; return 1; }
 
   echo "[INFO] ***** Configuring openvz-specific *****"
   configure_container ${chroot_dir}
+}
+
+##
+
+function render_openvz_config() {
+  cat <<'EOS'
+#  Copyright (C) 2000-2011, Parallels, Inc. All rights reserved.
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+
+# UBC parameters (in form of barrier:limit)
+KMEMSIZE="unlimited"
+LOCKEDPAGES="2048:2048"
+PRIVVMPAGES="65536:69632"
+SHMPAGES="21504:21504"
+NUMPROC="unlimited"
+PHYSPAGES="0:unlimited"
+VMGUARPAGES="33792:unlimited"
+OOMGUARPAGES="26112:unlimited"
+NUMTCPSOCK="unlimited"
+NUMFLOCK="188:206"
+NUMPTY="16:16"
+NUMSIGINFO="256:256"
+TCPSNDBUF="unlimited"
+TCPRCVBUF="1720320:2703360"
+OTHERSOCKBUF="1126080:2097152"
+DGRAMRCVBUF="262144:262144"
+NUMOTHERSOCK="360:360"
+DCACHESIZE="3409920:3624960"
+NUMFILE="9312:9312"
+AVNUMPROC="180:180"
+NUMIPTENT="128:128"
+
+# Disk quota parameters (in form of softlimit:hardlimit)
+DISKSPACE="2G:2.2G"
+DISKINODES="200000:220000"
+QUOTATIME="0"
+
+# CPU fair scheduler parameter
+CPUUNITS="1000"
+EOS
+}
+
+## controll openvz process
+
+# render ....
+# vzctl set 101 --name i-101 --save
+# vzctl set 101 --cpus 1 --save
+# mkdir /vz/root/101
+# vzctl start i-101
+
+function openvz_create() {
+  local name=$1
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/openvz:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  local openvz_config_path=$(pwd)/openvz.conf
+  render_openvz_config > ${openvz_config_path}
+ #shlog vzctl create -f ${openvz_config_path} -n ${name}
+}
+
+function openvz_start() {
+  local name=$1
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/openvz:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  shlog vzctl start ${name}
+}
+
+function openvz_stop() {
+  local name=$1
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/openvz:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  shlog vzctl stop ${name}
+}
+
+function openvz_destroy() {
+  local name=$1
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/openvz:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  shlog vzctl destroy ${name}
+}
+
+function openvz_console() {
+  local name=$1
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/openvz:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  shlog vzctl console --name ${name}
+}
+
+function openvz_list() {
+  checkroot || return 1
+
+  shlog vzlist
 }
