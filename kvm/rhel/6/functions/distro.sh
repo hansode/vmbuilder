@@ -268,6 +268,14 @@ function configure_container() {
   reconfigure_mtab      ${chroot_dir}
 }
 
+function configure_openvz() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  install_vzkernel          ${chroot_dir}
+  install_vzutils           ${chroot_dir}
+  install_menu_lst_vzkernel ${chroot_dir}
+}
 
 ## yum
 
