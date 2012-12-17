@@ -728,6 +728,8 @@ function install_menu_lst_grub() {
   cd ${chroot_dir}/boot/grub
   ln -fs grub.conf menu.lst
   cd - >/dev/null
+
+  run_in_target ${chroot_dir} ln -fs /boot/grub/grub.conf /etc/grub.conf
 }
 
 function install_menu_lst_grub2() {
