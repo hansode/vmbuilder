@@ -22,7 +22,7 @@ function test_is_dmdev_text() {
 }
 
 function test_is_dmdev_empty() {
-  is_dmdev
+  is_dmdev 2>/dev/null
   assertNotEquals "$?" "0"
 }
 
