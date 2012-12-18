@@ -14,7 +14,7 @@
 ## public functions
 
 function test_get_suffix_no_opts() {
-  get_suffix ""
+  get_suffix "" 2>/dev/null
   assertNotEquals "$?" "0"
 }
 
