@@ -3,6 +3,7 @@
 # requires:
 #  bash
 #  cd, dirname
+#  touch, rm
 #
 
 ## include files
@@ -17,6 +18,10 @@ function setUp() {
   touch ${inode_file}
 
   function stat() { echo stat $*; }
+}
+
+function tearDown() {
+  rm -f ${inode_file}
 }
 
 function test_inodeof_file_exists() {
