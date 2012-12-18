@@ -39,6 +39,8 @@ function setUp() {
   function install_addedpkgs() { echo install_addedpkgs $*; }
   function run_copy()       { echo run_copy       $*; }
   function run_execscript() { echo run_execscript $*; }
+  function install_firstboot() { echo install_firstboot $*; }
+  function install_firstlogin() { echo install_firstlogin $*; }
 }
 
 function tearDown() {
