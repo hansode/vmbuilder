@@ -119,7 +119,14 @@ function openvz_create() {
   [[ -d "${VE_PRIVATE}" ]] || mkdir -p ${VE_PRIVATE}
 
   render_openvz_config > ${vzconf_dir:-/etc/vz/conf}/${VEID}.conf
+
   shlog vzctl set ${VEID} --name ${name} --save
+  shlog vzctl set ${VEID} --cpus 1 --save
+  shlog vzctl set ${VEID} --privvmpage  65536 --save
+  shlog vzctl set ${VEID} --vmguarpages 65536 --save
+
+  echo "[INFO] You should deploy 'rootfs/' to '${VE_ROOT}/'."
+  echo "[INFO] \$ rsync -aHA rootfs/ ${VE_PRIVATE}/"
 }
 
 function openvz_start() {

@@ -20,15 +20,19 @@ function setUp() {
   add_option_hypervisor_openvz
 
   mkdir -p ${vzconf_dir}
-  cat <<-'EOS' > ${vzconf_path}
+  cat <<-EOS > ${vzconf_path}
 	## Defaults for containers
-	VE_ROOT=/vz/root/$VEID
-	VE_PRIVATE=/vz/private/$VEID
+	VE_ROOT=${chroot_dir}/vz/root/\$VEID
+	VE_PRIVATE=${chroot_dir}/vz/private/\$VEID
 	EOS
 
   function checkroot() { echo checkroot $*; }
   function next_ctid() { echo 102; }
   function shlog() { echo shlog $*; }
+}
+
+function tearDown() {
+  rm -rf ${chroot_dir}
 }
 
 function test_openvz_create() {
