@@ -151,7 +151,7 @@ function openvz_console() {
   [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/openvz:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
-  shlog vzctl console --name ${name}
+  shlog vzctl console ${name}
 }
 
 function openvz_list() {
