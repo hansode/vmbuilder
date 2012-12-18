@@ -1,21 +1,22 @@
 #!/bin/bash
 #
 # requires:
-#   bash
+#  bash
+#  dirname, pwd
 #
 
 ## include files
 
-. ./helper_shunit2.sh
+. $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
 
 ## functions
 
 function test_checkroot() {
-  [ $UID == 0 ] && {
-    checkroot
+  [[ $UID == 0 ]] && {
+    checkroot 2>/dev/null
     assertEquals "$?" "0"
   } || {
-    checkroot
+    checkroot 2>/dev/null
     assertNotEquals "$?" "0"
   }
 }

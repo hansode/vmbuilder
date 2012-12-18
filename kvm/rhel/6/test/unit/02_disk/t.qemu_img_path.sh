@@ -1,20 +1,20 @@
 #!/bin/bash
 #
 # requires:
-#   bash
+#  bash
+#  cd, dirname
 #
 
 ## include files
 
-. ./helper_shunit2.sh
+. $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
 
 ## variables
 
 ## public functions
 
 function test_qemu_img_path() {
-  qemu_img_path
-  assertEquals $? 0
+  assertEquals $(qemu_img_path | wc -l) 1
 }
 
 ## shunit2

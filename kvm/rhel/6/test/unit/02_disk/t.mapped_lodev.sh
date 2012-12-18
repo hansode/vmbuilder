@@ -1,40 +1,37 @@
 #!/bin/bash
 #
 # requires:
-#   bash
+#  bash
+#  cd, dirname
+#  touch, rm
 #
 
 ## include files
 
-. ./helper_shunit2.sh
+. $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
 
 ## variables
 
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename} $(sum_disksize) 2>/dev/null
-  mkptab ${disk_filename}
+  touch ${disk_filename}
+
+  function checkroot() { :; }
+  function is_mapped() { echo "/dev/loop0: [fd02]:9044139 (./centos-6.3_x86_64.raw)"; }
 }
 
 function tearDown() {
-  unmapptab ${disk_filename}
   rm -f ${disk_filename}
 }
 
-function test_mapped_lodev() {
-  mapptab ${disk_filename}
-
-  mapped_lodev ${disk_filename}
-  assertEquals $? 0
+function test_mapped_lodev_opts() {
+  assertEquals "$(mapped_lodev ${disk_filename})" loop0
 }
 
-function test_mapped_lodev_2times_to_use_mapped_device() {
-  mapptab ${disk_filename}
-  mapped_lodev ${disk_filename}
-
-  mapped_lodev ${disk_filename}
-  assertEquals $? 0
+function test_mapped_lodev_no_opts() {
+  mapped_lodev 2>/dev/null
+  assertNotEquals $? 0
 }
 
 ## shunit2

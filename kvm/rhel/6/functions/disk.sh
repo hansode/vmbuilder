@@ -369,6 +369,9 @@ function is_mapped() {
   checkroot || return 1
 
   local inode=$(inodeof ${disk_filename})
+
+  # # losetup -a
+  # /dev/loop0: [fd02]:9044139 (./centos-6.3_x86_64.raw)
   losetup -a | egrep "\]:${inode} " ${opts}
 }
 
@@ -493,6 +496,10 @@ function lsdevmap() {
   checkroot || return 1
 
   is_dev ${disk_filename} && {
+    # # kpartx -l /dev/sda
+    # sda1 : 0 1024000 /dev/sda 2048
+    # sda2 : 0 485300224 /dev/sda 1026048
+
     kpartx -l ${disk_filename} \
      | egrep -v "^(gpt|dos):" \
      | awk '{print $1}'
@@ -550,7 +557,7 @@ function devname2index() {
   local part_index=$(xptabinfo | cat -n | egrep -w "${name}" | awk '{print $1}')
   case "${part_index}" in
   "")
-    echo "[ERROR] not such part_index" >&2
+    echo "[ERROR] no such part_index" >&2
     return 1
     ;;
   [1-3])
@@ -568,6 +575,19 @@ function mntpnt2path() {
   local disk_filename=$1 mountpoint=$2
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   [[ -n "${mountpoint}"    ]] || { echo "[ERROR] Invalid argument: mountpoint:${mountpoint} (disk:${LINENO})" >&2; return 1; }
+
+  # 1# # lsdevmap ${disk_filename}
+  # loop0p1
+  # loop0p2
+  #
+  # 2# ... | devmap2path
+  # /dev/mapper/loop0p1
+  # /dev/mapper/loop0p2
+  #
+  # 3# devname2index root
+  # 2
+  #
+  # > #{1} | #{2} | egrep "#{3}\$"
 
   lsdevmap ${disk_filename} | devmap2path | egrep "$(devname2index "${mountpoint}")\$"
 }

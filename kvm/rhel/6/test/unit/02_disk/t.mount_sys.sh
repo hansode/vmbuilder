@@ -1,12 +1,13 @@
 #!/bin/bash
 #
 # requires:
-#   bash
+#  bash
+#  cd, dirname
 #
 
 ## include files
 
-. ./helper_shunit2.sh
+. $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
 
 ## variables
 
@@ -14,15 +15,17 @@
 
 function setUp() {
   mkdir -p ${chroot_dir}/sys
+
+  function checkroot() { :; }
+  function mount() { :; }
 }
 
 function tearDown() {
-  umount ${chroot_dir}/sys
   rm -rf ${chroot_dir}
 }
 
 function test_mount_sys() {
-  mount_sys ${chroot_dir}
+  mount_sys ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 

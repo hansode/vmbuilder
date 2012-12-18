@@ -1,27 +1,26 @@
 #!/bin/bash
 #
 # requires:
-#   bash
+#  bash
+#  dirname, pwd
 #
 
 ## include files
 
-. ./helper_shunit2.sh
+. $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
 
 ## functions
 
 function test_expand_path_parent_dir() {
-  expand_path ../
-  assertEquals $? 0
+  assertEquals "$(expand_path ../)" "$(pwd)/.."
 }
 
 function test_expand_path_current_dir() {
-  expand_path ./
-  assertEquals $? 0
+  assertEquals "$(expand_path ./)" "$(pwd)/."
 }
 
 function test_expand_path_parent_file_not_found() {
-  expand_path /a/s/d/f
+  expand_path /a/s/d/f 2>/dev/null
   assertNotEquals $? 0
 }
 

@@ -1,23 +1,23 @@
 #!/bin/bash
 #
 # requires:
-#   bash
+#  bash
+#  cd, dirname
 #
 
 ## include files
 
-. ./helper_shunit2.sh
+. $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
 
 ## variables
 
 ## public functions
 
 function setUp() {
-  mkdir -p ${chroot_dir}/proc
-  mkdir -p ${chroot_dir}/dev
-  checkroot || return 1
-  mount --bind /proc ${chroot_dir}/proc
-  mount --bind /dev  ${chroot_dir}/dev
+  mkdir -p ${chroot_dir}
+
+  function checkroot() { :; }
+  function umount() { :; }
 }
 
 function tearDown() {

@@ -1,12 +1,13 @@
 #!/bin/bash
 #
 # requires:
-#   bash
+#  bash
+#  cd, dirname
 #
 
 ## include files
 
-. ./helper_shunit2.sh
+. $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
 
 ## functions
 
@@ -21,7 +22,7 @@ function test_is_dev_text() {
 }
 
 function test_is_dev_empty() {
-  is_dev
+  is_dev 2>/dev/null
   assertNotEquals "$?" "0"
 }
 

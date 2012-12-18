@@ -1,12 +1,14 @@
 #!/bin/bash
 #
 # requires:
-#   bash
+#  bash
+#  cd, dirname
+#  touch, rm
 #
 
 ## include files
 
-. ./helper_shunit2.sh
+. $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
 
 ## functions
 
@@ -14,6 +16,8 @@ declare inode_file=inode.$$
 
 function setUp() {
   touch ${inode_file}
+
+  function stat() { echo stat $*; }
 }
 
 function tearDown() {
@@ -21,16 +25,12 @@ function tearDown() {
 }
 
 function test_inodeof_file_exists() {
-  inodeof ${inode_file}
+  inodeof ${inode_file} >/dev/null
   assertEquals $? 0
 }
 
-function test_inodeof_file_exists_compare_using_ls() {
-  assertEquals "$(inodeof ${inode_file})" "$(ls -i ${inode_file} | awk '{print $1}')"
-}
-
 function test_inodeof_file_not_found() {
-  inodeof /${inode_file}
+  inodeof /${inode_file} 2>/dev/null
   assertNotEquals $? 0
 }
 

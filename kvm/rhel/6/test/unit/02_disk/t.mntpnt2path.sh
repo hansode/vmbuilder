@@ -1,25 +1,28 @@
 #!/bin/bash
 #
 # requires:
-#   bash
+#  bash
+#  cd, dirname
 #
 
 ## include files
 
-. ./helper_shunit2.sh
+. $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
 
 ## variables
 
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename} $(sum_disksize) 2>/dev/null
-  mkptab ${disk_filename}
-  mapptab ${disk_filename}
+  touch ${disk_filename}
+
+  function lsdevmap() { echo lsdevmap $*; }
+  function devmap2path() { :; }
+  function egrep() { :; }
+  function devname2index() { :; }
 }
 
 function tearDown() {
-  unmapptab ${disk_filename}
   rm -f ${disk_filename}
 }
 
@@ -39,7 +42,7 @@ function test_mntpnt2path_opt() {
 }
 
 function test_mntpnt2path_empty() {
-  mntpnt2path ${disk_filename}
+  mntpnt2path ${disk_filename} 2>/dev/null
   assertNotEquals $? 0
 }
 

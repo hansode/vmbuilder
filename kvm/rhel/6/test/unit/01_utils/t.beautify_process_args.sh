@@ -1,12 +1,13 @@
 #!/bin/bash
 #
 # requires:
-#   bash
+#  bash
+#  dirname, pwd
 #
 
 ## include files
 
-. ./helper_shunit2.sh
+. $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
 
 ## variables
 
@@ -17,7 +18,10 @@ declare chroot_dir=${abs_dirname}/_chroot.$$
 test_beautify_process_args() {
   local process="root pid 1 0 00:01 ? 00:00:00 /path/to/command -name asdf -m 128 -smp 1"
 
-  echo ${process} | beautify_process_args
+  assertEquals "$(echo ${process} | beautify_process_args)" "-name asdf
+-m 128
+-smp 1"
+
 }
 
 ## shunit2

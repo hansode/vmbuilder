@@ -1,12 +1,14 @@
 #!/bin/bash
 #
 # requires:
-#   bash
+#  bash
+#  dirname, pwd
+#  date, egrep
 #
 
 ## include files
 
-. ./helper_shunit2.sh
+. $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
 
 ## variables
 
@@ -25,7 +27,7 @@ function tearDown() {
 }
 
 function test_run_in_target() {
- run_in_target ${chroot_dir} date | egrep "chroot ${chroot_dir} bash -e -c date"
+ run_in_target ${chroot_dir} date | egrep -q "chroot ${chroot_dir} bash -e -c date"
  assertEquals $? 0
 }
 

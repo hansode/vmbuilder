@@ -1,30 +1,29 @@
 #!/bin/bash
 #
 # requires:
-#   bash
+#  bash
+#  cd, dirname
 #
 
 ## include files
 
-. ./helper_shunit2.sh
+. $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
 
 ## variables
 
 ## public functions
 
 function test_mkfs_fstype_empty() {
-  mkfs_fstype ""
+  mkfs_fstype "" 2>/dev/null
   assertNotEquals "$?" 0
 }
 
 function test_mkfs_fstype_ext3() {
-  mkfs_fstype ext3
-  assertEquals "$?" 0
+  assertEquals "$(mkfs_fstype ext3)" "mkfs.ext3 -F -I 128"
 }
 
 function test_mkfs_fstype_ext4() {
-  mkfs_fstype ext4
-  assertEquals "$?" 0
+  assertEquals "$(mkfs_fstype ext4)" "mkfs.ext4 -F -E lazy_itable_init=1"
 }
 
 
