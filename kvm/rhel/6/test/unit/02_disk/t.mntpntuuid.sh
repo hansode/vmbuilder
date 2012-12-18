@@ -11,40 +11,29 @@
 
 ## variables
 
+declare part_filename=/dev/mapper/loop0p2
+
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename} $(sum_disksize) 2>/dev/null
-  mkptab ${disk_filename}
-  mapptab ${disk_filename}
-  checkroot || return 1
-  mkfs $(mntpnt2path ${disk_filename} root)
-  mkfs $(mntpnt2path ${disk_filename} swap)
-  mkfs $(mntpnt2path ${disk_filename} /opt)
+  touch ${disk_filename}
+
+  function checkroot() { :; }
+  function mntpnt2path() { echo ${part_filename}; }
+  function blkid() { echo blkid $*; }
 }
 
 function tearDown() {
-  unmapptab ${disk_filename}
   rm -f ${disk_filename}
 }
 
 function test_mntpntuuid_root() {
-  mntpntuuid ${disk_filename} root
-  assertEquals $? 0
-}
-
-function test_mntpntuuid_swap() {
-  mntpntuuid ${disk_filename} swap
-  assertEquals $? 0
-}
-
-function test_mntpntuuid_opt() {
-  mntpntuuid ${disk_filename} /opt
+  mntpntuuid ${disk_filename} root | egrep ${part_filename}\$ -q
   assertEquals $? 0
 }
 
 function test_mntpntuuid_empty() {
-  mntpntuuid ${disk_filename}
+  mntpntuuid ${disk_filename} 2>/dev/null
   assertNotEquals $? 0
 }
 
