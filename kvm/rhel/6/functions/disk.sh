@@ -496,6 +496,10 @@ function lsdevmap() {
   checkroot || return 1
 
   is_dev ${disk_filename} && {
+    # # kpartx -l /dev/sda
+    # sda1 : 0 1024000 /dev/sda 2048
+    # sda2 : 0 485300224 /dev/sda 1026048
+
     kpartx -l ${disk_filename} \
      | egrep -v "^(gpt|dos):" \
      | awk '{print $1}'
