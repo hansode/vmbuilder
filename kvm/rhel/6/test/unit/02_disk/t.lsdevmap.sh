@@ -14,17 +14,32 @@
 ## public functions
 
 function setUp() {
-  mkdisk  ${disk_filename} $(sum_disksize) 2>/dev/null
-  mkptab  ${disk_filename}
-  mapptab ${disk_filename}
+  touch ${disk_filename}
+
+  function checkroot() { :; }
+  function kpartx() { cat <<-EOS
+	sda1 : 0 1024000 /dev/sda 2048
+	sda2 : 0 485300224 /dev/sda 1026048
+	EOS
+  }
+  function mapped_lodev() { echo mapped_lodev $*; }
+  function dmsetup() { echo dmsetup $*; }
 }
 
 function tearDown() {
-  unmapptab ${disk_filename}
-  rm -f     ${disk_filename}
+  rm -f ${disk_filename}
 }
 
-function test_lsdevmap() {
+function test_lsdevmap_dev() {
+  function is_dev() { true; }
+
+  assertEquals "$(lsdevmap ${disk_filename})" "sda1
+sda2"
+}
+
+function test_lsdevmap_file() {
+  function is_dev() { false; }
+
   lsdevmap ${disk_filename}
   assertEquals $? 0
 }
