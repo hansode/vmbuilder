@@ -922,6 +922,10 @@ function render_interface_netowrk_configuration() {
 	$([[ -z "${gw}"     ]] || echo "GATEWAY=${gw}")
 	EOS
   }
+
+  cat <<-EOS
+	ONBOOT=${onboot:-yes}
+	EOS
 }
 
 function render_interface_ethernet() {
@@ -930,7 +934,6 @@ function render_interface_ethernet() {
   cat <<-EOS
 	DEVICE=${ifname}
 	TYPE=Ethernet
-	ONBOOT=yes
 	$([[ -z "${bridge}" ]] || echo "BRIDGE=${bridge}")
 	EOS
 }
@@ -941,7 +944,6 @@ function render_interface_bridge() {
   cat <<-EOS
 	DEVICE=${ifname}
 	TYPE=Bridge
-	ONBOOT=yes
 	EOS
 }
 
@@ -951,7 +953,6 @@ function render_interface_ovsbridge() {
   cat <<-EOS
 	DEVICE=${ifname}
 	TYPE=OVSBridge
-	ONBOOT=yes
 	NM_CONTROLLED=no
 	DEVICETYPE=ovs
 	OVS_EXTRA="\\
