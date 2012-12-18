@@ -40,7 +40,7 @@ function controll_openvz() {
   case "${cmd}" in
   build)
     # kind of virt-install
-    ${abs_dirname}/../vmbuilder.sh --config-path=${config_path}
+    ${abs_dirname}/../vmbuilder.sh --config-path=${config_path} --hypervisor=${hypervisor} --diskless
     ;;
   create|start|stop|destroy|info|console)
     openvz_${cmd} ${name}
