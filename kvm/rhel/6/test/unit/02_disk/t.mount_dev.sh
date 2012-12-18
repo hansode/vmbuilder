@@ -15,15 +15,17 @@
 
 function setUp() {
   mkdir -p ${chroot_dir}/dev
+
+  function checkroot() { :; }
+  function mount() { :; }
 }
 
 function tearDown() {
-  umount ${chroot_dir}/dev
   rm -rf ${chroot_dir}
 }
 
 function test_mount_dev() {
-  mount_dev ${chroot_dir}
+  mount_dev ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 
