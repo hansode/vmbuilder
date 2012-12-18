@@ -576,6 +576,19 @@ function mntpnt2path() {
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (disk:${LINENO})" >&2; return 1; }
   [[ -n "${mountpoint}"    ]] || { echo "[ERROR] Invalid argument: mountpoint:${mountpoint} (disk:${LINENO})" >&2; return 1; }
 
+  # 1# # lsdevmap ${disk_filename}
+  # loop0p1
+  # loop0p2
+  #
+  # 2# ... | devmap2path
+  # /dev/mapper/loop0p1
+  # /dev/mapper/loop0p2
+  #
+  # 3# devname2index root
+  # 2
+  #
+  # > #{1} | #{2} | egrep "#{3}\$"
+
   lsdevmap ${disk_filename} | devmap2path | egrep "$(devname2index "${mountpoint}")\$"
 }
 
