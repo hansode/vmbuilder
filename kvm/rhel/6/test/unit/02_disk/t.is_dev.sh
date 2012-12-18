@@ -22,7 +22,7 @@ function test_is_dev_text() {
 }
 
 function test_is_dev_empty() {
-  is_dev
+  is_dev 2>/dev/null
   assertNotEquals "$?" "0"
 }
 
