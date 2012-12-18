@@ -5,11 +5,11 @@
 #
 # requires:
 #  bash
-#  cat
-#  yum, mkdir, arch
+#  cat, curl
+#  rpm, yum, mkdir, arch
 #  pwconv, chkconfig, grub, grub2-mkconfig, grub2-set-default
 #  cp, rm, ln, touch, rsync
-#  find, egrep, sed, xargs
+#  find, egrep, grep, sed, xargs
 #  mount, umount
 #  ls, tail
 #
@@ -268,6 +268,14 @@ function configure_container() {
   reconfigure_mtab      ${chroot_dir}
 }
 
+function configure_openvz() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  install_vzkernel          ${chroot_dir}
+  install_vzutils           ${chroot_dir}
+  install_menu_lst_vzkernel ${chroot_dir}
+}
 
 ## yum
 
@@ -448,7 +456,7 @@ function reconfigure_mtab() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
 
-  [[ -f ${chroot_dir}/etc/mtab ]] && rm -f ${chroot_dir}/etc/mtab || :
+  [[ -f "${chroot_dir}/etc/mtab" ]] && rm -f ${chroot_dir}/etc/mtab || :
   run_in_target ${chroot_dir} ln -fs /proc/mounts /etc/mtab
 }
 
@@ -512,6 +520,8 @@ function install_authorized_keys() {
 
 ## package configuration
 
+### vanilla kernel
+
 function install_kernel() {
   local chroot_dir=$1
 
@@ -524,6 +534,7 @@ function install_kernel() {
   run_yum ${chroot_dir} install kernel
   verify_kernel_installation ${chroot_dir}
 }
+
 
 function install_extras() {
   local chroot_dir=$1
@@ -549,6 +560,25 @@ function erase_selinux() {
   local chroot_dir=$1
 
   run_yum ${chroot_dir} erase selinux*
+}
+
+### openvz kernel
+
+function install_vzkernel() {
+  local chroot_dir=$1
+
+  [[ -f ${chroot_dir}/etc/yum.repos.d/openvz.repo ]] || {
+    curl http://download.openvz.org/openvz.repo -o ${chroot_dir}/etc/yum.repos.d/openvz.repo
+  }
+
+  run_in_target ${chroot_dir} yum install -y vzkernel
+  verify_kernel_installation ${chroot_dir}
+}
+
+function install_vzutils() {
+  local chroot_dir=$1
+
+  run_in_target ${chroot_dir} yum install -y vzctl vzquota
 }
 
 ## kernel configuration
@@ -591,6 +621,8 @@ function install_grub2() {
 }
 
 ## bootloader configuration
+
+### vanilla kernel
 
 function install_bootloader_cleanup() {
   local chroot_dir=$1 disk_filename=$2
@@ -770,6 +802,51 @@ function mangle_grub_menu_lst_grub2() {
 
   # show booting progress
   sed -i "s,quiet rhgb,," ${chroot_dir}/boot/grub2/grub.cfg
+}
+
+### openvz kernel
+
+function vzkernel_version() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+
+  run_in_target ${chroot_dir} rpm -q --qf '%{Version}-%{Release}' vzkernel
+}
+
+function install_menu_lst_vzkernel() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}"                     ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -a "${chroot_dir}/etc/fstab"           ]] || { echo "[ERROR] file not found: ${chroot_dir}/etc/fstab (distro:${LINENO})" >&2; return 1; }
+  [[ -a "${chroot_dir}/boot/grub/grub.conf" ]] || { echo "[ERROR] file not found: ${chroot_dir}/boot/grub/grub.conf (distro:${LINENO})" >&2; return 1; }
+  local version=$(vzkernel_version ${chroot_dir})
+  [[ -n "${version}" ]] || { echo "[ERROR] vzkernel not found (distro:${LINENO})" &2; return 1; }
+
+  local bootdir_path=
+  local root_dev=$(awk '$2 == "/boot" {print $1}' ${chroot_dir}/etc/fstab)
+
+  [[ -n "${root_dev}" ]] || {
+    # has no /boot partition case
+    root_dev=$(awk '$2 == "/" {print $1}' ${chroot_dir}/etc/fstab)
+    bootdir_path=/boot
+  }
+
+  local grub_title="OpenVZ (${version})"
+  cat <<-_EOS_ >> ${chroot_dir}/boot/grub/grub.conf
+	title ${grub_title}
+	        root (hd0,0)
+	        kernel ${bootdir_path}/vmlinuz-${version} ro root=${root_dev} rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM
+	        initrd ${bootdir_path}/initramfs-${version}.img
+	_EOS_
+
+  # set default kernel
+  # *** "grep" should be used at after 'cat -n'. because ${grub_title} includes regex meta characters. ex. '(' and ')'. ***
+  local menu_order=$(egrep ^title ${chroot_dir}/boot/grub/grub.conf | cat -n | grep "${grub_title}" | tail | awk '{print $1}')
+  local menu_offset=0
+  [[ -z "${menu_order}" ]] || {
+    menu_offset=$((${menu_order} - 1))
+  }
+  sed -i "s,^default=.*,default=${menu_offset}," ${chroot_dir}/boot/grub/grub.conf
+  cat ${chroot_dir}/boot/grub/grub.conf
 }
 
 ## networking configuration
