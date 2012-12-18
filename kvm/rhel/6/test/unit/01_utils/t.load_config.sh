@@ -1,12 +1,14 @@
 #!/bin/bash
 #
 # requires:
-#   bash
+#  bash
+#  dirname, pwd
+#  rm
 #
 
 ## include files
 
-. ./helper_shunit2.sh
+. $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
 
 ## functions
 
@@ -21,7 +23,7 @@ function tearDown() {
 }
 
 function test_load_config_empty() {
-  load_config
+  load_config 2>/dev/null
   assertNotEquals $? 0
 }
 
@@ -32,6 +34,7 @@ function test_load_config_exists() {
 
 function test_load_config_access_defined_parameter() {
   load_config ${config_file}
+
   [[ -n "${now}" ]]
   assertEquals $? 0
 }

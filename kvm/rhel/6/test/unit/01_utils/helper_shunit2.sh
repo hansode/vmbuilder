@@ -1,7 +1,8 @@
 # -*-Shell-script-*-
 #
 # requires:
-#   bash
+#  bash
+#  cd, dirname
 #
 
 ## system variables

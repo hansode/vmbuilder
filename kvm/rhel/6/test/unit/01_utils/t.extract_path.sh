@@ -1,27 +1,26 @@
 #!/bin/bash
 #
 # requires:
-#   bash
+#  bash
+#  dirname, pwd
 #
 
 ## include files
 
-. ./helper_shunit2.sh
+. $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
 
 ## functions
 
 function test_extract_path_parent_dir() {
-  extract_path ../
-  assertEquals $? 0
+  assertEquals $(extract_path ../) $(pwd)/..
 }
 
 function test_extract_path_current_dir() {
-  extract_path ./
-  assertEquals $? 0
+  assertEquals $(extract_path ./) $(pwd)/.
 }
 
 function test_extract_path_parent_file_not_found() {
-  extract_path /a/s/d/f
+  extract_path /a/s/d/f 2>/dev/null
   assertNotEquals $? 0
 }
 
