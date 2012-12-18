@@ -14,7 +14,7 @@
 # import:
 #  utils: extract_args, shlog
 #  hypervisor: gen_macaddr
-#              openvz_create, openvz_start, openvz_stop, openvz_destroy, openvz_console
+#              openvz_create, openvz_start, openvz_stop, openvz_destroy, openvz_console, openvz_status
 #
 # usage:
 #
@@ -42,8 +42,11 @@ function controll_openvz() {
     # kind of virt-install
     ${abs_dirname}/../vmbuilder.sh --config-path=${config_path} --hypervisor=${hypervisor} --diskless
     ;;
-  create|start|stop|destroy|info|console)
+  create|start|stop|destroy|console|status)
     openvz_${cmd} ${name}
+    ;;
+  list)
+    openvz_${cmd}
     ;;
   *)
     echo $"USAGE: $0 [start] OPTIONS..." >&2
