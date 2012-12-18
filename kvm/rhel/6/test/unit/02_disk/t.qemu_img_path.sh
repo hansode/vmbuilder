@@ -14,8 +14,7 @@
 ## public functions
 
 function test_qemu_img_path() {
-  qemu_img_path
-  assertEquals $? 0
+  assertEquals $(qemu_img_path | wc -l) 1
 }
 
 ## shunit2
