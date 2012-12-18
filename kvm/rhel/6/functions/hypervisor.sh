@@ -157,11 +157,11 @@ function install_firstboot() {
   local chroot_dir=$1 firstboot=$2
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
   [[ -n "${firstboot}"  ]] || return 0
-  [[ -f "${firstboot}"  ]] || { echo "[ERROR] The path to the firstboot directive is invalid: ${firstboot}. Make sure you are providing a full path. (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -f "${firstboot}"  ]] || { echo "[ERROR] The path to the first-boot directive is invalid: ${firstboot}. Make sure you are providing a full path. (hypervisor:${LINENO})" >&2; return 1; }
 
   printf "[DEBUG] Installing firstboot script %s\n" ${firstboot}
   rsync -aHA ${firstboot} ${chroot_dir}/root/firstboot.sh
-  chmod 755 ${chroot_dir}/root/firstboot.sh
+  chmod 0700 ${chroot_dir}/root/firstboot.sh
 
   mv ${chroot_dir}/etc/rc.d/rc.local ${chroot_dir}/etc/rc.d/rc.local.orig
   cat <<-'EOS' > ${chroot_dir}/etc/rc.d/rc.local
