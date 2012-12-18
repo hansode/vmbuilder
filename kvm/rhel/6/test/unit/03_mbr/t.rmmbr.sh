@@ -13,17 +13,25 @@
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename} 10
+  touch ${disk_filename}
+
+  function dd() { :; }
 }
 
 function tearDown() {
   rm -f ${disk_filename}
 }
 
-function test_rmmbr() {
-  rmmbr ${disk_filename} 2>/dev/null
+function test_rmmbr_no_opts() {
+  rmmbr 2>/dev/null
+  assertNotEquals $? 0
+}
+
+function test_rmmbr_file_exists() {
+  rmmbr ${disk_filename}
   assertEquals $? 0
 }
+
 
 ## shunit2
 
