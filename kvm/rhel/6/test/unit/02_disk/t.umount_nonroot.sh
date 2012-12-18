@@ -14,11 +14,10 @@
 ## public functions
 
 function setUp() {
-  mkdir -p ${chroot_dir}/proc
-  mkdir -p ${chroot_dir}/dev
-  checkroot || return 1
-  mount --bind /proc ${chroot_dir}/proc
-  mount --bind /dev  ${chroot_dir}/dev
+  mkdir -p ${chroot_dir}
+
+  function checkroot() { :; }
+  function umount() { :; }
 }
 
 function tearDown() {
