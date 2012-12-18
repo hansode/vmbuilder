@@ -1,12 +1,13 @@
 #!/bin/bash
 #
 # requires:
-#   bash
+#  bash
+#  cd, dirname
 #
 
 ## include files
 
-. ./helper_shunit2.sh
+. $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
 
 ## functions
 
