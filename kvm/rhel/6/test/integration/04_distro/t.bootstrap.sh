@@ -17,13 +17,6 @@ function setUp() {
   distro_ver=6
 
   add_option_distro
-
-  function checkroot() { :; }
-  function mkdevice() { :; }
-  function mkprocdir() { :; }
-  function mount_proc() { :; }
-  function run_yum() { :; }
-  function umount_nonroot() { :; }
 }
 
 function tearDown() {
