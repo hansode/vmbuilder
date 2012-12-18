@@ -15,23 +15,17 @@ declare inode_file=inode.$$
 
 function setUp() {
   touch ${inode_file}
-}
 
-function tearDown() {
-  rm -f ${inode_file}
+  function stat() { echo stat $*; }
 }
 
 function test_inodeof_file_exists() {
-  inodeof ${inode_file}
+  inodeof ${inode_file} >/dev/null
   assertEquals $? 0
 }
 
-function test_inodeof_file_exists_compare_using_ls() {
-  assertEquals "$(inodeof ${inode_file})" "$(ls -i ${inode_file} | awk '{print $1}')"
-}
-
 function test_inodeof_file_not_found() {
-  inodeof /${inode_file}
+  inodeof /${inode_file} 2>/dev/null
   assertNotEquals $? 0
 }
 
