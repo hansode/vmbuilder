@@ -5,8 +5,8 @@
 #
 # requires:
 #  bash
-#  pwd, stat, chroot
-#  cat, xargs, cut,sed
+#  pwd, dirname, basename, stat, chroot
+#  cat, xargs, cut, sed
 #
 # imports:
 #
@@ -70,17 +70,6 @@ function extract_path() {
   } || {
     echo ${tmp_path}
   }
-}
-
-function run_cmd() {
-  #
-  # Runs a command.
-  #
-  # Locale is reset to C to make parsing error messages possible.
-  #
-  export LANG=C
-  export LC_ALL=C
-  eval $*
 }
 
 function run_in_target() {
