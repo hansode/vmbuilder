@@ -3,6 +3,7 @@
 # requires:
 #  bash
 #  cd, dirname
+#  touch, rm
 #
 
 ## include files
@@ -11,27 +12,31 @@
 
 ## variables
 
+declare inode=12345
+
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename} $(sum_disksize) 2>/dev/null
-  mkptab ${disk_filename}
+  touch ${disk_filename}
+
+  function checkroot() { :; }
+  function inodeof() { echo -n ${inode}; }
+  function losetup() { echo "/dev/loop0: [fd02]:${inode} (${disk_filename})"; }
 }
 
 function tearDown() {
-  unmapptab ${disk_filename}
   rm -f ${disk_filename}
 }
 
 function test_is_mapped_no() {
-  is_mapped ${disk_filename}
+  function losetup() { :; }
+
+  is_mapped ${disk_filename} >/dev/null
   assertNotEquals $? 0
 }
 
 function test_is_mapped_yes() {
-  mapptab ${disk_filename}
-
-  is_mapped ${disk_filename}
+  is_mapped ${disk_filename} >/dev/null
   assertEquals $? 0
 }
 

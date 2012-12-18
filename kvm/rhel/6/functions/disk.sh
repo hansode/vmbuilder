@@ -369,6 +369,9 @@ function is_mapped() {
   checkroot || return 1
 
   local inode=$(inodeof ${disk_filename})
+
+  # # losetup -a
+  # /dev/loop0: [fd02]:9044139 (./centos-6.3_x86_64.raw)
   losetup -a | egrep "\]:${inode} " ${opts}
 }
 
