@@ -14,9 +14,18 @@
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename} $(sum_disksize) 2>/dev/null
-  mkptab ${disk_filename}
-  mapptab ${disk_filename}
+  touch ${disk_filename}
+
+  function checkroot() { :; }
+  function kpartx() { :; }
+  function dmsetup() { :; }
+  function losetup() { :; }
+  function mapped_lodev() { :; }
+  function lsdevmap() { cat <<-EOS
+	loop0p1
+	loop0p2
+	EOS
+  }
 }
 
 function tearDown() {
@@ -24,7 +33,7 @@ function tearDown() {
 }
 
 function test_unmapptab() {
-  unmapptab ${disk_filename}
+  unmapptab ${disk_filename} >/dev/null
   assertEquals $? 0
 }
 
