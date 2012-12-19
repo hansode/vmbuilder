@@ -6,7 +6,7 @@
 
 ## include files
 
-. ./helper_shunit2.sh
+. $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
 
 ## variables
 
@@ -39,8 +39,8 @@ function test_config_interfaces_static_ip_net() {
 
   config_interfaces ${chroot_dir}
   assertEquals $? 0
-
 }
+
 function test_config_interfaces_static_ip_net_mask() {
   local ip=192.0.2.10 net=192.0.2.0 mask=255.255.255.128
 
@@ -57,6 +57,13 @@ function test_config_interfaces_static_ip_net_mask_bcast() {
 
 function test_config_interfaces_static_ip_net_mask_bcast_gw() {
   local ip=192.0.2.10 net=192.0.2.0 mask=255.255.255.128 bcast=192.0.2.127 gw=192.0.2.1
+
+  config_interfaces ${chroot_dir}
+  assertEquals $? 0
+}
+
+function test_config_interfaces_static_ip_net_mask_bcast_gw_onboot() {
+  local ip=192.0.2.10 net=192.0.2.0 mask=255.255.255.128 bcast=192.0.2.127 gw=192.0.2.1 onboot=no
 
   config_interfaces ${chroot_dir}
   assertEquals $? 0
@@ -94,6 +101,13 @@ function test_config_interfaces_bcast_empty() {
 
 function test_config_interfaces_gw_empty() {
   local gw=
+
+  config_interfaces ${chroot_dir}
+  assertEquals $? 0
+}
+
+function test_config_interfaces_onboot_empty() {
+  local onboot=
 
   config_interfaces ${chroot_dir}
   assertEquals $? 0
