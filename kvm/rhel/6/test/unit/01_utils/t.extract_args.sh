@@ -49,6 +49,17 @@ function test_extract_args_commands_simple_opts() {
   assertEquals "${disk_less}" "1"
 }
 
+function test_extract_args_commands_complex_opts() {
+  local opts="--overwrite --diskless yes --disk-less no --dry-run"
+
+  extract_args ${opts}
+
+  assertEquals "${overwrite}" "1"
+  assertEquals "${diskless}"  "yes"
+  assertEquals "${disk_less}" "no"
+  assertEquals "${dry_run}"   "1"
+}
+
 ## shunit2
 
 . ${shunit2_file}

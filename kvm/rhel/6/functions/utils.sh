@@ -13,8 +13,9 @@
 
 function extract_args() {
   CMD_ARGS=
-  local arg=
-  for arg in ${*}; do
+  local arg= key= value=
+  while [[ $# != 0 ]]; do
+    arg="$1"
     case "${arg}" in
     --*=*)
       key=${arg%%=*}; key=${key##--}; key=${key//-/_}
@@ -23,14 +24,22 @@ function extract_args() {
       ;;
     --*)
       key=${arg##--}; key=${key//-/_}
-      eval "${key}=1"
+      case "$2" in
+      --*|"")
+        eval "${key}=1"
+        ;;
+      *)
+        eval "${key}=\"$2\""
+        shift
+        ;;
+      esac
       ;;
     *)
       CMD_ARGS="${CMD_ARGS} ${arg}"
       ;;
     esac
+    shift
   done
-  unset arg key value
   # trim
   CMD_ARGS=${CMD_ARGS%% }
   CMD_ARGS=${CMD_ARGS## }
