@@ -40,6 +40,7 @@ function test_extract_args_underbar_to_hyphen() {
 }
 
 function test_extract_args_commands_simple_opts() {
+  local overwrite= diskless= disk_less=
   local opts="--overwrite --diskless --disk-less"
 
   extract_args ${opts}
@@ -50,6 +51,7 @@ function test_extract_args_commands_simple_opts() {
 }
 
 function test_extract_args_commands_complex_opts() {
+  local overwrite= diskless= disk_less= dry_run=
   local opts="--overwrite --diskless yes --disk-less no --dry-run"
 
   extract_args ${opts}
@@ -58,6 +60,15 @@ function test_extract_args_commands_complex_opts() {
   assertEquals "${diskless}"  "yes"
   assertEquals "${disk_less}" "no"
   assertEquals "${dry_run}"   "1"
+}
+
+function test_extract_args_commands_same_opts() {
+  local addpkg=
+  local opts="--addpkg openssh-server --addpkg openssh-clients"
+
+  extract_args ${opts}
+
+  assertEquals "${addpkg}"  "openssh-server openssh-clients"
 }
 
 ## shunit2

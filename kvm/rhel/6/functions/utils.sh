@@ -15,12 +15,12 @@ function extract_args() {
   CMD_ARGS=
   local arg= key= value=
   while [[ $# != 0 ]]; do
-    arg="$1"
+    arg="$1" key= value=
     case "${arg}" in
     --*=*)
       key=${arg%%=*}; key=${key##--}; key=${key//-/_}
-      value=${arg##--*=}
-      eval "${key}=\"${value}\""
+      value="${value} ${arg##--*=}"
+      eval "${key}=\"${value}\""; value="\${${key}}"; value=$(eval echo ${value}); eval "${key}=\"${value## }\""
       ;;
     --*)
       key=${arg##--}; key=${key//-/_}
@@ -29,7 +29,8 @@ function extract_args() {
         eval "${key}=1"
         ;;
       *)
-        eval "${key}=\"$2\""
+        value="\${${key}} $2"
+        eval "${key}=\"${value}\""; value="\${${key}}"; value=$(eval echo ${value}); eval "${key}=\"${value## }\""
         shift
         ;;
       esac
