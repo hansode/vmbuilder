@@ -13,18 +13,18 @@
 ## public functions
 
 function setUp() {
-  mkdir -p ${chroot_dir}
+  distro_name=centos
+  distro_ver=6
 
-  function chroot() { echo chroot $*; }
-  function run_yum() { echo run_yum $*; }
+  add_option_distro
 }
 
 function tearDown() {
   rm -rf ${chroot_dir}
 }
 
-function test_install_vzutils() {
-  install_vzutils ${chroot_dir} | egrep 'vzctl vzquota'
+function test_bootstrap() {
+  bootstrap ${chroot_dir}
   assertEquals $? 0
 }
 

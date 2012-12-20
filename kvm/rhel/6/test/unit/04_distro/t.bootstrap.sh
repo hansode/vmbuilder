@@ -6,16 +6,24 @@
 
 ## include files
 
-. ./helper_shunit2.sh
+. $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
 
 ## variables
 
 ## public functions
 
 function setUp() {
+  distro_name=centos
+  distro_ver=6
+
   add_option_distro
 
-  function run_yum() { echo run_yum $*; }
+  function checkroot() { :; }
+  function mkdevice() { :; }
+  function mkprocdir() { :; }
+  function mount_proc() { :; }
+  function run_yum() { :; }
+  function umount_nonroot() { :; }
 }
 
 function tearDown() {
