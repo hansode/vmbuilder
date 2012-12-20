@@ -45,6 +45,14 @@ function test_install_menu_lst_vzkernel() {
   assertEquals $? 0
 }
 
+function test_install_menu_lst_vzkernel_no_fstab() {
+  # for diskless mode
+  rm -f ${chroot_dir}/etc/fstab
+
+  install_menu_lst_vzkernel ${chroot_dir}
+  assertEquals $? 0
+}
+
 ## shunit2
 
 . ${shunit2_file}
