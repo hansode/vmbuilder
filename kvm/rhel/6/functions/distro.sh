@@ -552,7 +552,7 @@ function install_epel() {
   local chroot_dir=$1
 
   # need to periodically update uri
-  # ex) http://ftp.riken.jp/Linux/fedora/epel/6/i386/epel-release-6-7.noarch.rpm
+  # ex) http://ftp.riken.jp/Linux/fedora/epel/6/i386/epel-release-6-8.noarch.rpm
   [[ -z "${epel_uri}" ]] || run_in_target ${chroot_dir} yum install -y ${epel_uri}
 }
 
