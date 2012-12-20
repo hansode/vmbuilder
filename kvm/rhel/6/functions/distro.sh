@@ -816,7 +816,7 @@ function vzkernel_version() {
 function install_menu_lst_vzkernel() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}"                     ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-  [[ -a "${chroot_dir}/etc/fstab"           ]] || { echo "[ERROR] file not found: ${chroot_dir}/etc/fstab (distro:${LINENO})" >&2; return 1; }
+  [[ -a "${chroot_dir}/etc/fstab"           ]] || { echo "[WARN] file not found: ${chroot_dir}/etc/fstab (distro:${LINENO})" >&2; return 0; }
   [[ -a "${chroot_dir}/boot/grub/grub.conf" ]] || { echo "[ERROR] file not found: ${chroot_dir}/boot/grub/grub.conf (distro:${LINENO})" >&2; return 1; }
   local version=$(vzkernel_version ${chroot_dir})
   [[ -n "${version}" ]] || { echo "[ERROR] vzkernel not found (distro:${LINENO})" &2; return 1; }
