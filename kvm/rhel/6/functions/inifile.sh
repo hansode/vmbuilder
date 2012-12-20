@@ -54,3 +54,14 @@ function eval_ini() {
   [[ -z "${prefix}" ]] || prefix="${prefix}_"
   eval "$(parse_ini ${section} ${inifile_path} | sed "s,^,${prefix},")"
 }
+
+function csv2ln() {
+  # "a, b, c" => "a\nb\nc\n"
+  local saved_ifs=${IFS} subcmd=cat
+  [[ $# == 0 ]] || subcmd='echo "$*"'
+
+  local line=
+  IFS=,
+  while read line; do echo ${line}; done < <(eval "${subcmd} | sed \"s, ,\n,g\"")
+  IFS=${saved_ifs}
+}
