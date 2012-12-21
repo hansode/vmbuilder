@@ -40,8 +40,11 @@ function additional_tearDown() {
 }
 
 function tearDown() {
+  umount_ptab ${chroot_dir}
+  unmapptab   ${disk_filename}
+
   rm -rf ${chroot_dir}
-  rm -f ${disk_filename}
+  rm -f  ${disk_filename}
 
   additional_tearDown
 }
