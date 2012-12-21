@@ -12,14 +12,14 @@
 
 ## functions
 
-function test_csv2ln_args() {
-  assertEquals "$(csv2ln "a, b, c")" "a
+function test_csv2lsv_args() {
+  assertEquals "$(csv2lsv "a, b, c")" "a
 b
 c"
 }
 
-function test_csv2ln_filter() {
-  assertEquals "$(echo "a, b, c" | csv2ln)" "a
+function test_csv2lsv_filter() {
+  assertEquals "$(echo "a, b, c" | csv2lsv)" "a
 b
 c"
 }

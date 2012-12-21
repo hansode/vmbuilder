@@ -55,8 +55,11 @@ function eval_ini() {
   eval "$(parse_ini ${section} ${inifile_path} | sed "s,^,${prefix},")"
 }
 
-function csv2ln() {
+function csv2lsv() {
+  #
+  # CSV(comma-separeted values) => LSV(line-separeted values)
   # "a, b, c" => "a\nb\nc\n"
+  #
   local saved_ifs=${IFS} subcmd=cat
   [[ $# == 0 ]] || subcmd='echo "$*"'
 
