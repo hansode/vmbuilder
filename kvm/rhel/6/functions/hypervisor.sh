@@ -4,7 +4,7 @@
 #  Hypervisor
 #
 # requires:
-#  bash
+#  bash, basename
 #  pwd, date
 #  mount, umount
 #  mkdir, rmdir
@@ -47,7 +47,7 @@ function add_option_hypervisor() {
     load_hypervisor_driver ${hypervisor}
     ;;
   *)
-    echo "[ERROR] no mutch hypervisor (hypervisor:${LINENO})" >&2
+    echo "[ERROR] no mutch hypervisor ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
     return 1
     ;;
   esac
@@ -55,10 +55,10 @@ function add_option_hypervisor() {
 
 function load_hypervisor_driver() {
   local driver_name=$1
-  [[ -n "${driver_name}" ]] || { echo "[ERROR] Invalid argument: driver_name:${driver_name} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -n "${driver_name}" ]] || { echo "[ERROR] Invalid argument: driver_name:${driver_name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   local driver_path=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/hypervisor/${driver_name}.sh
-  [[ -f "${driver_path}" ]] || { echo "[ERROR] no such driver: ${driver_path} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -f "${driver_path}" ]] || { echo "[ERROR] no such driver: ${driver_path} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   . ${driver_path}
   add_option_hypervisor_${driver_name}
@@ -72,8 +72,8 @@ function preflight_check_hypervisor() {
 
 function mount_ptab_root() {
   local disk_filename=$1 chroot_dir=$2
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
-  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   xptabproc <<'EOS'
@@ -89,8 +89,8 @@ EOS
 
 function mount_ptab_nonroot() {
   local disk_filename=$1 chroot_dir=$2
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
-  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   xptabproc <<'EOS'
@@ -108,8 +108,8 @@ EOS
 
 function mount_ptab() {
   local disk_filename=$1 chroot_dir=$2
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
-  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   mount_ptab_root    ${disk_filename} ${chroot_dir}
@@ -118,7 +118,7 @@ function mount_ptab() {
 
 function umount_ptab() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   umount_nonroot ${chroot_dir}
@@ -129,9 +129,9 @@ function umount_ptab() {
 
 function run_copy() {
   local chroot_dir=$1 copy=$2
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   [[ -n "${copy}" ]] || return 0
-  [[ -f "${copy}" ]] || { echo "[ERROR] The path to the copy directive is invalid: ${copy}. Make sure you are providing a full path. (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -f "${copy}" ]] || { echo "[ERROR] The path to the copy directive is invalid: ${copy}. Make sure you are providing a full path. ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   printf "[INFO] Copying files specified by copy in: %s\n" ${copy}
   while read line; do
@@ -145,9 +145,9 @@ function run_copy() {
 
 function run_execscript() {
   local chroot_dir=$1 execscript=$2
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   [[ -n "${execscript}" ]] || return 0
-  [[ -x "${execscript}" ]] || { echo "[WARN] cannot execute script: ${execscript} (hypervisor:${LINENO})" >&2; return 0; }
+  [[ -x "${execscript}" ]] || { echo "[WARN] cannot execute script: ${execscript} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 0; }
 
   printf "[INFO] Excecuting script: %s\n" ${execscript}
   [[ -n "${distro_arch}" ]] || add_option_distro
@@ -156,9 +156,9 @@ function run_execscript() {
 
 function install_firstboot() {
   local chroot_dir=$1 firstboot=$2
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   [[ -n "${firstboot}"  ]] || return 0
-  [[ -f "${firstboot}"  ]] || { echo "[ERROR] The path to the first-boot directive is invalid: ${firstboot}. Make sure you are providing a full path. (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -f "${firstboot}"  ]] || { echo "[ERROR] The path to the first-boot directive is invalid: ${firstboot}. Make sure you are providing a full path. ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   printf "[DEBUG] Installing firstboot script %s\n" ${firstboot}
   rsync -aHA ${firstboot} ${chroot_dir}/root/firstboot.sh
@@ -181,9 +181,9 @@ function install_firstboot() {
 
 function install_firstlogin() {
   local chroot_dir=$1 firstlogin=$2
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   [[ -n "${firstlogin}" ]] || return 0
-  [[ -f "${firstlogin}" ]] || { echo "[ERROR] The path to the first-login directive is invalid: ${firstlogin}. Make sure you are providing a full path. (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -f "${firstlogin}" ]] || { echo "[ERROR] The path to the first-login directive is invalid: ${firstlogin}. Make sure you are providing a full path. ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   printf "[DEBUG] Installing first login script %s\n" ${firstlogin}
   rsync -aHA ${firstlogin} ${chroot_dir}/root/firstlogin.sh
@@ -214,8 +214,8 @@ function sync_os() {
   # **The argument order is depending on rsync**
   #
   local distro_dir=$1 chroot_dir=$2
-  [[ -d "${distro_dir}" ]] || { echo "[ERROR] no such directory: ${distro_dir} (hypervisor:${LINENO})" >&2; return 1; }
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] no such directory: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -d "${distro_dir}" ]] || { echo "[ERROR] no such directory: ${distro_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] no such directory: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   rsync -aHA ${distro_dir}/ ${chroot_dir}
@@ -224,7 +224,7 @@ function sync_os() {
 
 function configure_hypervisor() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] no such directory: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] no such directory: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   # should be implemented in hypervisor-specific function file.
   :
@@ -232,17 +232,17 @@ function configure_hypervisor() {
 
 function install_os() {
   local chroot_dir=$1 distro_dir=$2 disk_filename=$3
-  [[ -d "${chroot_dir}"    ]] && { echo "[ERROR] already exists: ${chroot_dir} (hypervisor:${LINENO})" >&2; return 1; }
-  [[ -d "${distro_dir}"    ]] || { echo "[ERROR] no such directory: ${distro_dir} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] && { echo "[ERROR] already exists: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -d "${distro_dir}"    ]] || { echo "[ERROR] no such directory: ${distro_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   [[ -z "${diskless}" ]] && {
     # needs disk
-    [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (hypervisor:${LINENO})" >&2; return 1; }
+    [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   } || {
     # diskless
     printf "[INFO] Diskless mode\n"
   }
   # install_kernel depends on distro_name.
-  [[ -n "${distro_name}"   ]] || { echo "[ERROR] Invalid argument: distro_name:${distro_name} (hypervisor:${LINENO})" >&2; return 1; }
+  [[ -n "${distro_name}"   ]] || { echo "[ERROR] Invalid argument: distro_name:${distro_name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   mkdir -p ${chroot_dir}

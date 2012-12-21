@@ -4,7 +4,7 @@
 #  Hypervisor openvz
 #
 # requires:
-#  bash
+#  bash, basename
 #
 # imports:
 #  utils: shlog
@@ -24,7 +24,7 @@ function add_option_hypervisor_openvz() {
 
 function configure_hypervisor() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] no such directory: ${chroot_dir} (hypervisor/openvz:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] no such directory: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   echo "[INFO] ***** Configuring openvz-specific *****"
   configure_container ${chroot_dir}
@@ -109,7 +109,7 @@ EOS
 
 function openvz_create() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/openvz:${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   VEID=$(next_ctid)
@@ -131,7 +131,7 @@ function openvz_create() {
 
 function openvz_start() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/openvz:${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   shlog vzctl start ${name}
@@ -139,7 +139,7 @@ function openvz_start() {
 
 function openvz_stop() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/openvz:${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   shlog vzctl stop ${name}
@@ -147,7 +147,7 @@ function openvz_stop() {
 
 function openvz_destroy() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/openvz:${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   shlog vzctl destroy ${name}
@@ -155,7 +155,7 @@ function openvz_destroy() {
 
 function openvz_console() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/openvz:${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   shlog vzctl console ${name}
@@ -163,7 +163,7 @@ function openvz_console() {
 
 function openvz_status() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/openvz:${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   shlog vzctl status ${name}

@@ -4,7 +4,7 @@
 #  Linux Distribution
 #
 # requires:
-#  bash
+#  bash, basename
 #  cat, curl
 #  rpm, yum, mkdir, arch
 #  pwconv, chkconfig, grub, grub2-mkconfig, grub2-set-default
@@ -50,7 +50,7 @@ function add_option_distro() {
     load_distro_driver ${driver_name}
     ;;
   *)
-    echo "[ERROR] no mutch distro (distro:${LINENO})" >&2
+    echo "[ERROR] no mutch distro ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
     return 1
     ;;
   esac
@@ -81,10 +81,10 @@ function add_option_distro() {
 
 function load_distro_driver() {
   local driver_name=$1
-  [[ -n "${driver_name}" ]] || { echo "[ERROR] Invalid argument: driver_name:${driver_name} (distro:${LINENO})" >&2; return 1; }
+  [[ -n "${driver_name}" ]] || { echo "[ERROR] Invalid argument: driver_name:${driver_name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   local distro_driver_path=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/distro/${driver_name}.sh
-  [[ -f "${distro_driver_path}" ]] || { echo "[ERROR] no such distro driver: ${distro_driver_path} (distro:${LINENO})" >&2; return 1; }
+  [[ -f "${distro_driver_path}" ]] || { echo "[ERROR] no such distro driver: ${distro_driver_path} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   . ${distro_driver_path}
   add_option_distro_${driver_name}
@@ -94,7 +94,7 @@ function load_distro_driver() {
 
 function get_normalized_distro_name() {
   local distro_name=$1
-  [[ -n "${distro_name}" ]] || { echo "[ERROR] Invalid argument: distro_name:${distro_name} (distro:${LINENO})" >&2; return 1; }
+  [[ -n "${distro_name}" ]] || { echo "[ERROR] Invalid argument: distro_name:${distro_name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   case "${distro_name}" in
   rhel)
@@ -110,7 +110,7 @@ function get_normalized_distro_name() {
     echo fedora
     ;;
   *)
-    echo "[ERROR] no mutch distro: ${distro_name} (distro:${LINENO})" >&2
+    echo "[ERROR] no mutch $(basename ${BASH_SOURCE[0]}): ${distro_name} (distro:${LINENO})" >&2
     return 1
     ;;
   esac
@@ -118,7 +118,7 @@ function get_normalized_distro_name() {
 
 function get_distro_major_ver() {
   local distro_ver=$1
-  [[ -n "${distro_ver}" ]] || { echo "[ERROR] Invalid argument: distro_ver:${distro_ver} (distro:${LINENO})" >&2; return 1; }
+  [[ -n "${distro_ver}" ]] || { echo "[ERROR] Invalid argument: distro_ver:${distro_ver} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   # x.y -> x
   echo ${distro_ver%%.*}
@@ -126,14 +126,14 @@ function get_distro_major_ver() {
 
 function preflight_check_uri() {
   local uri=$1
-  [[ -n "${uri}" ]] || { echo "[ERROR] Invalid argument: uri:${uri} (distro:${LINENO})" >&2; return 1; }
+  [[ -n "${uri}" ]] || { echo "[ERROR] Invalid argument: uri:${uri} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   case "${uri}" in
   http://*)  ;;
   https://*) ;;
   ftp://*)   ;;
   *)
-    echo "[ERROR] unknown scheme: ${uri} (distro:${LINENO})" >&2
+    echo "[ERROR] unknown scheme: ${uri} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
     return 1
     ;;
   esac
@@ -146,10 +146,10 @@ function preflight_check_uri() {
 }
 
 function preflight_check_distro() {
-  [[ -n "${baseurl}" ]] || { echo "[ERROR] Invalid argument: baseurl:${baseurl} (distro:${LINENO})" >&2; return 1; }
+  [[ -n "${baseurl}" ]] || { echo "[ERROR] Invalid argument: baseurl:${baseurl} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   preflight_check_uri "${baseurl}" || return 1
 
-  [[ -n "${gpgkey}" ]] || { echo "[ERROR] Invalid argument: gpgkey:${gpgkey} (distro:${LINENO})" >&2; return 1; }
+  [[ -n "${gpgkey}" ]] || { echo "[ERROR] Invalid argument: gpgkey:${gpgkey} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   for i in ${gpgkey}; do
     preflight_check_uri "${i}" || return 1
   done
@@ -176,7 +176,7 @@ function build_chroot() {
   preflight_check_distro
 
   local chroot_dir=${1:-$(pwd)/${distro_name}-${distro_ver}_${distro_arch}}
-  [[ -d "${chroot_dir}" ]] && { echo "[ERROR] ${chroot_dir} already exists (distro:${LINENO})" >&2; return 1; } || :
+  [[ -d "${chroot_dir}" ]] && { echo "[ERROR] ${chroot_dir} already exists ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; } || :
 
   distroinfo
   # set_defaults
@@ -187,7 +187,7 @@ function build_chroot() {
 
 function cleanup_distro() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   find   ${chroot_dir}/var/log/ -type f | xargs rm
   rm -rf ${chroot_dir}/tmp/*
@@ -197,7 +197,7 @@ function cleanup_distro() {
 
 function trap_distro() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   umount_nonroot ${chroot_dir}
   [[ -d "${chroot_dir}" ]] && rm -rf ${chroot_dir}
@@ -205,7 +205,7 @@ function trap_distro() {
 
 function bootstrap() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] && { echo "[ERROR] ${chroot_dir} already exists (distro:${LINENO})" >&2; return 1; } || :
+  [[ -d "${chroot_dir}" ]] && { echo "[ERROR] ${chroot_dir} already exists ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; } || :
   checkroot || return 1
 
   # via $ trap -l
@@ -229,7 +229,7 @@ function bootstrap() {
 
 function configure_os() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   mount_proc               ${chroot_dir}
@@ -258,7 +258,7 @@ function configure_os() {
 
 function configure_container() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   # make sure to make device files & directories at post install phase
   mkdevice              ${chroot_dir}
@@ -270,7 +270,7 @@ function configure_container() {
 
 function configure_openvz() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   install_vzkernel          ${chroot_dir}
   install_vzutils           ${chroot_dir}
@@ -281,9 +281,9 @@ function configure_openvz() {
 
 function repofile() {
   local reponame=$1 baseurl="$2" gpgkey="$3" keepcache=${4:-0}
-  [[ -n "${reponame}" ]] || { echo "[ERROR] Invalid argument: reponame:${reponame} (distro:${LINENO})" >&2; return 1; }
-  [[ -n "${baseurl}"  ]] || { echo "[ERROR] Invalid argument: baseurl:${baseurl} (distro:${LINENO})" >&2; return 1; }
-  [[ -n "${gpgkey}"   ]] || { echo "[ERROR] Invalid argument: gpgkey:${gpgkey} (distro:${LINENO})" >&2; return 1; }
+  [[ -n "${reponame}" ]] || { echo "[ERROR] Invalid argument: reponame:${reponame} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${baseurl}"  ]] || { echo "[ERROR] Invalid argument: baseurl:${baseurl} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${gpgkey}"   ]] || { echo "[ERROR] Invalid argument: gpgkey:${gpgkey} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   cat <<-EOS
 	[main]
@@ -311,9 +311,9 @@ function repofile() {
 
 function run_yum() {
   local chroot_dir=$1; shift
-  [[ -d "${chroot_dir}"  ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"  ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   # install_kernel depends on distro_name.
-  [[ -n "${distro_name}" ]] || { echo "[ERROR] Invalid argument: distro_name:${distro_name} (distro:${LINENO})" >&2; return 1; }
+  [[ -n "${distro_name}" ]] || { echo "[ERROR] Invalid argument: distro_name:${distro_name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   local reponame=${distro_name}
   local tmpdir=${chroot_dir}/tmp
@@ -335,7 +335,7 @@ function run_yum() {
 
 function configure_keepcache() {
   local chroot_dir=$1 keepcache=${2:-0}
-  [[ -a "${chroot_dir}/etc/yum.conf" ]] || { echo "[ERROR] file not found: ${chroot_dir}/etc/yum.conf (distro:${LINENO})" >&2; return 1; }
+  [[ -a "${chroot_dir}/etc/yum.conf" ]] || { echo "[ERROR] file not found: ${chroot_dir}/etc/yum.conf ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   case "${keepcache}" in
   [01]) ;;
@@ -362,7 +362,7 @@ function configure_selinux() {
   enforcing|permissive|disabled)
     ;;
   *)
-    echo "[ERROR] unknown SELINUX value: ${selinux} (distro:${LINENO})" >&2
+    echo "[ERROR] unknown SELINUX value: ${selinux} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
     return 1
     ;;
   esac
@@ -373,7 +373,7 @@ function configure_selinux() {
 
 function set_timezone() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   printf "[INFO] Setting /etc/localtime\n"
   cp ${chroot_dir}/usr/share/zoneinfo/Japan ${chroot_dir}/etc/localtime
@@ -381,7 +381,7 @@ function set_timezone() {
 
 function prevent_daemons_starting() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
  #local svc= dummy=
  #while read svc dummy; do
@@ -392,7 +392,7 @@ function prevent_daemons_starting() {
 function prevent_udev_starting() {
   local chroot_dir=$1
 
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   sed -i 's,/sbin/start_udev,#\0,' \
     ${chroot_dir}/etc/rc.sysinit   \
     ${chroot_dir}/etc/rc.d/rc.sysinit
@@ -412,8 +412,8 @@ function preferred_filesystem() {
 
 function install_fstab() {
   local chroot_dir=$1 disk_filename=$2
-  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   printf "[INFO] Overwriting /etc/fstab\n"
@@ -447,14 +447,14 @@ function render_fstab() {
 
 function reconfigure_fstab() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   render_fstab ${chroot_dir} | tee ${chroot_dir}/etc/fstab
 }
 
 function reconfigure_mtab() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   [[ -f "${chroot_dir}/etc/mtab" ]] && rm -f ${chroot_dir}/etc/mtab || :
   run_in_target ${chroot_dir} ln -fs /proc/mounts /etc/mtab
@@ -464,7 +464,7 @@ function reconfigure_mtab() {
 
 function update_passwords() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   printf "[INFO] Updating passwords\n"
   run_in_target ${chroot_dir} pwconv
@@ -477,7 +477,7 @@ function update_passwords() {
 
 function create_initial_user() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   [[ -z "${devel_user}" ]] || {
     printf "[INFO] Creating user: %s\n" ${devel_user}
@@ -500,7 +500,7 @@ function create_initial_user() {
 
 function install_authorized_keys() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   [[ -f "${ssh_key}" ]] && {
     printf "[INFO] Installing authorized_keys %s\n" /root/.ssh/authorized_keys
@@ -590,8 +590,8 @@ function preferred_initrd() {
 function verify_kernel_installation() {
   local chroot_dir=$1
 
-  ls ${chroot_dir}/boot/vmlinuz-*             || { echo "[ERROR] vmlinuz not found (distro:${LINENO})" >&2; return 1; }
-  ls ${chroot_dir}/boot/$(preferred_initrd)-* || { echo "[ERROR] $(preferred_initrd) not found (distro:${LINENO})" >&2; return 1; }
+  ls ${chroot_dir}/boot/vmlinuz-*             || { echo "[ERROR] vmlinuz not found ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  ls ${chroot_dir}/boot/$(preferred_initrd)-* || { echo "[ERROR] $(preferred_initrd) not found ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 }
 
 ## grub configuration
@@ -602,7 +602,7 @@ function preferred_grub() {
 
 function install_grub() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   local grub_distro_name=
   for grub_distro_name in redhat unknown; do
@@ -614,7 +614,7 @@ function install_grub() {
 
 function install_grub2() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   # fedora >= 16 should be used not grub but grub2
   run_yum ${chroot_dir} install grub2
@@ -626,8 +626,8 @@ function install_grub2() {
 
 function install_bootloader_cleanup() {
   local chroot_dir=$1 disk_filename=$2
-  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   local tmpdir=/tmp/vmbuilder-grub
@@ -646,8 +646,8 @@ function install_bootloader_cleanup() {
 
 function install_bootloader() {
   local chroot_dir=$1 disk_filename=$2
-  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   local root_dev="hd$(get_grub_id)"
@@ -723,8 +723,8 @@ function install_bootloader() {
 
 function install_menu_lst() {
   local chroot_dir=$1 disk_filename=$2
-  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   case "$(preferred_grub)" in
   grub)  install_menu_lst_grub  ${chroot_dir} ${disk_filename} ;;
@@ -734,8 +734,8 @@ function install_menu_lst() {
 
 function install_menu_lst_grub() {
   local chroot_dir=$1 disk_filename=$2
-  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   printf "[INFO] Generating /boot/grub/grub.conf\n"
 
@@ -766,8 +766,8 @@ function install_menu_lst_grub() {
 
 function install_menu_lst_grub2() {
   local chroot_dir=$1 disk_filename=$2
-  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   printf "[INFO] Generating /boot/grub2/grub.cfg\n"
 
@@ -781,8 +781,8 @@ function install_menu_lst_grub2() {
 
 function mangle_grub_menu_lst_grub2() {
   local chroot_dir=$1 disk_filename=$2
-  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   local bootdir_path=/boot
   xptabinfo | egrep -q /boot && {
@@ -808,18 +808,18 @@ function mangle_grub_menu_lst_grub2() {
 
 function vzkernel_version() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   run_in_target ${chroot_dir} rpm -q --qf '%{Version}-%{Release}' vzkernel
 }
 
 function install_menu_lst_vzkernel() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}"                     ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-  [[ -a "${chroot_dir}/etc/fstab"           ]] || { echo "[WARN] file not found: ${chroot_dir}/etc/fstab (distro:${LINENO})" >&2; return 0; }
-  [[ -a "${chroot_dir}/boot/grub/grub.conf" ]] || { echo "[ERROR] file not found: ${chroot_dir}/boot/grub/grub.conf (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"                     ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${chroot_dir}/etc/fstab"           ]] || { echo "[WARN] file not found: ${chroot_dir}/etc/fstab ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 0; }
+  [[ -a "${chroot_dir}/boot/grub/grub.conf" ]] || { echo "[ERROR] file not found: ${chroot_dir}/boot/grub/grub.conf ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   local version=$(vzkernel_version ${chroot_dir})
-  [[ -n "${version}" ]] || { echo "[ERROR] vzkernel not found (distro:${LINENO})" &2; return 1; }
+  [[ -n "${version}" ]] || { echo "[ERROR] vzkernel not found ($(basename ${BASH_SOURCE[0]}):${LINENO})" &2; return 1; }
 
   local bootdir_path=
   local root_dev=$(awk '$2 == "/boot" {print $1}' ${chroot_dir}/etc/fstab)
@@ -861,7 +861,7 @@ function install_resolv_conf() {
 
 function configure_networking() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   cat <<-EOS > ${chroot_dir}/etc/sysconfig/network
 	NETWORKING=yes
@@ -878,7 +878,7 @@ function configure_networking() {
 
 function config_host_and_domainname() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   cat <<-EOS > ${chroot_dir}/etc/hosts
 	127.0.0.1       localhost
@@ -910,7 +910,7 @@ function config_host_and_domainname() {
 
 function configure_console() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   printf "[INFO] Configuring console\n"
   [[ -f ${chroot_dir}/etc/sysconfig/init ]] && {
@@ -936,7 +936,7 @@ function nictabinfo() {
 
 function config_interfaces() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   local line=
   while read line; do
@@ -950,7 +950,7 @@ function config_interfaces() {
 
 function install_interface() {
   local chroot_dir=$1 ifname=${2:-eth0} iftype=${3:-ethernet}
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   local ifcfg_path=/etc/sysconfig/network-scripts/ifcfg-${ifname}
 
@@ -964,7 +964,7 @@ function install_interface() {
     run_yum ${chroot_dir} install bridge-utils
     ;;
   *)
-    echo "[ERROR] no mutch iftype: ${iftype} (distro:${LINENO})" >&2
+    echo "[ERROR] no mutch iftype: ${iftype} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
     return 1
     ;;
   esac
@@ -1050,7 +1050,7 @@ function routetabinfo() {
 
 function config_routing() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   local line=
   while read line; do
@@ -1064,8 +1064,8 @@ function config_routing() {
 
 function install_routing() {
   local chroot_dir=$1 ifname=$2
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
-  [[ -n "${ifname}" ]] || { echo "[ERROR] Invalid argument: ifname:${ifname} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${ifname}" ]] || { echo "[ERROR] Invalid argument: ifname:${ifname} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   local route_path=/etc/sysconfig/network-scripts/route-${ifname}
 
@@ -1077,7 +1077,7 @@ function install_routing() {
 
 function render_routing() {
   local ifname=$1
-  [[ -n "${ifname}" ]] || { echo "[ERROR] Invalid argument: ifname:${ifname} (distro:${LINENO})" >&2; return 1; }
+  [[ -n "${ifname}" ]] || { echo "[ERROR] Invalid argument: ifname:${ifname} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   # ip command arguments format
   # - default X.X.X.X dev interface
@@ -1103,7 +1103,7 @@ function render_routing() {
 
 function detect_distro() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (distro:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   # * /etc/lsb-release
   # DISTRIB_ID=Ubuntu

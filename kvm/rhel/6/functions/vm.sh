@@ -4,7 +4,7 @@
 #  The VM
 #
 # requires:
-#  bash
+#  bash, basename
 #  rm
 #
 # imports:
@@ -52,7 +52,7 @@ function create_vm() {
 
 function create_vm_disk() {
   local disk_filename=$1
-  [[ -a "${disk_filename}" ]] && { echo "[WARN] already exists: ${disk_filename} (vm:${LINENO})"; } || :
+  [[ -a "${disk_filename}" ]] && { echo "[WARN] already exists: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})"; } || :
   checkroot || return 1
 
   # via $ trap -l
@@ -94,7 +94,7 @@ function create_vm_disk() {
 
 function create_vm_tree() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] && { echo "[WARN] ${chroot_dir} already exists (vm:${LINENO})"; } || :
+  [[ -d "${chroot_dir}" ]] && { echo "[WARN] ${chroot_dir} already exists ($(basename ${BASH_SOURCE[0]}):${LINENO})"; } || :
   checkroot || return 1
 
   install_os ${chroot_dir} ${distro_dir}
