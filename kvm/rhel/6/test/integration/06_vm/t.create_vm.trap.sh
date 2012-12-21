@@ -17,19 +17,8 @@ function test_create_vm_not_enough_root() {
     set -e
     create_vm ${disk_filename} ${chroot_dir}
   )
-  # MEMO: don't uncomment following line
-  #assertNotEquals $? 0
-
-  umount_ptab ${chroot_dir}
-  unmapptab   ${disk_filename}
-
-  false
 }
 
 ## shunit2
-
-### shunit2 hack
-### call test function here in order to test/use trap
-test_create_vm_not_enough_root
 
 . ${shunit2_file}
