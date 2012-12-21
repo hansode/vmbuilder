@@ -5,7 +5,7 @@
 #
 # requires:
 #  bash
-#  sed, cat
+#  sed, cat, egrep
 #
 # imports:
 #
@@ -19,7 +19,7 @@ function normalize_ini() {
    -e 's/[[:space:]]*$//' \
    -e 's/^[[:space:]]*//' \
    -e "s/^\(.*\)=\([^\"']*\)$/\1=\"\2\"/" \
-   < <(cat $*)
+   < <(cat $* | egrep -v '^#')
 }
 
 function ini_section() {
