@@ -49,7 +49,7 @@ function controll_openvz() {
     openvz_${cmd}
     ;;
   *)
-    echo $"USAGE: $0 [start] OPTIONS..." >&2
+    echo "[ERROR] no such command: ${cmd} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
     return 2
   ;;
   esac

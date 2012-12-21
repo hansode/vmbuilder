@@ -46,7 +46,7 @@ function controll_lxc() {
     lxc_${cmd} ${name}
     ;;
   *)
-    echo $"USAGE: $0 [start] OPTIONS..." >&2
+    echo "[ERROR] no such command: ${cmd} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
     return 2
   ;;
   esac
