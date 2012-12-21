@@ -22,6 +22,8 @@ function trap_vm() {
   [[ -d "${chroot_dir}" ]] && umount_ptab ${chroot_dir} || :
   checkroot || return 1
 
+  echo "[DEBUG] trap_vm fired"
+
   is_dev ${disk_filename} || {
     unmapptab ${disk_filename}
     # TODO
@@ -55,15 +57,7 @@ function create_vm_disk() {
   [[ -a "${disk_filename}" ]] && { echo "[WARN] already exists: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})"; } || :
   checkroot || return 1
 
-  # via $ trap -l
-  #
-  #  1) SIGHUP
-  #  2) SIGINT
-  #  3) SIGQUIT
-  # 13) SIGPIPE
-  # 15) SIGTERM
-  #
-  trap "trap_vm ${disk_filename} ${chroot_dir}" HUP INT PIPE QUIT TERM
+  trap "trap_vm ${disk_filename} ${chroot_dir}" ERR
 
   is_dev ${disk_filename} && {
     rmmbr ${disk_filename}

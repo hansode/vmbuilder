@@ -199,6 +199,8 @@ function trap_distro() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
+  echo "[DEBUG] trap_distro fired"
+
   umount_nonroot ${chroot_dir}
   [[ -d "${chroot_dir}" ]] && rm -rf ${chroot_dir}
 }
@@ -208,14 +210,7 @@ function bootstrap() {
   [[ -d "${chroot_dir}" ]] && { echo "[ERROR] ${chroot_dir} already exists ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; } || :
   checkroot || return 1
 
-  # via $ trap -l
-  #
-  #  1) SIGHUP
-  #  2) SIGINT
-  #  3) SIGQUIT
-  # 15) SIGTERM
-  #
-  trap "trap_distro ${chroot_dir}" 1 2 3 15
+  trap "trap_distro ${chroot_dir}" ERR
 
   mkdir -p       ${chroot_dir}
   mkdevice       ${chroot_dir}
