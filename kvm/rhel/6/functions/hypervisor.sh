@@ -151,7 +151,11 @@ function run_execscript() {
 
   printf "[INFO] Excecuting script: %s\n" ${execscript}
   [[ -n "${distro_arch}" ]] || add_option_distro
-  setarch ${distro_arch} ${execscript} ${chroot_dir}
+
+  setarch ${distro_arch} ${execscript} ${chroot_dir} || {
+    echo "[ERROR] execscript failed: exitcode=$? ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
+    return 1
+  }
 }
 
 function install_firstboot() {
