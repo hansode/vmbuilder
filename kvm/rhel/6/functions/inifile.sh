@@ -24,7 +24,7 @@ function normalize_ini() {
 
 function ini_section() {
   local section=$1
-  [[ -n "${section}" ]] || { echo "[ERROR] Invalid argument: section:${section} (inifile:${LINENO})" >&2; return 1; }
+  [[ -n "${section}" ]] || { echo "[ERROR] Invalid argument: section:${section} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   sed -n -e "/^\[${section}\]/,/^\s*\[/{/^[^;].*\=.*/p;}" <(normalize_ini <(cat))
 }
@@ -41,15 +41,15 @@ function inikey2sh() {
 
 function parse_ini() {
   local section=$1; shift
-  [[ -n "${section}" ]] || { echo "[ERROR] Invalid argument: section:${section} (inifile:${LINENO})" >&2; return 1; }
+  [[ -n "${section}" ]] || { echo "[ERROR] Invalid argument: section:${section} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   ini_section ${section} < <(cat $*) | inikey2sh
 }
 
 function eval_ini() {
   local inifile_path=$1 section=$2 prefix=$3
-  [[ -a "${inifile_path}" ]] || { echo "[ERROR] file not found: ${inifile_path} (inifile:${LINENO})" >&2; return 1; }
-  [[ -n "${section}"      ]] || { echo "[ERROR] Invalid argument: section:${section} (inifile:${LINENO})" >&2; return 1; }
+  [[ -a "${inifile_path}" ]] || { echo "[ERROR] file not found: ${inifile_path} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${section}"      ]] || { echo "[ERROR] Invalid argument: section:${section} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   [[ -z "${prefix}" ]] || prefix="${prefix}_"
   eval "$(parse_ini ${section} ${inifile_path} | sed "s,^,${prefix},")"

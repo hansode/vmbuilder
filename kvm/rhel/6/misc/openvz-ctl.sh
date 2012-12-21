@@ -35,7 +35,7 @@ function register_options() {
 
 function controll_openvz() {
   local cmd=$1
-  [[ -n "${cmd}" ]] || { echo "[ERROR] Invalid argument: cmd:${cmd} (lxc-ctl.sh:${LINENO})" >&2; return 1; }
+  [[ -n "${cmd}" ]] || { echo "[ERROR] Invalid argument: cmd:${cmd} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   case "${cmd}" in
   build)
