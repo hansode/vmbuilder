@@ -78,7 +78,6 @@ function create_vm_disk() {
 
   (
     # execute sub-shell in order to fire trap
-    set -e
     install_os ${chroot_dir} ${distro_dir} ${disk_filename}
   )
 
@@ -99,7 +98,6 @@ function create_vm_tree() {
 
   (
     # execute sub-shell in order to fire trap
-    set -e
     install_os ${chroot_dir} ${distro_dir}
   )
   printf "[INFO] Built => %s\n" ${chroot_dir}
