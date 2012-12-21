@@ -11,7 +11,7 @@
 #  utils: checkroot
 #  mbr: rmmbr
 #  disk: is_dev, sum_disksize, mkdisk, mkptab, mapptab, mkfsdisk, unmapptab
-#  distro: build_chroot, preferred_filesystem
+#  distro: build_chroot, preferred_filesystem, trap_distro
 #  hypervisor: preflight_check_hypervisor, install_os, umount_ptab
 #
 
@@ -76,7 +76,11 @@ function create_vm_disk() {
 
   mkfsdisk ${disk_filename} $(preferred_filesystem)
 
-  install_os ${chroot_dir} ${distro_dir} ${disk_filename}
+  (
+    # execute sub-shell in order to fire trap
+    set -e
+    install_os ${chroot_dir} ${distro_dir} ${disk_filename}
+  )
 
   is_dev ${disk_filename} || {
     printf "[INFO] Deleting loop devices\n"
@@ -91,6 +95,12 @@ function create_vm_tree() {
   [[ -d "${chroot_dir}" ]] && { echo "[WARN] ${chroot_dir} already exists ($(basename ${BASH_SOURCE[0]}):${LINENO})"; } || :
   checkroot || return 1
 
-  install_os ${chroot_dir} ${distro_dir}
+  trap "trap_distro ${chroot_dir}" ERR
+
+  (
+    # execute sub-shell in order to fire trap
+    set -e
+    install_os ${chroot_dir} ${distro_dir}
+  )
   printf "[INFO] Built => %s\n" ${chroot_dir}
 }
