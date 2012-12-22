@@ -33,6 +33,7 @@ function setUp() {
   function configure_keepcache() { echo configure_keepcache $*; }
   function configure_console() { echo configure_console $*; }
   function configure_hypervisor() { echo configure_hypervisor $*; }
+  function configure_selinux() { echo configure_selinux $*; }
   function install_kernel() { echo install_kernel $*; }
   function install_bootloader() { echo install_bootloader $*; }
   function install_epel() { echo install_epel $*; }

@@ -275,6 +275,7 @@ function install_os() {
   configure_keepcache  ${chroot_dir}
   configure_console    ${chroot_dir}
   configure_hypervisor ${chroot_dir}
+  configure_selinux    ${chroot_dir}
   install_kernel       ${chroot_dir}
   [[ -n "${diskless}" ]] || {
     install_bootloader ${chroot_dir} ${disk_filename}

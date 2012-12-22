@@ -230,8 +230,6 @@ function configure_os() {
   mount_proc               ${chroot_dir}
   mount_dev                ${chroot_dir}
 
-  configure_selinux        ${chroot_dir} ${selinux}
-
   # TODO
   #  should decide where the better place is distro or hypervisor or both.
   #  so far following three functions are defined in distro.
