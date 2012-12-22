@@ -36,31 +36,26 @@ function test_configure_selinux_file_not_found() {
   rm ${chroot_dir}/etc/sysconfig/selinux
 
   configure_selinux ${chroot_dir} ""
-  assertEquals $? 0
+  assertNotEquals $? 0
 }
 
 function test_configure_selinux_empty() {
-  configure_selinux ${chroot_dir} ""
+  configure_selinux ${chroot_dir} "" | egrep ^SELINUX=disabled -q
   assertEquals $? 0
 }
 
-function test_configure_selinux_enforcing() {
-  configure_selinux ${chroot_dir} enforcing
-  assertEquals $? 0
-}
-
-function test_configure_selinux_permissive() {
-  configure_selinux ${chroot_dir} permissive
+function test_configure_selinux_enabled() {
+  configure_selinux ${chroot_dir} 1 | egrep ^SELINUX=enforcing -q
   assertEquals $? 0
 }
 
 function test_configure_selinux_disabled() {
-  configure_selinux ${chroot_dir} disabled
+  configure_selinux ${chroot_dir} 1 | egrep ^SELINUX=enforcing -q
   assertEquals $? 0
 }
 
 function test_configure_selinux_unknown() {
-  configure_selinux ${chroot_dir} unknown
+  configure_selinux ${chroot_dir} 2 | egrep ^SELINUX=disabled -q
   assertNotEquals $? 0
 }
 
