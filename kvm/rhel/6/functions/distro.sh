@@ -31,7 +31,7 @@ function add_option_distro() {
   distro_ver=${distro_ver}
 
   keepcache=${keepcache:-0}
-  selinux=${selinux:-disabled}
+  selinux=${selinux:-0}
 
   distro_name=$(get_normalized_distro_name ${distro_name})
 
@@ -230,11 +230,7 @@ function configure_os() {
   mount_proc               ${chroot_dir}
   mount_dev                ${chroot_dir}
 
-  # TODO
-  #  should use configure_selinux,
-  #  but configure_selinux has an issue which don't allow logging in by root without erasing selinux.
- #configure_selinux        ${chroot_dir} ${selinux}
-  erase_selinux            ${chroot_dir}
+  configure_selinux        ${chroot_dir} ${selinux}
 
   # TODO
   #  should decide where the better place is distro or hypervisor or both.
@@ -350,20 +346,17 @@ function configure_keepcache() {
 ## other system configuration
 
 function configure_selinux() {
-  local chroot_dir=$1 selinux=${2:-disabled}
-  [[ -a "${chroot_dir}/etc/sysconfig/selinux" ]] || return 0
+  local chroot_dir=$1 selinux=${2:-0}
+  [[ -a "${chroot_dir}/etc/sysconfig/selinux" ]] || { echo "[ERROR] file not found: ${chroot_dir}/etc/sysconfig/selinux ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
+  printf "[INFO] Setting /etc/sysconfig/selinux: SELINUX=%s\n" ${selinux}
   case "${selinux}" in
-  enforcing|permissive|disabled)
-    ;;
-  *)
-    echo "[ERROR] unknown SELINUX value: ${selinux} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
-    return 1
+  0)
+    sed -i "s/^\(SELINUX=\).*/\1disabled/" ${chroot_dir}/etc/sysconfig/selinux
+    egrep ^SELINUX= ${chroot_dir}/etc/sysconfig/selinux
     ;;
   esac
-  printf "[INFO] Setting /etc/sysconfig/selinux: SELINUX=%s\n" ${selinux}
-  sed -i "s/^\(SELINUX=\).*/\1${selinux}/"  ${chroot_dir}/etc/sysconfig/selinux
-  egrep ^SELINUX= ${chroot_dir}/etc/sysconfig/selinux
+  cat ${chroot_dir}/etc/sysconfig/selinux
 }
 
 function set_timezone() {
@@ -549,12 +542,6 @@ function install_epel() {
   # need to periodically update uri
   # ex) http://ftp.riken.jp/Linux/fedora/epel/6/i386/epel-release-6-8.noarch.rpm
   [[ -z "${epel_uri}" ]] || run_in_target ${chroot_dir} yum install -y ${epel_uri}
-}
-
-function erase_selinux() {
-  local chroot_dir=$1
-
-  run_yum ${chroot_dir} erase selinux*
 }
 
 ### openvz kernel
@@ -747,7 +734,7 @@ function install_menu_lst_grub() {
 	hiddenmenu
 	title ${distro} ($(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1 | sed 's,^vmlinuz-,,'))
 	        root (hd${grub_id},0)
-	        kernel ${bootdir_path}/$(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1) ro root=UUID=$(mntpntuuid ${disk_filename} root) rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto  KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM
+	        kernel ${bootdir_path}/$(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1) ro root=UUID=$(mntpntuuid ${disk_filename} root) rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM selinux=${selinux:-0}
 	        initrd ${bootdir_path}/$(cd ${chroot_dir}/boot && ls $(preferred_initrd)-*| tail -1)
 	_EOS_
   cat ${chroot_dir}/boot/grub/grub.conf
@@ -829,7 +816,7 @@ function install_menu_lst_vzkernel() {
   cat <<-_EOS_ >> ${chroot_dir}/boot/grub/grub.conf
 	title ${grub_title}
 	        root (hd0,0)
-	        kernel ${bootdir_path}/vmlinuz-${version} ro root=${root_dev} rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM
+	        kernel ${bootdir_path}/vmlinuz-${version} ro root=${root_dev} rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM selinux=${selinux:-0}
 	        initrd ${bootdir_path}/initramfs-${version}.img
 	_EOS_
 
