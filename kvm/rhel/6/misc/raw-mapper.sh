@@ -29,22 +29,24 @@ function register_options() {
 }
 
 function raw_mapper() {
+  local cmd=$1
+  [[ -n "${cmd}" ]] || { echo "[ERROR] Invalid argument: cmd:${cmd} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
-  case "$1" in
+  case "${cmd}" in
   map|unmap)
-    ${1}ptab ${image_path}
+    ${cmd}ptab ${image_path}
     ;;
   ls)
     is_mapped ${image_path} && {
       lsdevmap ${image_path}
     } || {
-      echo "[WARN] file not mapped: ${image_path}." >&2
+      echo "[WARN] file not mapped: ${image_path} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
       return 2
     }
     ;;
   *)
-    echo "[ERROR] no such command: ${1}" >&2
+    echo "[ERROR] no such command: ${cmd} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
     return 1
     ;;
   esac
@@ -65,7 +67,7 @@ extract_args $*
 
 ### main
 
-cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
+declare cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
 [[ -f "${config_path}" ]] && load_config ${config_path} || :
 register_options

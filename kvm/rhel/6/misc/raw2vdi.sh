@@ -3,6 +3,10 @@
 # requires:
 #  bash
 #
+# imports:
+#  utils:
+#  disk: convert_disk
+#
 set -e
 
 ### read-only variables
@@ -18,5 +22,5 @@ readonly abs_dirname=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
 
 declare disk_filename=${1}
 
-[[ -f "${disk_filename}" ]] || { echo "no such file: ${disk_filename}" >&2; exit 1; }
+[[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; exit 1; }
 convert_disk ${disk_filename} $(pwd) vdi

@@ -28,22 +28,21 @@ function register_options() {
 
   config_path=${config_path:-}
   image_path=${image_path:-${image_file}}
-  mntpnt_path=${mntpnt_path:-`pwd`/mnt}
+  mntpnt_path=${mntpnt_path:-$(pwd)/mnt}
 }
 
 function ptab_mounter() {
+  local cmd=$1
+  [[ -n "${cmd}" ]] || { echo "[ERROR] Invalid argument: cmd:${cmd} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
-  case "$1" in
+  case "${cmd}" in
   mount|umount)
-    [[ -d "${mntpnt_path}" ]] || {
-      echo "[ERROR] directory not found: ${mntpnt_path}." >&2
-      return 1
-    }
+    [[ -d "${mntpnt_path}" ]] || { echo "[ERROR] no such directory: ${mntpnt_path} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
-    case "${1}" in
-    mount)  ${1}_ptab ${image_path} ${mntpnt_path} ;;
-    umount) ${1}_ptab               ${mntpnt_path} ;;
+    case "${cmd}" in
+    mount)  ${cmd}_ptab ${image_path} ${mntpnt_path} ;;
+    umount) ${cmd}_ptab               ${mntpnt_path} ;;
     esac
 
     ;;
@@ -51,7 +50,7 @@ function ptab_mounter() {
     mount | egrep ${mntpnt_path}
     ;;
   *)
-    echo "[ERROR] no such command: ${1}" >&2
+    echo "[ERROR] no such command: ${cmd} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
     return 1
     ;;
   esac
@@ -73,7 +72,7 @@ extract_args $*
 
 ### main
 
-cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
+declare cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
 [[ -f "${config_path}" ]] && load_config ${config_path} || :
 register_options

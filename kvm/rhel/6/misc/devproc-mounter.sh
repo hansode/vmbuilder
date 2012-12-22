@@ -1,24 +1,22 @@
 #!/bin/bash
 #
 # description:
-#  Controll a lxc process
+#  Mount/Umount a virtual filesystems (/dev, /proc, /sys)
 #
 # requires:
 #  bash
 #  dirname, pwd
 #  sed, head
-#  cat
-#  awk, ls, sort
-#  ../vmbuilder.sh
+#  egrep
 #
 # import:
-#  utils: extract_args, shlog, beautify_process_args
-#  hypervisor: gen_macaddr
-#              lxc_create, lxc_start, lxc_stop, lxc_destroy, lxc_info, lxc_console
+#  utils: extract_args
+#  disk: add_option_disk
+#  hypervisor: mount_dev, mount_proc, mount_sys, umount_nonroot
 #
 # usage:
 #
-#  $0 start --image-path=/path/to/vmimage.raw
+#  $0 COMMAND --config-path=/path/to/config
 #
 set -e
 
@@ -29,26 +27,37 @@ function register_options() {
   [[ -z "${debug}" ]] || set -x
 
   config_path=${config_path:-}
-  name=${name:-rhel6}
-  hypervisor=lxc
+  mntpnt_path=${mntpnt_path:-$(pwd)/mnt}
 }
 
-function controll_lxc() {
+function nonroot_mounter() {
   local cmd=$1
   [[ -n "${cmd}" ]] || { echo "[ERROR] Invalid argument: cmd:${cmd} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  checkroot || return 1
 
   case "${cmd}" in
-  build)
-    # kind of virt-install
-    ${abs_dirname}/../vmbuilder.sh --config-path=${config_path}
+  mount|umount)
+    [[ -d "${mntpnt_path}" ]] || { echo "[ERROR] no such directory: ${mntpnt_path} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+
+    case "${cmd}" in
+    mount)
+      mount_dev  ${mntpnt_path}
+      mount_proc ${mntpnt_path}
+      mount_sys  ${mntpnt_path}
+      ;;
+    umount)
+      umount_nonroot ${mntpnt_path}
+      ;;
+    esac
+
     ;;
-  create|start|stop|destroy|info|console)
-    lxc_${cmd} ${name}
+  ls)
+    mount | egrep ${mntpnt_path}
     ;;
   *)
     echo "[ERROR] no such command: ${cmd} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
-    return 2
-  ;;
+    return 1
+    ;;
   esac
 }
 
@@ -59,6 +68,7 @@ readonly abs_dirname=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
 ### include files
 
 . ${abs_dirname}/../functions/utils.sh
+. ${abs_dirname}/../functions/disk.sh
 . ${abs_dirname}/../functions/hypervisor.sh
 
 ### prepare
@@ -71,5 +81,5 @@ declare cmd="$(echo ${CMD_ARGS} | sed "s, ,\n,g" | head -1)"
 
 [[ -f "${config_path}" ]] && load_config ${config_path} || :
 register_options
-add_option_hypervisor
-controll_lxc ${cmd}
+add_option_disk
+nonroot_mounter ${cmd}
