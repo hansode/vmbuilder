@@ -345,7 +345,7 @@ function configure_keepcache() {
 
 function configure_selinux() {
   local chroot_dir=$1 selinux=${2:-0}
-  [[ -a "${chroot_dir}/etc/sysconfig/selinux" ]] || { echo "[ERROR] file not found: ${chroot_dir}/etc/sysconfig/selinux ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${chroot_dir}/etc/sysconfig/selinux" ]] || { echo "[WARN] file not found: ${chroot_dir}/etc/sysconfig/selinux ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 0; }
 
   printf "[INFO] Setting /etc/sysconfig/selinux: SELINUX=%s\n" ${selinux}
   case "${selinux}" in
