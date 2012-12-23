@@ -280,6 +280,8 @@ function install_os() {
   [[ -n "${diskless}" ]] || {
     install_bootloader ${chroot_dir} ${disk_filename}
   }
+  configure_sshd_password_authentication ${chroot_dir} ${sshd_passauth}
+
   install_epel         ${chroot_dir}
   install_addedpkgs    ${chroot_dir}
   run_copy             ${chroot_dir} ${copy}
