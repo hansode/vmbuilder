@@ -25,7 +25,7 @@ function test_config_udev_persistent_net_file_not_found() {
   rm ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
 
   config_udev_persistent_net ${chroot_dir}
-  assertNotEquals $? 0
+  assertEquals $? 0
 }
 
 function test_config_udev_persistent_net() {
