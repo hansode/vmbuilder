@@ -362,7 +362,7 @@ function configure_sshd_password_authentication() {
   local chroot_dir=$1 passauth=${2:-no}
   [[ -a "${chroot_dir}/etc/ssh/sshd_config" ]] || { echo "[WARN] file not found: ${chroot_dir}/etc/ssh/sshd_config ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 0; }
 
-  echo "[INFO] Configuring sshd PasswordAuthentication"
+  printf "[INFO] Configuring sshd PasswordAuthentication: %s\n" ${passauth}
   egrep "^PasswordAuthentication" ${chroot_dir}/etc/ssh/sshd_config -q || {
     echo "PasswordAuthentication ${passauth}" >> ${chroot_dir}/etc/ssh/sshd_config
   }
