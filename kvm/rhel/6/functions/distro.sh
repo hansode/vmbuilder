@@ -77,6 +77,7 @@ function add_option_distro() {
 
   ssh_key=${ssh_key:-}
   ssh_user_key=${ssh_user_key:-}
+  sshd_passauth=${sshd_passauth:-}
 }
 
 function load_distro_driver() {
@@ -355,6 +356,17 @@ function configure_selinux() {
     ;;
   esac
   cat ${chroot_dir}/etc/sysconfig/selinux
+}
+
+function configure_sshd_password_authentication() {
+  local chroot_dir=$1 passauth=${2:-no}
+  [[ -a "${chroot_dir}/etc/ssh/sshd_config" ]] || { echo "[WARN] file not found: ${chroot_dir}/etc/ssh/sshd_config ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 0; }
+
+  echo "[INFO] Configuring sshd PasswordAuthentication"
+  egrep "^PasswordAuthentication" ${chroot_dir}/etc/ssh/sshd_config -q || {
+    echo "PasswordAuthentication ${passauth}" >> ${chroot_dir}/etc/ssh/sshd_config
+  }
+  sed -i "s/^\(PasswordAuthentication\).*/\1 ${passauth}/" ${chroot_dir}/etc/ssh/sshd_config
 }
 
 function set_timezone() {
