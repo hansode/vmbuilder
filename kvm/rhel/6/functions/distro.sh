@@ -862,6 +862,14 @@ function configure_networking() {
   config_interfaces          ${chroot_dir}
   config_routing             ${chroot_dir}
 
+  config_udev_persistent_net ${chroot_dir}
+}
+
+function config_udev_persistent_net() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules" ]] || { echo "[ERROR] file not found: ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+
   local udev_70_persistent_net_path=${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
   printf "[INFO] Unsetting udev 70-persistent-net.rules\n"
   [[ -a "${udev_70_persistent_net_path}" ]] && rm -f ${udev_70_persistent_net_path} || :
