@@ -862,10 +862,36 @@ function configure_networking() {
   config_interfaces          ${chroot_dir}
   config_routing             ${chroot_dir}
 
+  config_udev_persistent_net           ${chroot_dir}
+  config_udev_persistent_net_generator ${chroot_dir}
+}
+
+function config_udev_persistent_net() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+
   local udev_70_persistent_net_path=${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
   printf "[INFO] Unsetting udev 70-persistent-net.rules\n"
   [[ -a "${udev_70_persistent_net_path}" ]] && rm -f ${udev_70_persistent_net_path} || :
   ln -s /dev/null ${udev_70_persistent_net_path}
+}
+
+function config_udev_persistent_net_generator() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+
+  # append virtual interface ignore rules to 75-persistent-net-generator.rules.
+  # * udev creates persistent network rule for KVM virtual interface: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=638159
+  # * udev: Additional VMware MAC ranges for 75-persistent-net-generator.rules: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=637571
+  printf "[INFO] Configuring udev: 75-persistent-net-generator rule\n"
+  sed -i -e '/^ENV{MATCHADDR}=="00:00:00:00:00:00", ENV{MATCHADDR}=""/a \
+# and KVM, Hyper-V and VMWare virtual interfaces\
+ENV{MATCHADDR}=="?[2367abef]:*",       ENV{MATCHADDR}=""\
+ENV{MATCHADDR}=="00:00:00:00:00:00",   ENV{MATCHADDR}=""\
+ENV{MATCHADDR}=="00:05::69:*|00:0c:29:*|00:50:56:*|00:1C:14:*", ENV{MATCHADDR}=""\
+ENV{MATCHADDR}=="00:15:5d:*",          ENV{MATCHADDR}=""\
+ENV{MATCHADDR}=="52:54:00:*|54:52:00:*", ENV{MATCHADDR}=""\
+' ${chroot_dir}/lib/udev/rules.d/75-persistent-net-generator.rules
 }
 
 function config_host_and_domainname() {
