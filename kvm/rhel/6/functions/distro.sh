@@ -908,7 +908,7 @@ function nictabinfo() {
       cat ${nictab}
     } || {
       cat <<-EOS
-	ifname=eth0 ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw}
+	ifname=eth0 ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} onboot=${onboot} iftype=ethernet
 	EOS
     }
   } | egrep -v '^$|^#'
@@ -921,7 +921,7 @@ function config_interfaces() {
   local line=
   while read line; do
     (
-      set -e
+      ifname= ip= mask= net= bcast= gw= onboot= iftype=
       eval ${line}
       install_interface ${chroot_dir} ${ifname} ${iftype}
     )
@@ -1035,7 +1035,7 @@ function config_routing() {
   local line=
   while read line; do
     (
-      set -e
+      ifname= cidr= gw=
       eval ${line}
       install_routing ${chroot_dir} ${ifname}
     )
