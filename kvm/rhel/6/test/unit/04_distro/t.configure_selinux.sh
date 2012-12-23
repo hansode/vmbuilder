@@ -36,7 +36,7 @@ function test_configure_selinux_file_not_found() {
   rm ${chroot_dir}/etc/sysconfig/selinux
 
   configure_selinux ${chroot_dir} ""
-  assertNotEquals $? 0
+  assertEquals $? 0
 }
 
 function test_configure_selinux_empty() {
