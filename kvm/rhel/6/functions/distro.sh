@@ -436,6 +436,16 @@ function render_fstab() {
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
+  render_fstab_ptab ${chroot_dir} ${disk_filename} || return 1
+  render_fstab_nonptab
+}
+
+function render_fstab_ptab() {
+  local chroot_dir=$1 disk_filename=$2
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
   case "${fstab_type:-uuid}" in
   uuid|label) ;;
   *)
@@ -467,6 +477,9 @@ function render_fstab() {
 
     printf "%s %s\t%s\tdefaults\t%s %s\n" ${dev_path} ${mountpath} ${fstype} ${dumpopt} ${fsckopt}
 EOS
+}
+
+function render_fstab_nonptab() {
   cat <<-_EOS_
 	tmpfs                   /dev/shm                tmpfs   defaults        0 0
 	devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
@@ -479,7 +492,7 @@ function reconfigure_fstab() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
-  render_fstab ${chroot_dir} | tee ${chroot_dir}/etc/fstab
+  render_fstab_nonptab | tee ${chroot_dir}/etc/fstab
 }
 
 function reconfigure_mtab() {
