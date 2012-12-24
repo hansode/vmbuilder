@@ -12,10 +12,34 @@
 
 ## public functions
 
-function test_render_fstab() {
-  render_fstab
+function setUp() {
+  mkdisk ${disk_filename} $(sum_disksize)
+  mkdir -p ${chroot_dir}/etc
+  mkptab ${disk_filename}
+  mapptab ${disk_filename}
+  mkfsdisk ${disk_filename} $(preferred_filesystem)
+}
+
+function tearDown() {
+  unmapptab ${disk_filename}
+  rm ${disk_filename}
+  rm -rf ${chroot_dir}
+}
+
+function test_render_fstab_ext3() {
+  local preferred_filesystem=ext3
+
+  render_fstab ${chroot_dir} ${disk_filename}
   assertEquals $? 0
 }
+
+function test_render_fstab_ext4() {
+  local preferred_filesystem=ext4
+
+  render_fstab ${chroot_dir} ${disk_filename}
+  assertEquals $? 0
+}
+
 
 ## shunit2
 

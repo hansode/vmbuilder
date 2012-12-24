@@ -15,26 +15,22 @@
 function setUp() {
   mkdisk ${disk_filename} $(sum_disksize)
   mkdir -p ${chroot_dir}/etc
-  mkptab ${disk_filename}
-  mapptab ${disk_filename}
+
+  function render_fstab() { cat <<-EOS
+	tmpfs                   /dev/shm                tmpfs   defaults        0 0
+	devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
+	sysfs                   /sys                    sysfs   defaults        0 0
+	proc                    /proc                   proc    defaults        0 0
+	EOS
+  }
 }
 
 function tearDown() {
-  unmapptab ${disk_filename}
   rm ${disk_filename}
   rm -rf ${chroot_dir}
 }
 
-function test_install_fstab_ext3() {
-  local preferred_filesystem=ext3
-
-  install_fstab ${chroot_dir} ${disk_filename}
-  assertEquals $? 0
-}
-
-function test_install_fstab_ext4() {
-  local preferred_filesystem=ext4
-
+function test_install_fstab() {
   install_fstab ${chroot_dir} ${disk_filename}
   assertEquals $? 0
 }
