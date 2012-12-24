@@ -11,7 +11,7 @@
 #
 # imports:
 #  utils: shlog
-#  hypervisor: viftabproc
+#  hypervisor: viftabproc, configure_acpiphp
 #
 
 function add_option_hypervisor_kvm() {
@@ -41,6 +41,14 @@ function add_option_hypervisor_kvm() {
   viftab=${viftab:-}
 
   vendor_id=${vendor_id:-52:54:00}
+}
+
+function configure_hypervisor() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] no such directory: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+
+  echo "[INFO] ***** Configuring kvm-specific *****"
+  configure_acpiphp ${chroot_dir}
 }
 
 ## command path

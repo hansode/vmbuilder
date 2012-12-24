@@ -246,6 +246,15 @@ function configure_os() {
   umount_nonroot           ${chroot_dir}
 }
 
+function configure_acpiphp() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+
+  #Load acpiphp.ko at boot
+  printf "[INFO] Adding acpiphp to kernel modules to load at boot\n"
+  echo "acpiphp" >> ${chroot_dir}/etc/modules
+}
+
 ## container
 
 function configure_container() {
