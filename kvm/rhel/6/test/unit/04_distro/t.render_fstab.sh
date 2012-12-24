@@ -40,6 +40,37 @@ function test_render_fstab_ext4() {
   assertEquals $? 0
 }
 
+## fstab_type
+
+function test_render_fstab_type_undefined() {
+  local fstab_type=
+
+  render_fstab ${chroot_dir} ${disk_filename}
+  assertEquals $? 0
+}
+
+function test_render_fstab_type_uuid() {
+  local fstab_type=uuid
+
+  render_fstab ${chroot_dir} ${disk_filename}
+  assertEquals $? 0
+}
+
+function test_render_fstab_type_label() {
+  local fstab_type=label
+
+  render_fstab ${chroot_dir} ${disk_filename}
+  assertEquals $? 0
+}
+
+function test_render_fstab_type_unknown() {
+  local fstab_type=unknown
+
+  render_fstab ${chroot_dir} ${disk_filename}
+  assertNotEquals $? 0
+}
+
+
 
 ## shunit2
 

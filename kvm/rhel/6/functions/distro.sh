@@ -78,6 +78,8 @@ function add_option_distro() {
   ssh_key=${ssh_key:-}
   ssh_user_key=${ssh_user_key:-}
   sshd_passauth=${sshd_passauth:-}
+
+  fstab_type=${fstab_type:-uuid}
 }
 
 function load_distro_driver() {
@@ -425,6 +427,14 @@ function render_fstab() {
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
+  case "${fstab_type:-uuid}" in
+  uuid|label) ;;
+  *)
+    echo "[ERROR] no such fstab_type:${fstab_type} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
+    return 1
+    ;;
+  esac
+
   local default_filesystem=$(preferred_filesystem)
   xptabproc <<'EOS'
     case "${mountpoint}" in
@@ -435,7 +445,17 @@ function render_fstab() {
     /home) fstype=${default_filesystem} dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
     *)     fstype=${default_filesystem} dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
     esac
-    local dev_path="UUID=$(mntpntuuid ${disk_filename} ${mountpoint})"
+
+    local dev_path=
+    case "${fstab_type:-uuid}" in
+    uuid)
+      dev_path="UUID=$(mntpntuuid ${disk_filename} ${mountpoint})"
+      ;;
+    label)
+      dev_path="LABEL=${mountpoint}"
+      ;;
+    esac
+
     printf "%s %s\t%s\tdefaults\t%s %s\n" ${dev_path} ${mountpath} ${fstype} ${dumpopt} ${fsckopt}
 EOS
   cat <<-_EOS_
@@ -740,7 +760,21 @@ function install_menu_lst_grub() {
   }
 
   local grub_id=$(get_grub_id)
-  local dev_path="UUID=$(mntpntuuid ${disk_filename} root)"
+
+  local dev_path=
+  case "${fstab_type:-uuid}" in
+  uuid)
+    dev_path="UUID=$(mntpntuuid ${disk_filename} root)"
+    ;;
+  label)
+    dev_path="LABEL=root"
+    ;;
+  *)
+    echo "[ERROR] no such fstab_type:${fstab_type} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
+    return 1
+    ;;
+  esac
+
   cat <<-_EOS_ > ${chroot_dir}/boot/grub/grub.conf
 	default=0
 	timeout=5

@@ -32,6 +32,36 @@ function test_install_menu_lst_grub() {
   assertEquals $? 0
 }
 
+## fstab_type
+
+function test_install_menu_lst_grub_fstab_undefined() {
+  local fstab_type=
+
+  install_menu_lst_grub ${chroot_dir} ${disk_filename}
+  assertEquals $? 0
+}
+
+function test_install_menu_lst_grub_fstab_uuid() {
+  local fstab_type=uuid
+
+  install_menu_lst_grub ${chroot_dir} ${disk_filename}
+  assertEquals $? 0
+}
+
+function test_install_menu_lst_grub_fstab_label() {
+  local fstab_type=label
+
+  install_menu_lst_grub ${chroot_dir} ${disk_filename}
+  assertEquals $? 0
+}
+
+function test_install_menu_lst_grub_fstab_unknown() {
+  local fstab_type=unknown
+
+  install_menu_lst_grub ${chroot_dir} ${disk_filename}
+  assertNotEquals $? 0
+}
+
 ## shunit2
 
 . ${shunit2_file}
