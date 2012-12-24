@@ -12,17 +12,10 @@
 
 ## public functions
 
-function setUp() {
-  mkdir -p ${chroot_dir}/etc
-}
+## fstab_type
 
-function tearDown() {
-  rm -rf ${chroot_dir}
-}
-
-
-function test_reconfigure_fstab() {
-  reconfigure_fstab ${chroot_dir}
+function test_render_fstab_nonptab() {
+  render_fstab_nonptab
   assertEquals $? 0
 }
 
