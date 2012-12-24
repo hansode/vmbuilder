@@ -435,8 +435,8 @@ function render_fstab() {
     /home) fstype=${default_filesystem} dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
     *)     fstype=${default_filesystem} dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
     esac
-    local uuid=$(mntpntuuid ${disk_filename} ${mountpoint})
-    printf "UUID=%s %s\t%s\tdefaults\t%s %s\n" ${uuid} ${mountpath} ${fstype} ${dumpopt} ${fsckopt}
+    local dev_path="UUID=$(mntpntuuid ${disk_filename} ${mountpoint})"
+    printf "%s %s\t%s\tdefaults\t%s %s\n" ${dev_path} ${mountpath} ${fstype} ${dumpopt} ${fsckopt}
 EOS
   cat <<-_EOS_
 	tmpfs                   /dev/shm                tmpfs   defaults        0 0
