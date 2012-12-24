@@ -78,6 +78,8 @@ function add_option_distro() {
   ssh_key=${ssh_key:-}
   ssh_user_key=${ssh_user_key:-}
   sshd_passauth=${sshd_passauth:-}
+
+  fstab_type=${fstab_type:-uuid}
 }
 
 function load_distro_driver() {
@@ -415,7 +417,24 @@ function install_fstab() {
   checkroot || return 1
 
   printf "[INFO] Overwriting /etc/fstab\n"
-  {
+  render_fstab ${chroot_dir} ${disk_filename} > ${chroot_dir}/etc/fstab
+  cat ${chroot_dir}/etc/fstab
+}
+
+function render_fstab() {
+  local chroot_dir=$1 disk_filename=$2
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  case "${fstab_type:-uuid}" in
+  uuid|label) ;;
+  *)
+    echo "[ERROR] no such fstab_type:${fstab_type} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
+    return 1
+    ;;
+  esac
+
   local default_filesystem=$(preferred_filesystem)
   xptabproc <<'EOS'
     case "${mountpoint}" in
@@ -426,15 +445,19 @@ function install_fstab() {
     /home) fstype=${default_filesystem} dumpopt=1 fsckopt=2 mountpath=${mountpoint} ;;
     *)     fstype=${default_filesystem} dumpopt=1 fsckopt=1 mountpath=${mountpoint} ;;
     esac
-    uuid=$(mntpntuuid ${disk_filename} ${mountpoint})
-    printf "UUID=%s %s\t%s\tdefaults\t%s %s\n" ${uuid} ${mountpath} ${fstype} ${dumpopt} ${fsckopt}
-EOS
-  render_fstab
-  } > ${chroot_dir}/etc/fstab
-  cat ${chroot_dir}/etc/fstab
-}
 
-function render_fstab() {
+    local dev_path=
+    case "${fstab_type:-uuid}" in
+    uuid)
+      dev_path="UUID=$(mntpntuuid ${disk_filename} ${mountpoint})"
+      ;;
+    label)
+      dev_path="LABEL=${mountpoint}"
+      ;;
+    esac
+
+    printf "%s %s\t%s\tdefaults\t%s %s\n" ${dev_path} ${mountpath} ${fstype} ${dumpopt} ${fsckopt}
+EOS
   cat <<-_EOS_
 	tmpfs                   /dev/shm                tmpfs   defaults        0 0
 	devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
@@ -737,6 +760,21 @@ function install_menu_lst_grub() {
   }
 
   local grub_id=$(get_grub_id)
+
+  local dev_path=
+  case "${fstab_type:-uuid}" in
+  uuid)
+    dev_path="UUID=$(mntpntuuid ${disk_filename} root)"
+    ;;
+  label)
+    dev_path="LABEL=root"
+    ;;
+  *)
+    echo "[ERROR] no such fstab_type:${fstab_type} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
+    return 1
+    ;;
+  esac
+
   cat <<-_EOS_ > ${chroot_dir}/boot/grub/grub.conf
 	default=0
 	timeout=5
@@ -744,7 +782,7 @@ function install_menu_lst_grub() {
 	hiddenmenu
 	title ${distro} ($(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1 | sed 's,^vmlinuz-,,'))
 	        root (hd${grub_id},0)
-	        kernel ${bootdir_path}/$(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1) ro root=UUID=$(mntpntuuid ${disk_filename} root) rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM selinux=${selinux:-0}
+	        kernel ${bootdir_path}/$(cd ${chroot_dir}/boot && ls vmlinuz-* | tail -1) ro root=${dev_path} rd_NO_LUKS rd_NO_LVM LANG=en_US.UTF-8 rd_NO_MD SYSFONT=latarcyrheb-sun16 crashkernel=auto KEYBOARDTYPE=pc KEYTABLE=us rd_NO_DM selinux=${selinux:-0}
 	        initrd ${bootdir_path}/$(cd ${chroot_dir}/boot && ls $(preferred_initrd)-*| tail -1)
 	_EOS_
   cat ${chroot_dir}/boot/grub/grub.conf
@@ -789,8 +827,9 @@ function mangle_grub_menu_lst_grub2() {
   # - linux   /boot/vmlinuz-3.1.0-7.fc16.x86_64 root=/dev/mapper/loop0p1 ro quiet rhgb
   # + linux   ${bootdir_path}/vmlinuz-3.1.0-7.fc16.x86_64 root=UUID=$(mntpntuuid ${disk_filename} root) ro quiet rhgb
 
+  local dev_path="UUID=$(mntpntuuid ${disk_filename} root)"
   sed -i "s,/boot,${bootdir_path}," ${chroot_dir}/boot/grub2/grub.cfg
-  sed -i "s,root=/[^ ]*,root=UUID=$(mntpntuuid ${disk_filename} root)," ${chroot_dir}/boot/grub2/grub.cfg
+  sed -i "s,root=/[^ ]*,root=${dev_path}," ${chroot_dir}/boot/grub2/grub.cfg
 
   # show booting progress
   sed -i "s,quiet rhgb,," ${chroot_dir}/boot/grub2/grub.cfg

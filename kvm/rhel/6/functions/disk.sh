@@ -622,7 +622,7 @@ function mkfsdisk() {
     swap)
       # > mkswap: /dev/mapper/loop0p7: warning: don't erase bootbits sectors
       # >  on whole disk. Use -f to force.
-      mkswap -f ${part_filename}
+      mkswap -L ${mountpoint} -f ${part_filename}
       ;;
     *)
       local cmd="$(mkfs_fstype ${default_filesystem}) -L ${mountpoint} ${part_filename}"
