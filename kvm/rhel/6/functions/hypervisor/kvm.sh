@@ -158,7 +158,7 @@ function render_kvm_runscript() {
     function shlog() { echo $*; }
     function checkroot() { echo checkroot $* >/dev/null; }
 
-    start_kvm ${name}
+    kvm_start ${name}
   )
 }
 
