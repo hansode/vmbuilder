@@ -87,8 +87,13 @@ EOS
 }
 
 function build_drive_opt() {
-  echo \
-    -drive file=${image_path},media=disk,boot=on,index=0,cache=none
+  local i=0 img_path= boot=on
+
+  for img_path in ${image_path}; do
+    echo -drive file=${img_path},media=disk,boot=${boot},index=${i},cache=none
+    boot=off
+    let i++
+  done
 }
 
 function build_kvm_opts() {

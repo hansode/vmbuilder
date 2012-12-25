@@ -15,15 +15,13 @@ declare imagefile_path=${abs_dirname}/image_path.$$
 ## public functions
 
 function test_build_drive_opt_no_opts() {
-  build_drive_opt | egrep file=,
-  assertEquals $? 0
+  assertEquals "$(${image_path})" ""
 }
 
 function test_build_drive_opt_defined_image_path() {
-  local image_path=${imagefile_path}
+  local image_path="${imagefile_path} ${imagefile_path}.2"
 
-  build_drive_opt | egrep file=${image_path},
-  assertEquals $? 0
+  assertEquals "$(build_drive_opt | wc -l)" 2
 }
 
 ## shunit2
