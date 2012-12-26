@@ -19,6 +19,7 @@
 #  distro: add_option_distro, preflight_check_distro, install_kernel, install_bootloader, install_epel, install_addedpkgs, mount_proc
 #          create_initial_user, install_authorized_keys
 #          mount_dev, mount_sys, configure_networking, configure_mounting, configure_keepcache, configure_console
+#          run_copy, run_execscript
 #
 
 ## depending on global variables
@@ -126,37 +127,6 @@ function umount_ptab() {
 }
 
 ##
-
-function run_copy() {
-  local chroot_dir=$1 copy=$2
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-  [[ -n "${copy}" ]] || return 0
-  [[ -f "${copy}" ]] || { echo "[ERROR] The path to the copy directive is invalid: ${copy}. Make sure you are providing a full path. ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-
-  printf "[INFO] Copying files specified by copy in: %s\n" ${copy}
-  while read line; do
-    set ${line}
-    [[ $# == 2 ]] || continue
-    local destdir=${chroot_dir}$(dirname ${2})
-    [[ -d "${destdir}" ]] || mkdir -p ${destdir}
-    rsync -aHA ${1} ${chroot_dir}${2} || :
-  done < <(egrep -v '^$' ${copy})
-}
-
-function run_execscript() {
-  local chroot_dir=$1 execscript=$2
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-  [[ -n "${execscript}" ]] || return 0
-  [[ -x "${execscript}" ]] || { echo "[WARN] cannot execute script: ${execscript} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 0; }
-
-  printf "[INFO] Excecuting script: %s\n" ${execscript}
-  [[ -n "${distro_arch}" ]] || add_option_distro
-
-  setarch ${distro_arch} ${execscript} ${chroot_dir} || {
-    echo "[ERROR] execscript failed: exitcode=$? ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
-    return 1
-  }
-}
 
 function install_firstboot() {
   local chroot_dir=$1 firstboot=$2

@@ -1255,3 +1255,36 @@ function detect_distro() {
 	DISTRIB_RELEASE=${DISTRIB_RELEASE}
 	EOS
 }
+
+## post_install
+
+function run_copy() {
+  local chroot_dir=$1 copy=$2
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${copy}" ]] || return 0
+  [[ -f "${copy}" ]] || { echo "[ERROR] The path to the copy directive is invalid: ${copy}. Make sure you are providing a full path. ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+
+  printf "[INFO] Copying files specified by copy in: %s\n" ${copy}
+  while read line; do
+    set ${line}
+    [[ $# == 2 ]] || continue
+    local destdir=${chroot_dir}$(dirname ${2})
+    [[ -d "${destdir}" ]] || mkdir -p ${destdir}
+    rsync -aHA ${1} ${chroot_dir}${2} || :
+  done < <(egrep -v '^$' ${copy})
+}
+
+function run_execscript() {
+  local chroot_dir=$1 execscript=$2
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${execscript}" ]] || return 0
+  [[ -x "${execscript}" ]] || { echo "[WARN] cannot execute script: ${execscript} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 0; }
+
+  printf "[INFO] Excecuting script: %s\n" ${execscript}
+  [[ -n "${distro_arch}" ]] || add_option_distro
+
+  setarch ${distro_arch} ${execscript} ${chroot_dir} || {
+    echo "[ERROR] execscript failed: exitcode=$? ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
+    return 1
+  }
+}
