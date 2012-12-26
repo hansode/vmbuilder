@@ -13,15 +13,18 @@
 ## public functions
 
 function setUp() {
-  add_option_disk
   add_option_distro
   add_option_hypervisor
+  add_option_disk
   [[ -d ${distro_dir} ]] || build_chroot ${distro_dir}
 }
 
-function tearDown() { :; }
+function tearDown() {
+  rm -rf ${chroot_dir}
+} 
 
 function test_install_os() {
+  local diskless=1
   (
     set -e
     install_os ${chroot_dir} ${distro_dir}
