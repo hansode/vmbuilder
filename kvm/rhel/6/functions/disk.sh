@@ -31,6 +31,14 @@ function add_option_disk() {
   tmpsize=${tmpsize:-0}
 
   xpart=${xpart:-}
+
+  chroot_dir=${chroot_dir:-/tmp/tmp$(date +%s)}
+
+  distro=${distro_name}-${distro_ver}_${distro_arch}
+  distro_dir=${distro_dir:-$(pwd)/${distro}}
+  raw=${raw:-./${distro}.raw}
+  rootfs_dir=${rootfs_dir:-./rootfs}
+  diskless=${diskless:-}
 }
 
 ## utils
