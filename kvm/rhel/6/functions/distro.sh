@@ -389,13 +389,13 @@ function set_timezone() {
 }
 
 function prevent_daemons_starting() {
-  local chroot_dir=$1
+  local chroot_dir=$1; shift
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
- #local svc= dummy=
- #while read svc dummy; do
- #  run_in_target ${chroot_dir} chkconfig --del ${svc}
- #done < <(run_in_target ${chroot_dir} chkconfig --list | egrep -v :on)
+  while [[ $# -ne 0 ]]; do
+    run_in_target ${chroot_dir} chkconfig $1 off
+    shift
+  done
 }
 
 function prevent_udev_starting() {

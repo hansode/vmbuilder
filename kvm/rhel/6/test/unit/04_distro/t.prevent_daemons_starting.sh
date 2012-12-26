@@ -1,7 +1,9 @@
 #!/bin/bash
 #
 # requires:
-#   bash
+#  bash
+#  dirname, pwd
+#  date, egrep
 #
 
 ## include files
@@ -9,6 +11,8 @@
 . $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
 
 ## variables
+
+declare chroot_dir=${abs_dirname}/_chroot.$$
 
 ## public functions
 
@@ -22,11 +26,18 @@ function tearDown() {
   rm -rf ${chroot_dir}
 }
 
+function test_prevent_daemons_starting_single() {
+  local svcs=sshd
 
-function test_prevent_daemons_starting() {
-  prevent_daemons_starting ${chroot_dir}
+  prevent_daemons_starting ${chroot_dir} ${svcs} | egrep "chkconfig ${svcs} off$"
   assertEquals $? 0
 }
+
+function test_prevent_daemons_starting_multi() {
+  local svc_name="sshd network"
+  assertEquals "$(prevent_daemons_starting ${chroot_dir} ${svc_name} | wc -l)" 2
+}
+
 
 ## shunit2
 
