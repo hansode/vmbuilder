@@ -10,9 +10,9 @@
 # imports:
 #  utils: checkroot
 #  mbr: rmmbr
-#  disk: is_dev, sum_disksize, mkdisk, mkptab, mapptab, mkfsdisk, unmapptab
-#  distro: build_chroot, preferred_filesystem, trap_distro
-#  hypervisor: preflight_check_hypervisor, install_os, umount_ptab
+#  disk: add_option_disk, is_dev, sum_disksize, mkdisk, mkptab, mapptab, mkfsdisk, unmapptab
+#  distro: add_option_distro, build_chroot, preferred_filesystem, trap_distro
+#  hypervisor: add_option_hypervisor, preflight_check_hypervisor, install_os, umount_ptab
 #
 
 ##
@@ -37,9 +37,9 @@ function trap_vm() {
 function create_vm() {
   checkroot || return 1
 
-  add_option_disk
   add_option_distro
   add_option_hypervisor
+  add_option_disk
   preflight_check_hypervisor
   [[ -d "${distro_dir}" ]] || build_chroot ${distro_dir}
 
