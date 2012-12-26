@@ -166,7 +166,7 @@ function umount_root() {
   checkroot || return 1
 
   printf "[DEBUG] Unmounting %s\n" ${chroot_dir}
-  umount ${chroot_dir}
+  umount -l ${chroot_dir}
 }
 
 function umount_nonroot() {
@@ -177,7 +177,7 @@ function umount_nonroot() {
   local mountpoint=
   while read mountpoint; do
     printf "[DEBUG] Unmounting %s\n" ${mountpoint}
-    umount ${mountpoint}
+    umount -l ${mountpoint}
   done < <(egrep ${chroot_dir}/ /etc/mtab | awk '{print $2}')
 }
 
