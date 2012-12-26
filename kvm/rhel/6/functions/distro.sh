@@ -80,6 +80,10 @@ function add_option_distro() {
   sshd_passauth=${sshd_passauth:-}
 
   fstab_type=${fstab_type:-uuid}
+
+  # post_install
+  copy=${copy:-}
+  execscript=${execscript:-}
 }
 
 function load_distro_driver() {
