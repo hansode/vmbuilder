@@ -25,16 +25,6 @@
 ## depending on global variables
 
 function add_option_hypervisor() {
-  distro=${distro_name}-${distro_ver}_${distro_arch}
-  distro_dir=${distro_dir:-$(pwd)/${distro}}
-
-  raw=${raw:-./${distro}.raw}
-
-  rootfs_dir=${rootfs_dir:-./rootfs}
-  diskless=${diskless:-}
-
-  chroot_dir=${chroot_dir:-/tmp/tmp$(date +%s)}
-
   viftab=${viftab:-}
 
   hypervisor=${hypervisor:-}
