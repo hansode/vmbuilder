@@ -26,16 +26,16 @@ function tearDown() {
   rm -rf ${chroot_dir}
 }
 
-function test_prevent_daemons_starting_single() {
+function test_unprevent_daemons_starting_single() {
   local svcs=sshd
 
-  prevent_daemons_starting ${chroot_dir} ${svcs} | egrep "chkconfig ${svcs} off$"
+  unprevent_daemons_starting ${chroot_dir} ${svcs} | egrep "chkconfig ${svcs} on$"
   assertEquals $? 0
 }
 
-function test_prevent_daemons_starting_multi() {
+function test_unprevent_daemons_starting_multi() {
   local svc_name="sshd network"
-  assertEquals "$(prevent_daemons_starting ${chroot_dir} ${svc_name} | wc -l)" 2
+  assertEquals "$(unprevent_daemons_starting ${chroot_dir} ${svc_name} | wc -l)" 2
 }
 
 
