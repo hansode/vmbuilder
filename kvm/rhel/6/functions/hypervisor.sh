@@ -28,8 +28,6 @@ function add_option_hypervisor() {
   distro=${distro_name}-${distro_ver}_${distro_arch}
   distro_dir=${distro_dir:-$(pwd)/${distro}}
 
-  firstboot=${firstboot:-}
-  firstlogin=${firstlogin:-}
   raw=${raw:-./${distro}.raw}
 
   rootfs_dir=${rootfs_dir:-./rootfs}
@@ -125,59 +123,6 @@ function umount_ptab() {
 }
 
 ##
-
-function install_firstboot() {
-  local chroot_dir=$1 firstboot=$2
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-  [[ -n "${firstboot}"  ]] || return 0
-  [[ -f "${firstboot}"  ]] || { echo "[ERROR] The path to the first-boot directive is invalid: ${firstboot}. Make sure you are providing a full path. ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-
-  printf "[DEBUG] Installing firstboot script %s\n" ${firstboot}
-  rsync -aHA ${firstboot} ${chroot_dir}/root/firstboot.sh
-  chmod 0700 ${chroot_dir}/root/firstboot.sh
-
-  mv ${chroot_dir}/etc/rc.d/rc.local ${chroot_dir}/etc/rc.d/rc.local.orig
-  cat <<-'EOS' > ${chroot_dir}/etc/rc.d/rc.local
-	#!/bin/sh -e
-	#execute firstboot.sh only once
-	if [ ! -e /root/firstboot_done ]; then
-	    if [ -e /root/firstboot.sh ]; then
-	        /root/firstboot.sh
-	    fi
-	    touch /root/firstboot_done
-	fi
-	touch /var/lock/subsys/local
-	EOS
-  chmod 755 ${chroot_dir}/etc/rc.d/rc.local
-}
-
-function install_firstlogin() {
-  local chroot_dir=$1 firstlogin=$2
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-  [[ -n "${firstlogin}" ]] || return 0
-  [[ -f "${firstlogin}" ]] || { echo "[ERROR] The path to the first-login directive is invalid: ${firstlogin}. Make sure you are providing a full path. ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-
-  printf "[DEBUG] Installing first login script %s\n" ${firstlogin}
-  rsync -aHA ${firstlogin} ${chroot_dir}/root/firstlogin.sh
-  chmod 0755 ${chroot_dir}/root/firstlogin.sh
-
-  cp ${chroot_dir}/etc/bashrc ${chroot_dir}/etc/bashrc.orig
-  cat <<-'EOS' >> ${chroot_dir}/etc/bashrc
-	#execute firstlogin.sh only once
-	if [ ! -e /root/firstlogin_done ]; then
-	    if [ -e /root/firstlogin.sh ]; then
-	        /root/firstlogin.sh
-	    fi
-	    # This part should not be necessary any more
-	    # sudo dpkg-reconfigure -p critical console-setup &> /dev/null
-	    sudo touch /root/firstlogin_done
-	    # MEMO(first-login): should be changed previous attribute?
-	    # sudo chmod 0550 ${chroot_dir}/root/
-	fi
-	EOS
-  # MEMO(first-login): should be changed to access first-login script.
-  chmod 0711 ${chroot_dir}/root/
-}
 
 function sync_os() {
   #
