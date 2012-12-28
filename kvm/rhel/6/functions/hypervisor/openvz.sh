@@ -12,11 +12,7 @@
 #
 
 function add_option_hypervisor_openvz() {
-  name=${name:-rhel6}
-
-  image_format=${image_format:-raw}
-  image_file=${image_file:-${name}.${image_format}}
-  image_path=${image_path:-${image_file}}
+  needs_kernel=
 
   vzconf_path=${vzconf_path:-}
   vzconf_dir=${vzconf_dir:-}
