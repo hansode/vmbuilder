@@ -15,9 +15,7 @@
 #
 
 function add_option_hypervisor_kvm() {
-  image_format=${image_format:-raw}
-  image_file=${image_file:-${name}.${image_format}}
-  image_path=${image_path:-${image_file}}
+  needs_kernel=1
 
   brname=${brname:-br0}
 

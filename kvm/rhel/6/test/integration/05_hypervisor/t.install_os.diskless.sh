@@ -21,7 +21,7 @@ function setUp() {
 
 function tearDown() {
   rm -rf ${chroot_dir}
-} 
+}
 
 function test_install_os() {
   local diskless=1

@@ -141,12 +141,14 @@ function install_os() {
   local chroot_dir=$1 distro_dir=$2 disk_filename=$3
   [[ -d "${chroot_dir}"    ]] && { echo "[ERROR] already exists: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   [[ -d "${distro_dir}"    ]] || { echo "[ERROR] no such directory: ${distro_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  local needs_bootloader=1
   [[ -z "${diskless}" ]] && {
     # needs disk
     [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   } || {
     # diskless
     printf "[INFO] Diskless mode\n"
+    needs_bootloader=
   }
   # install_kernel depends on distro_name.
   [[ -n "${distro_name}"   ]] || { echo "[ERROR] Invalid argument: distro_name:${distro_name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
@@ -179,8 +181,13 @@ function install_os() {
   configure_console    ${chroot_dir}
   configure_hypervisor ${chroot_dir}
   configure_selinux    ${chroot_dir}
-  install_kernel       ${chroot_dir}
-  [[ -n "${diskless}" ]] || {
+
+  [[ -n "${needs_kernel}" ]] && {
+    install_kernel     ${chroot_dir}
+  } || {
+    needs_bootloader=
+  }
+  [[ -z "${needs_bootloader}" ]] || {
     install_bootloader ${chroot_dir} ${disk_filename}
   }
   configure_sshd_password_authentication ${chroot_dir} ${sshd_passauth}
