@@ -87,6 +87,11 @@ EOS
 function build_drive_opt() {
   local i=0 img_path= boot=on
 
+  for img_path in ${cdrom_path}; do
+    echo -drive file=${img_path},media=cdrom,index=${i}
+    let i++
+  done
+
   for img_path in ${image_path}; do
     echo -drive file=${img_path},media=disk,boot=${boot},index=${i},cache=none
     boot=off
