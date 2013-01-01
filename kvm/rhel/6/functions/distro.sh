@@ -349,10 +349,10 @@ function configure_keepcache() {
   esac
 
   printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
-  egrep -q ^keepcache= ${chroot_dir}/etc/yum.conf || {
-    echo keepcache=${keepcache} >> ${chroot_dir}/etc/yum.conf
-  } || {
+  egrep -q ^keepcache= ${chroot_dir}/etc/yum.conf && {
     sed -i "s,^keepcache=.*,keepcache=${keepcache}," ${chroot_dir}/etc/yum.conf
+  } || {
+    echo keepcache=${keepcache} >> ${chroot_dir}/etc/yum.conf
   }
 
   egrep ^keepcache= ${chroot_dir}/etc/yum.conf
