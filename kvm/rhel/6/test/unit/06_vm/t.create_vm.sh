@@ -13,13 +13,22 @@
 declare raw=${disk_filename}
 declare distro_name=centos
 declare distro_ver=6
+declare hypervisor=kvm
 
 ## public functions
 
 function setUp() {
+  touch ${disk_filename}
+
+  function checkroot() { :; }
+
   function is_dev() { return 1; }
+  function mkdisk() { echo mkdisk $*; }
+  function mkptab() { echo mkptab $*; }
+  function mapptab() { echo mapptab $*; }
+  function mkfsdisk() { echo mkfsdisk $*; }
+  function unmapptab() { echo unmapptab $*; }
   function bootstrap() { echo bootstrap $*; }
-  function install_kernel() { echo install_kernel $*; }
   function configure_os() { echo configure_os $*; }
   function cleanup_distro() { echo cleanup_distro $*; }
   function install_os() { echo install_os $*; }
@@ -30,7 +39,7 @@ function tearDown() {
 }
 
 function test_create_vm() {
-  create_vm ${disk_filename} ${chroot_dir}
+  create_vm ${disk_filename} ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 

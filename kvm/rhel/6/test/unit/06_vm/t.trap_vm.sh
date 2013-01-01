@@ -13,22 +13,20 @@
 ## public functions
 
 function setUp() {
-  mkdir -p ${chroot_dir}
+  touch ${disk_filename}
 
-  mkdisk ${disk_filename} $(sum_disksize) 2>/dev/null
-  mkptab ${disk_filename}
-  mapptab ${disk_filename}
-  mkfsdisk ${disk_filename} ext4
-  mount_ptab ${disk_filename} ${chroot_dir}
+  function checkroot() { :; }
+
+  function is_dev() { return 1; }
+  function unmapptab() { echo unmapptab $*; }
 }
 
 function tearDown() {
   rm -f ${disk_filename}
-  rm -rf ${chroot_dir}
 }
 
 function test_trap_vm() {
-  trap_vm ${disk_filename} ${chroot_dir}
+  trap_vm ${disk_filename} ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 
