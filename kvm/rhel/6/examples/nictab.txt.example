@@ -10,9 +10,10 @@
 #  $ vmbuilder.sh --nictab=[FILE]
 #
 # format:
-#  + ifname=STRING ip=STRING mask=STRING net=STRING bcast=STRING gw=STRING onboot=[[default:yes]|yes|no]
+#  + ifname=STRING ip=STRING mask=STRING net=STRING bcast=STRING gw=STRING dns=STRING onboot=[[default:yes]|yes|no]
 #  + vmbuilder.sh ignores '^#|^$'
 #
 ifname=eth0 ip=192.0.2.10 mask=255.255.255.0 net=192.0.2.0 bcast=192.0.2.255 gw=192.0.2.1
-ifname=eth1 ip=192.0.2.11 mask=255.255.255.0 net=192.0.2.0 bcast=192.0.2.255 gw=192.0.2.1 onboot=no
-ifname=eth3 ip=192.0.2.13 mask=255.255.255.0 net=192.0.2.0 bcast=192.0.2.255 gw=192.0.2.1 onboot=yes
+ifname=eth1 ip=192.0.2.11 mask=255.255.255.0 net=192.0.2.0 bcast=192.0.2.255 gw=192.0.2.1 dns=8.8.8.8           onboot=no
+ifname=eth2 ip=192.0.2.12 mask=255.255.255.0 net=192.0.2.0 bcast=192.0.2.255 gw=192.0.2.1 dns=8.8.4.4           onboot=no
+ifname=eth3 ip=192.0.2.13 mask=255.255.255.0 net=192.0.2.0 bcast=192.0.2.255 gw=192.0.2.1 dns="8.8.8.8 8.8.4.4" onboot=yes

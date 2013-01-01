@@ -13,8 +13,9 @@
 ## public functions
 
 function setUp() {
-  mkdir -p ${chroot_dir}
+  mkdir -p ${chroot_dir}/etc/sysconfig
 
+  function install_resolv_conf() { echo install_resolv_conf $*; }
   function config_host_and_domainname() { echo config_host_and_domainname $* ; }
   function config_interfaces() { echo config_interfaces $* ; }
   function config_routing() { echo config_routing $* ; }

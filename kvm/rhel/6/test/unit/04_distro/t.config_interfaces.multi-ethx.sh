@@ -15,6 +15,11 @@ declare nictab_file=${abs_dirname}/nictab_file.$$
 ## public functions
 
 function setUp() {
+  DEVICE= TYPE=
+  BOOTPROTO= IPADDR= NETMASK= NETWORK= BROADCAST= GATEWAY=
+  DNS1= DNS2= DNS3=
+  ifname= ip= mask= net= bcast= gw= dns= onboot= iftype=
+
   mkdir -p ${chroot_dir}/etc/sysconfig/network-scripts
 
   cat <<-EOS > ${nictab_file}
@@ -37,8 +42,25 @@ function tearDown() {
 function test_config_interfaces_eth0() {
   nictab=${nictab_file}
 
-  config_interfaces ${chroot_dir}
-  assertEquals $? 0
+  local i=
+  for i in {0..5}; do
+    local ifname=eth${i}
+    local ifcfg_path=${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-${ifname}
+
+    config_interfaces ${chroot_dir} >/dev/null
+    . ${ifcfg_path}
+
+    assertEquals "${DEVICE}"    "${ifname}"
+    assertEquals "${TYPE}"      "Ethernet"
+    assertEquals "${BOOTPROTO}" "static"
+    assertEquals "${ONBOOT}"    "yes"
+    assertEquals "${IPADDR}"    "192.0.2.1${i}"
+    assertEquals "${NETWORK}"   "192.0.2.0"
+    assertEquals "${NETMASK}"   "255.255.255.0"
+    assertEquals "${BROADCAST}" "192.0.2.255"
+    assertEquals "${GATEWAY}"   "192.0.2.1"
+    assertEquals "${ONBOOT}"    "yes"
+  done
 }
 
 ## shunit2

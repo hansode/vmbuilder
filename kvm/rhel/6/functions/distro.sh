@@ -247,7 +247,6 @@ function configure_os() {
  #create_initial_user      ${chroot_dir}
   set_timezone             ${chroot_dir}
 
-  install_resolv_conf      ${chroot_dir}
   install_extras           ${chroot_dir}
   umount_nonroot           ${chroot_dir}
 }
@@ -508,7 +507,8 @@ function reconfigure_fstab() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
-  render_fstab_nonptab | tee ${chroot_dir}/etc/fstab
+  render_fstab_nonptab > ${chroot_dir}/etc/fstab
+  cat ${chroot_dir}/etc/fstab
 }
 
 function reconfigure_mtab() {
@@ -920,12 +920,20 @@ function install_menu_lst_vzkernel() {
 
 ## networking configuration
 
+function render_resolv_conf() {
+  local dnssv=
+  for dnssv in ${dns:-8.8.8.8}; do
+    cat <<-EOS
+	nameserver ${dnssv}
+	EOS
+  done
+}
+
 function install_resolv_conf() {
   local chroot_dir=$1
 
-  cat <<-EOS > ${chroot_dir}/etc/resolv.conf
-	nameserver 8.8.8.8
-	EOS
+  printf "[INFO] Generating /etc/resolv.conf\n"
+  render_resolv_conf | tee ${chroot_dir}/etc/resolv.conf
 }
 
 function configure_networking() {
@@ -936,6 +944,7 @@ function configure_networking() {
 	NETWORKING=yes
 	EOS
   config_host_and_domainname ${chroot_dir}
+  install_resolv_conf        ${chroot_dir}
   config_interfaces          ${chroot_dir}
   config_routing             ${chroot_dir}
 
@@ -993,14 +1002,6 @@ function config_host_and_domainname() {
     echo 127.0.0.1 ${hostname} >> ${chroot_dir}/etc/hosts
     cat ${chroot_dir}/etc/hosts
   }
-
-  printf "[INFO] Generating /etc/resolv.conf\n"
-  [[ -z "${dns}" ]] || {
-    cat <<-EOS > ${chroot_dir}/etc/resolv.conf
-	nameserver ${dns}
-	EOS
-  }
-  [[ -f ${chroot_dir}/etc/resolv.conf ]] && cat ${chroot_dir}/etc/resolv.conf || :
 }
 
 function configure_console() {
@@ -1023,7 +1024,7 @@ function nictabinfo() {
       cat ${nictab}
     } || {
       cat <<-EOS
-	ifname=eth0 ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} onboot=${onboot} iftype=ethernet
+	ifname=eth0 ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns="${dns}" onboot=${onboot} iftype=ethernet
 	EOS
     }
   } | egrep -v '^$|^#'
@@ -1036,7 +1037,7 @@ function config_interfaces() {
   local line=
   while read line; do
     (
-      ifname= ip= mask= net= bcast= gw= onboot= iftype=
+      ifname= ip= mask= net= bcast= gw= dns= onboot= iftype=
       eval ${line}
       install_interface ${chroot_dir} ${ifname} ${iftype}
     )
@@ -1094,6 +1095,14 @@ function render_interface_netowrk_configuration() {
 	$([[ -z "${gw}"     ]] || echo "GATEWAY=${gw}")
 	EOS
   }
+
+  local dnssv= i=1
+  for dnssv in ${dns}; do
+    cat <<-EOS
+	$([[ -z "${dnssv}"  ]] || echo "DNS${i}=${dnssv}")
+	EOS
+    let i++
+  done
 
   cat <<-EOS
 	ONBOOT=${onboot:-yes}
