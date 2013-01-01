@@ -13,12 +13,12 @@
 ## public functions
 
 function test_gen_macaddr_no_opts() {
-  gen_macaddr
+  gen_macaddr >/dev/null
   assertEquals $? 0
 }
 
 function test_gen_macaddr_set_offset() {
-  gen_macaddr 1
+  gen_macaddr 1 >/dev/null
   assertEquals $? 0
 }
 

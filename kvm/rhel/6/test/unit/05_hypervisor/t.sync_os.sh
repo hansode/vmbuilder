@@ -23,6 +23,8 @@ function setUp() {
   mkdir -p ${chroot_dir}
   mkdir -p ${distro_dir}
   touch ${distro_dir}/dummy
+
+  function checkroot() { :; }
 }
 
 function tearDown() {

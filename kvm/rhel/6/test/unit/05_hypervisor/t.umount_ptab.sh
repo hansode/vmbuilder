@@ -13,12 +13,12 @@
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename} $(sum_disksize)
-  mkptab ${disk_filename}
-  mapptab ${disk_filename}
-  mkfsdisk ${disk_filename} ext4
+  touch ${disk_filename}
   mkdir -p ${chroot_dir}
-  mount_ptab ${disk_filename} ${chroot_dir}
+
+  function checkroot() { :; }
+  function umount_nonroot() { echo umount_nonroot $*; }
+  function umount_root() { echo umount_nonroot $*; }
 }
 
 function tearDown() {
@@ -27,9 +27,7 @@ function tearDown() {
 }
 
 function test_umount_ptab() {
-  umount_ptab ${chroot_dir}
-
-  unmapptab ${disk_filename}
+  umount_ptab ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 

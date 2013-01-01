@@ -20,15 +20,15 @@ function test_add_option_hypervisor_hypervisor_kvm() {
   local hypervisor=kvm
   local old_hypervisor=${hypervisor}
 
-  add_option_hypervisor
+  add_option_hypervisor >/dev/null
   assertEquals "${old_hypervisor}" "${hypervisor}"
 }
 
-function test_add_option_hypervisor_hypervisor_exists() {
+function test_add_option_hypervisor_hypervisor_empty() {
   local hypervisor=
   local old_hypervisor=${hypervisor}
 
-  add_option_hypervisor
+  add_option_hypervisor >/dev/null 2>&1
   assertNotEquals $? 0
 }
 

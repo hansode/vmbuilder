@@ -15,13 +15,13 @@ declare distro_dir=${abs_dirname}/_distro.$$
 ## public functions
 
 function setUp() {
+  # reinclude hypervisor
+  hypervisor=lxc
+  . ${abs_dirname}/../../../functions/hypervisor.sh
+
   mkdir -p ${distro_dir}
 
-  touch ${disk_filename}
-  function umount() { echo umount $*; }
-
   function checkroot() { :; }
-  function mount_ptab() { echo $*; }
   function sync_os() { echo sync_os $*; }
   function mount_proc() { echo mount_proc $*; }
   function mount_dev() { echo mount_dev $*; }
@@ -46,19 +46,15 @@ function setUp() {
 }
 
 function tearDown() {
-  rm -f ${disk_filename}
   rm -rf ${distro_dir}
+  rm -rf ${chroot_dir}
 }
 
-function test_install_os_distro_name_empty() {
-  local distro_name=
-  install_os ${chroot_dir} ${distro_dir} ${disk_filename} >/dev/null 2>&1
-  assertNotEquals $? 0
-}
-
-function test_install_os_distro_name_defined() {
+function test_install_os_diskless() {
   local distro_name=centos
-  install_os ${chroot_dir} ${distro_dir} ${disk_filename} >/dev/null
+  local diskless=1
+
+  install_os ${chroot_dir} ${distro_dir} >/dev/null
   assertEquals $? 0
 }
 
