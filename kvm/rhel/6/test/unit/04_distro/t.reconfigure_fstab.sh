@@ -22,7 +22,9 @@ function tearDown() {
 
 
 function test_reconfigure_fstab() {
-  reconfigure_fstab ${chroot_dir}
+  reconfigure_fstab ${chroot_dir} >/dev/null
+
+  [[ -f ${chroot_dir}/etc/fstab ]]
   assertEquals $? 0
 }
 

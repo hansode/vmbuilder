@@ -28,7 +28,7 @@ function tearDown() {
 }
 
 function test_install_firstlogin() {
-  install_firstlogin ${chroot_dir} ${firstscript}
+  install_firstlogin ${chroot_dir} ${firstscript} >/dev/null
   assertEquals $? 0
 
   # compare file
@@ -37,21 +37,21 @@ function test_install_firstlogin() {
 }
 
 function test_install_firstlogin_file_backup() {
-  install_firstlogin ${chroot_dir} ${firstscript}
+  install_firstlogin ${chroot_dir} ${firstscript} >/dev/null
 
   [[ -f "${chroot_dir}/etc/bashrc.orig" ]]
   assertEquals "$?" "0"
 }
 
 function test_install_firstlogin_file_master() {
-  install_firstlogin ${chroot_dir} ${firstscript}
+  install_firstlogin ${chroot_dir} ${firstscript} >/dev/null
 
   [[ -e "${chroot_dir}/etc/bashrc" ]]
   assertEquals "$?" "0"
 }
 
 function test_install_firstlogin_file_firstloginsh() {
-  install_firstlogin ${chroot_dir} ${firstscript}
+  install_firstlogin ${chroot_dir} ${firstscript} >/dev/null
 
   [[ -x "${chroot_dir}/root/firstlogin.sh" ]]
   assertEquals "$?" "0"

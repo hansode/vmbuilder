@@ -24,7 +24,7 @@ function tearDown() {
 }
 
 function test_vzkernel_version() {
-  vzkernel_version ${chroot_dir} | egrep vzkernel
+  vzkernel_version ${chroot_dir} | egrep -q -w 'vzkernel$'
   assertEquals $? 0
 }
 

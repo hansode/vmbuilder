@@ -24,7 +24,7 @@ function tearDown() {
 }
 
 function test_install_vzutils() {
-  install_vzutils ${chroot_dir} | egrep 'vzctl vzquota'
+  install_vzutils ${chroot_dir} | egrep -q -w 'vzctl vzquota'
   assertEquals $? 0
 }
 

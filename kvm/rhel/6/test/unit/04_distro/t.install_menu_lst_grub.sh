@@ -28,7 +28,9 @@ function tearDown() {
 }
 
 function test_install_menu_lst_grub() {
-  install_menu_lst_grub ${chroot_dir} ${disk_filename}
+  install_menu_lst_grub ${chroot_dir} ${disk_filename} >/dev/null
+
+  [[ -f ${chroot_dir}/boot/grub/grub.conf ]]
   assertEquals $? 0
 }
 
@@ -36,29 +38,33 @@ function test_install_menu_lst_grub() {
 
 function test_install_menu_lst_grub_fstab_undefined() {
   local fstab_type=
+  install_menu_lst_grub ${chroot_dir} ${disk_filename} >/dev/null
 
-  install_menu_lst_grub ${chroot_dir} ${disk_filename}
+  [[ -f ${chroot_dir}/boot/grub/grub.conf ]]
   assertEquals $? 0
 }
 
 function test_install_menu_lst_grub_fstab_uuid() {
   local fstab_type=uuid
+  install_menu_lst_grub ${chroot_dir} ${disk_filename} >/dev/null
 
-  install_menu_lst_grub ${chroot_dir} ${disk_filename}
+  [[ -f ${chroot_dir}/boot/grub/grub.conf ]]
   assertEquals $? 0
 }
 
 function test_install_menu_lst_grub_fstab_label() {
   local fstab_type=label
+  install_menu_lst_grub ${chroot_dir} ${disk_filename} >/dev/null
 
-  install_menu_lst_grub ${chroot_dir} ${disk_filename}
+  [[ -f ${chroot_dir}/boot/grub/grub.conf ]]
   assertEquals $? 0
 }
 
 function test_install_menu_lst_grub_fstab_unknown() {
   local fstab_type=unknown
+  install_menu_lst_grub ${chroot_dir} ${disk_filename} >/dev/null 2>&1
 
-  install_menu_lst_grub ${chroot_dir} ${disk_filename}
+  [[ -f ${chroot_dir}/boot/grub/grub.conf ]]
   assertNotEquals $? 0
 }
 

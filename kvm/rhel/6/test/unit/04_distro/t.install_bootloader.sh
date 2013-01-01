@@ -16,6 +16,8 @@ function setUp() {
   mkdisk ${disk_filename} $(sum_disksize)
   mkdir -p ${chroot_dir}/tmp/vmbuilder-grub
 
+  function checkroot() { :; }
+
   function is_dev() { echo is_dev $*; }
   function chroot() { echo chroot $*; }
   function grub() { cat; }
@@ -34,14 +36,14 @@ function tearDown() {
 function test_install_bootloader_grub_ver1() {
   preferred_grub=grub
 
-  install_bootloader ${chroot_dir} ${disk_filename}
+  install_bootloader ${chroot_dir} ${disk_filename} >/dev/null
   assertEquals $? 0
 }
 
 function test_install_bootloader_grub_ver2() {
   preferred_grub=grub2
 
-  install_bootloader ${chroot_dir} ${disk_filename}
+  install_bootloader ${chroot_dir} ${disk_filename} >/dev/null
   assertEquals $? 0
 }
 

@@ -23,14 +23,13 @@ function tearDown() {
 }
 
 function test_install_addedpkgs_empty() {
-  install_addedpkgs ${chroot_dir}
-  assertEquals $? 0
+  assertEquals "$(install_addedpkgs ${chroot_dir})" ""
 }
 
 function test_install_addedpkgs_defined() {
   local addpkg="make gcc g++"
 
-  install_addedpkgs ${chroot_dir}
+  install_addedpkgs ${chroot_dir} | grep -q "${addpkg}"
   assertEquals $? 0
 }
 

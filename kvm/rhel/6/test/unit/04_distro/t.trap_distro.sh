@@ -14,6 +14,8 @@
 
 function setUp() {
   mkdir -p ${chroot_dir}
+
+  function checkroot() { :; }
 }
 
 function tearDown() {
@@ -21,7 +23,7 @@ function tearDown() {
 }
 
 function test_trap_distro() {
-  trap_distro ${chroot_dir}
+  trap_distro ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 

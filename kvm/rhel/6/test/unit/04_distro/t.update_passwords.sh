@@ -25,14 +25,14 @@ function tearDown() {
 function test_update_passwords_empty_rootpass() {
   local rootpass=
 
-  update_passwords ${chroot_dir} | egrep "^chroot ${chroot_dir} bash -e -c echo root:${rootpass} | chpasswd"
+  update_passwords ${chroot_dir} | egrep -q -w "^chroot ${chroot_dir} bash -e -c echo root:${rootpass} | chpasswd"
   assertEquals $? 0
 }
 
 function test_update_passwords_rootpass() {
   local rootpass=asdf
 
-  update_passwords ${chroot_dir} | egrep "^chroot ${chroot_dir} bash -e -c echo root:${rootpass} | chpasswd"
+  update_passwords ${chroot_dir} | egrep -q -w "^chroot ${chroot_dir} bash -e -c echo root:${rootpass} | chpasswd"
   assertEquals $? 0
 }
 

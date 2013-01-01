@@ -23,12 +23,12 @@ function setUp() {
 }
 
 function test_build_chroot_defined_chroot_dir() {
-  build_chroot ${chroot_dir}
+  build_chroot ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 
 function test_build_chroot_undefined_chroot_dir() {
-  build_chroot
+  build_chroot >/dev/null
   assertEquals $? 0
 }
 

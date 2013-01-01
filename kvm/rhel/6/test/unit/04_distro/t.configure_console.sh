@@ -20,14 +20,13 @@ function setUp() {
 }
 
 function tearDown() {
-  cat ${chroot_dir}/etc/securetty
-  cat ${chroot_dir}/etc/sysconfig/init
-
   rm -rf ${chroot_dir}
 }
 
 function test_configure_console() {
-  configure_console ${chroot_dir}
+  configure_console ${chroot_dir} >/dev/null
+
+  egrep -w '^ACTIVE_CONSOLES=' ${chroot_dir}/etc/sysconfig/init | egrep -q -w '/dev/ttyS0'
   assertEquals $? 0
 }
 

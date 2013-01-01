@@ -29,7 +29,7 @@ function tearDown() {
 function test_unprevent_daemons_starting_single() {
   local svcs=sshd
 
-  unprevent_daemons_starting ${chroot_dir} ${svcs} | egrep "chkconfig ${svcs} on$"
+  unprevent_daemons_starting ${chroot_dir} ${svcs} | egrep -q -w "chkconfig ${svcs} on$"
   assertEquals $? 0
 }
 

@@ -20,7 +20,6 @@ function setUp() {
   mkdir -p ${chroot_dir}/usr/share/zoneinfo
   mkdir -p ${chroot_dir}/etc
   touch ${chroot_dir}/usr/share/zoneinfo/Japan
-  add_option_distro
 }
 
 function tearDown() {
@@ -28,7 +27,9 @@ function tearDown() {
 }
 
 function test_set_timezone() {
-  set_timezone ${chroot_dir}
+  set_timezone ${chroot_dir} >/dev/null
+
+  [[ -f${chroot_dir}/etc/localtime ]]
   assertEquals $? 0
 }
 

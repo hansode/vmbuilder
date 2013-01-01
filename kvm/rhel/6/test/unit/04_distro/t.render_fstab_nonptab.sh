@@ -15,8 +15,10 @@
 ## fstab_type
 
 function test_render_fstab_nonptab() {
-  render_fstab_nonptab
-  assertEquals $? 0
+  assertEquals "$(render_fstab_nonptab)" "tmpfs                   /dev/shm                tmpfs   defaults        0 0
+devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
+sysfs                   /sys                    sysfs   defaults        0 0
+proc                    /proc                   proc    defaults        0 0"
 }
 
 ## shunit2

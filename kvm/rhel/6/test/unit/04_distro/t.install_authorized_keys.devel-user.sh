@@ -35,7 +35,7 @@ function test_install_authorized_keys_ssh_user_key_empty() {
 
 function test_install_authorized_keys_ssh_user_key() {
   local ssh_user_key=${pubkey_file}
-  install_authorized_keys ${chroot_dir}
+  install_authorized_keys ${chroot_dir} >/dev/null
 
   [[ -d ${chroot_dir}/home/${devel_user}/.ssh ]]
   assertEquals $? 0

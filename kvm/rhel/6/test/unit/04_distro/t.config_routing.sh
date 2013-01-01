@@ -41,7 +41,9 @@ function tearDown() {
 
 function test_config_routing() {
   local routetab=${routetab_file}
-  config_routing ${chroot_dir}
+
+  config_routing ${chroot_dir} >/dev/null
+  assertEquals $? 0
 }
 
 ## shunit2

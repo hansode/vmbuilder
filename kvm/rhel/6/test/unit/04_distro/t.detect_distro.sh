@@ -27,16 +27,16 @@ function tearDown() {
   rm -rf ${chroot_dir}
 }
 
-function test_routetabinfo() {
+function test_detect_distro() {
  #detect_distro ${chroot_dir}
 
-  detect_distro ${chroot_dir} | egrep ^DISTRIB_FLAVOR=${distrib_flavor}
+  detect_distro ${chroot_dir} | egrep -q -w ^DISTRIB_FLAVOR=${distrib_flavor}
   assertEquals $? 0
 
-  detect_distro ${chroot_dir} | egrep ^DISTRIB_ID=${distrib_id}
+  detect_distro ${chroot_dir} | egrep -q -w ^DISTRIB_ID=${distrib_id}
   assertEquals $? 0
 
-  detect_distro ${chroot_dir} | egrep ^DISTRIB_RELEASE=${distrib_release}
+  detect_distro ${chroot_dir} | egrep -q -w ^DISTRIB_RELEASE=${distrib_release}
   assertEquals $? 0
 }
 

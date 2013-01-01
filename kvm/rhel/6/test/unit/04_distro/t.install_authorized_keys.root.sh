@@ -26,13 +26,16 @@ function tearDown() {
 }
 
 function test_install_authorized_keys_ssh_key_empty() {
-  local ssh_key=${pubkey_file}
+  local ssh_key=
   install_authorized_keys ${chroot_dir}
+
+  [[ -f ${chroot_dir}/root/.ssh/authorized_keys ]]
+  assertNotEquals $? 0
 }
 
 function test_install_authorized_keys_ssh_key_defined() {
   local ssh_key=${pubkey_file}
-  install_authorized_keys ${chroot_dir}
+  install_authorized_keys ${chroot_dir} >/dev/null
 
   [[ -d ${chroot_dir}/root/.ssh ]]
   assertEquals $? 0

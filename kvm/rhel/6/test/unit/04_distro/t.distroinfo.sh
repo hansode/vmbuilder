@@ -13,11 +13,14 @@
 ## public functions
 
 function setUp() {
+  distro_name=centos
+  distro_ver=6
+
   add_option_distro
 }
 
 function test_distroinfo() {
-  distroinfo | egrep ^chroot_dir | egrep -q ${chroot_dir}
+  distroinfo | egrep ^chroot_dir | egrep -q -w ${chroot_dir}
   assertEquals $? 0
 }
 

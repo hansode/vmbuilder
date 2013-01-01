@@ -23,7 +23,7 @@ function test_load_distro_driver_sl6() {
 }
 
 function test_load_distro_driver_unknown() {
-  load_distro_driver unknown
+  load_distro_driver unknown 2>/dev/null
   assertNotEquals $? 0
 }
 

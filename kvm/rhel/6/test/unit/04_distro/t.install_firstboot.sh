@@ -28,7 +28,7 @@ function tearDown() {
 }
 
 function test_install_firstboot() {
-  install_firstboot ${chroot_dir} ${firstscript}
+  install_firstboot ${chroot_dir} ${firstscript} >/dev/null
   assertEquals $? 0
 
   # compare file
@@ -37,21 +37,21 @@ function test_install_firstboot() {
 }
 
 function test_install_firstboot_file_backup() {
-  install_firstboot ${chroot_dir} ${firstscript}
+  install_firstboot ${chroot_dir} ${firstscript} >/dev/null
 
   [[ -f "${chroot_dir}/etc/rc.d/rc.local.orig" ]]
   assertEquals "$?" "0"
 }
 
 function test_install_firstboot_file_master() {
-  install_firstboot ${chroot_dir} ${firstscript}
+  install_firstboot ${chroot_dir} ${firstscript} >/dev/null
 
   [[ -x "${chroot_dir}/etc/rc.d/rc.local" ]]
   assertEquals "$?" "0"
 }
 
 function test_install_firstboot_file_firstbootsh() {
-  install_firstboot ${chroot_dir} ${firstscript}
+  install_firstboot ${chroot_dir} ${firstscript} >/dev/null
 
   [[ -x "${chroot_dir}/root/firstboot.sh" ]]
   assertEquals "$?" "0"

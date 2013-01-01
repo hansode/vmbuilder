@@ -25,7 +25,7 @@ function tearDown() {
 }
 
 function test_configure_openvz() {
-  configure_openvz ${chroot_dir}
+  configure_openvz ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 

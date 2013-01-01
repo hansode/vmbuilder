@@ -13,20 +13,19 @@
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename} $(sum_disksize)
+  touch ${disk_filename}
   mkdir -p ${chroot_dir}/etc
-  mkptab ${disk_filename}
-  mapptab ${disk_filename}
+
+  function checkroot() { :; }
 }
 
 function tearDown() {
-  unmapptab ${disk_filename}
   rm ${disk_filename}
   rm -rf ${chroot_dir}
 }
 
 function test_configure_mounting() {
-  configure_mounting ${chroot_dir} ${disk_filename}
+  configure_mounting ${chroot_dir} ${disk_filename} >/dev/null
   assertEquals $? 0
 }
 

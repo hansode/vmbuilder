@@ -16,7 +16,7 @@ function setUp() {
   function run_yum() { echo run_yum $*; }
 
   mkdir -p ${chroot_dir}
-  add_option_distro
+  add_option_distro 2>/dev/null
 }
 
 function tearDown() {
@@ -24,7 +24,7 @@ function tearDown() {
 }
 
 function test_install_grub2() {
-  install_grub2 ${chroot_dir}
+  install_grub2 ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 

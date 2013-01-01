@@ -22,7 +22,7 @@ function tearDown() {
 }
 
 function test_configure_mtab() {
-  reconfigure_mtab ${chroot_dir}
+  reconfigure_mtab ${chroot_dir} | egrep -q -w "ln -fs /proc/mounts /etc/mtab"
   assertEquals $? 0
 }
 
