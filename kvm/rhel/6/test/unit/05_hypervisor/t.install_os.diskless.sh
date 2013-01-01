@@ -17,6 +17,7 @@ declare distro_dir=${abs_dirname}/_distro.$$
 function setUp() {
   mkdir -p ${distro_dir}
 
+  function checkroot() { :; }
   function sync_os() { echo sync_os $*; }
   function mount_proc() { echo mount_proc $*; }
   function mount_dev() { echo mount_dev $*; }
@@ -49,7 +50,7 @@ function test_install_os_diskless() {
   local distro_name=centos
   local diskless=1
 
-  install_os ${chroot_dir} ${distro_dir}
+  install_os ${chroot_dir} ${distro_dir} >/dev/null
   assertEquals $? 0
 }
 

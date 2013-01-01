@@ -13,22 +13,20 @@
 ## public functions
 
 function setUp() {
-  mkdisk ${disk_filename} $(sum_disksize)
-  mkptab ${disk_filename}
-  mapptab ${disk_filename}
-  mkfsdisk ${disk_filename} ext4
+  touch ${disk_filename}
   mkdir -p ${chroot_dir}
+
+  function checkroot() { :; }
+  function mount() { echo mount $*; }
 }
 
 function tearDown() {
-  umount_ptab ${chroot_dir}
-  unmapptab ${disk_filename}
   rm -f ${disk_filename}
   rm -rf ${chroot_dir}
 }
 
 function test_mount_ptab_root() {
-  mount_ptab_root ${disk_filename} ${chroot_dir}
+  mount_ptab_root ${disk_filename} ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 
