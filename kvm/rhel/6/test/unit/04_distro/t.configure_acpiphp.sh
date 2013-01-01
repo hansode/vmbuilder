@@ -21,7 +21,7 @@ function tearDown() {
 }
 
 function test_configure_acpiphp() {
-  configure_acpiphp ${chroot_dir}
+  configure_acpiphp ${chroot_dir} >/dev/null
 
   egrep -q -w "^acpiphp" ${chroot_dir}/etc/modules
   assertEquals $? 0

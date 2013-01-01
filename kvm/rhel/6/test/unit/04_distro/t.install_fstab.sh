@@ -16,6 +16,7 @@ function setUp() {
   mkdisk ${disk_filename} $(sum_disksize)
   mkdir -p ${chroot_dir}/etc
 
+  function checkroot() { :; }
   function render_fstab() { cat <<-EOS
 	tmpfs                   /dev/shm                tmpfs   defaults        0 0
 	devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
@@ -31,8 +32,8 @@ function tearDown() {
 }
 
 function test_install_fstab() {
-  install_fstab ${chroot_dir} ${disk_filename}
-  assertEquals $? 0
+  install_fstab ${chroot_dir} ${disk_filename} >/dev/null
+  assertEquals "$(cat ${chroot_dir}/etc/fstab)" "$(render_fstab)"
 }
 
 

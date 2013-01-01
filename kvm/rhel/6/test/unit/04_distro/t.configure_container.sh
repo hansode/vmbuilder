@@ -26,7 +26,7 @@ function tearDown() {
 }
 
 function test_configure_container() {
-  configure_container ${chroot_dir}
+  configure_container ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 

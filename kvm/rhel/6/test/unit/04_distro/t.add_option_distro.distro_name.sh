@@ -18,7 +18,7 @@ function test_add_option_distro_name_rhel() {
   local distro_name=rhel
   local old_distro_name=${distro_name}
 
-  add_option_distro
+  add_option_distro >/dev/null 2>&1
   assertEquals "${old_distro_name}" "${distro_name}"
 }
 
@@ -27,7 +27,7 @@ function test_add_option_distro_name_centos() {
   local distro_ver=6
   local old_distro_name=${distro_name}
 
-  add_option_distro
+  add_option_distro >/dev/null 2>&1
   assertEquals "${old_distro_name}" "${distro_name}"
 }
 
@@ -53,7 +53,7 @@ function test_add_option_distro_name_empty() {
   local distro_name=
   local old_distro_name=${distro_name}
 
-  add_option_distro
+  add_option_distro  >/dev/null 2>&1
   assertEquals "${old_distro_name}" "${distro_name}"
 }
 

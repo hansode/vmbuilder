@@ -24,12 +24,12 @@ function tearDown() {
 }
 
 function test_create_initial_user() {
-  create_initial_user ${chroot_dir}
+  create_initial_user ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 
 function test_create_initial_user_no_opts() {
-  create_initial_user
+  create_initial_user 2>/dev/null
   assertNotEquals $? 0
 }
 

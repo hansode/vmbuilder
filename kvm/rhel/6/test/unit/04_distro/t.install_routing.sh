@@ -25,12 +25,14 @@ function tearDown() {
 }
 
 function test_install_routing_empty() {
-  install_routing ${chroot_dir}
+  install_routing ${chroot_dir} 2>/dev/null
   assertNotEquals $? 0
 }
 
 function test_install_routing_defined() {
-  install_routing ${chroot_dir} eth0
+  install_routing ${chroot_dir} eth0 >/dev/null
+
+  [[ -f ${chroot_dir}/etc/sysconfig/network-scripts/route-eth0 ]]
   assertEquals $? 0
 }
 

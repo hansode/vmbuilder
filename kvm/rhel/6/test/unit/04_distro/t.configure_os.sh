@@ -17,6 +17,8 @@ function setUp() {
   mkdir -p ${chroot_dir}/dev
   mkdir -p ${chroot_dir}/sys
 
+  function checkroot() { :; }
+  function mount() { echo mount $*; }
   function prevent_daemons_starting() { echo prevent_daemons_starting $*; }
  #function create_initial_user() { echo create_initial_user $*; }
   function set_timezone() { echo set_timezone $*; }
@@ -28,7 +30,7 @@ function tearDown() {
 }
 
 function test_configure_os() {
-  configure_os ${chroot_dir}
+  configure_os ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 

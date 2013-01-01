@@ -35,13 +35,13 @@ function tearDown() {
 }
 
 function test_install_menu_lst_vzkernel() {
-  install_menu_lst_vzkernel ${chroot_dir}
+  install_menu_lst_vzkernel ${chroot_dir} >/dev/null
   assertEquals $? 0
 
-  egrep ^title ${chroot_dir}/boot/grub/grub.conf
+  egrep -q ^title ${chroot_dir}/boot/grub/grub.conf
   assertEquals $? 0
 
-  egrep ^default= ${chroot_dir}/boot/grub/grub.conf
+  egrep -q ^default= ${chroot_dir}/boot/grub/grub.conf
   assertEquals $? 0
 }
 
@@ -49,7 +49,7 @@ function test_install_menu_lst_vzkernel_no_fstab() {
   # for diskless mode
   rm -f ${chroot_dir}/etc/fstab
 
-  install_menu_lst_vzkernel ${chroot_dir}
+  install_menu_lst_vzkernel ${chroot_dir} >/dev/null 2>&1
   assertEquals $? 0
 }
 

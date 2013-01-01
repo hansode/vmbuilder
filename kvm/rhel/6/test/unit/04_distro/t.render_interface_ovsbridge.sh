@@ -15,13 +15,29 @@
 ### set value
 
 function test_render_interface_ovsbridge_br0() {
-  render_interface_ovsbridge br0
-  assertEquals $? 0
+  eval "$(render_interface_ovsbridge br0)"
+
+  assertEquals "${DEVICE}"        "br0"
+  assertEquals "${TYPE}"          "OVSBridge"
+  assertEquals "${NM_CONTROLLED}" "no"
+  assertEquals "${DEVICETYPE}"    "ovs"
+  assertEquals "${OVS_EXTRA}"     " set bridge     ${DEVICE} other_config:disable-in-band=true --\
+ set-fail-mode  ${DEVICE} secure --\
+ set-controller ${DEVICE} unix:/var/run/openvswitch/${DEVICE}.controller
+"
 }
 
 function test_render_interface_ovsbridge_br1() {
-  render_interface_ovsbridge br1
-  assertEquals $? 0
+  eval "$(render_interface_ovsbridge br1)"
+
+  assertEquals "${DEVICE}"        "br1"
+  assertEquals "${TYPE}"          "OVSBridge"
+  assertEquals "${NM_CONTROLLED}" "no"
+  assertEquals "${DEVICETYPE}"    "ovs"
+  assertEquals "${OVS_EXTRA}"     " set bridge     ${DEVICE} other_config:disable-in-band=true --\
+ set-fail-mode  ${DEVICE} secure --\
+ set-controller ${DEVICE} unix:/var/run/openvswitch/${DEVICE}.controller
+"
 }
 
 ## shunit2

@@ -22,7 +22,7 @@ function tearDown() {
 }
 
 function test_install_authorized_keys_no_opts() {
-  install_authorized_keys
+  install_authorized_keys 2>/dev/null
   assertNotEquals $? 0
 }
 

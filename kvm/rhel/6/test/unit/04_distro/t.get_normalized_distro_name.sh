@@ -13,31 +13,26 @@
 ## public functions
 
 function test_get_normalized_distro_name_defined_rhel() {
-  get_normalized_distro_name rhel
-  assertEquals $? 0
+  assertEquals "$(get_normalized_distro_name rhel)" "rhel"
 }
 
 function test_get_normalized_distro_name_defined_centos() {
-  get_normalized_distro_name centos
-  assertEquals $? 0
+  assertEquals "$(get_normalized_distro_name centos)" "centos"
 }
 
 function test_get_normalized_distro_name_defined_sl() {
-  get_normalized_distro_name sl
-  assertEquals $? 0
+  assertEquals "$(get_normalized_distro_name sl)" "sl"
 
-  get_normalized_distro_name scientific
-  assertEquals $? 0
+  assertEquals "$(get_normalized_distro_name scientific)" "sl"
 
-  get_normalized_distro_name scientificlinux
-  assertEquals $? 0
+  assertEquals "$(get_normalized_distro_name scientificlinux)" "sl"
 }
 
 function test_get_normalized_distro_name_undefined() {
-  get_normalized_distro_name unknown
+  get_normalized_distro_name unknown 2>/dev/null
   assertNotEquals $? 0
 
-  get_normalized_distro_name ""
+  get_normalized_distro_name "" 2>/dev/null
   assertNotEquals $? 0
 }
 

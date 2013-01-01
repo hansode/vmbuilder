@@ -36,19 +36,19 @@ function test_create_initial_user_devel() {
 }
 
 function test_create_initial_user_devel_getent_group() {
-  create_initial_user ${chroot_dir} | egrep -w "getent group ${devel_group}"
+  create_initial_user ${chroot_dir} | egrep -q -w "getent group ${devel_group}"
   assertEquals $? 0
 }
 
 function test_create_initial_user_devel_getent_passwd() {
-  create_initial_user ${chroot_dir} | egrep -w "getent passwd ${devel_user}"
+  create_initial_user ${chroot_dir} | egrep -q -w "getent passwd ${devel_user}"
   assertEquals $? 0
 }
 
 function test_create_initial_user_devel_umask() {
   create_initial_user ${chroot_dir} >/dev/null
 
-  egrep -w "^umask 022" ${chroot_dir}/${devel_home}/.bashrc
+  egrep -q -w "^umask 022" ${chroot_dir}/${devel_home}/.bashrc
   assertEquals $? 0
 }
 

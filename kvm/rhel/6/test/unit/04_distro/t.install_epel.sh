@@ -29,7 +29,8 @@ function test_install_epel_empty() {
 
 function test_install_epel_defined() {
   local epel_uri=http://ftp.jaist.ac.jp/pub/Linux/Fedora/epel/6/i386/epel-release-6-8.noarch.rpm
-  install_epel ${chroot_dir}
+
+  install_epel ${chroot_dir} | egrep -q -w ${epel_uri}
   assertEquals $? 0
 }
 

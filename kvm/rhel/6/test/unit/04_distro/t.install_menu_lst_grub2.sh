@@ -27,7 +27,9 @@ function tearDown() {
 }
 
 function test_install_menu_lst_grub2() {
-  install_menu_lst_grub2 ${chroot_dir} ${disk_filename}
+  install_menu_lst_grub2 ${chroot_dir} ${disk_filename} >/dev/null
+
+  [[ -f ${chroot_dir}/boot/grub2/grub.cfg ]]
   assertEquals $? 0
 }
 

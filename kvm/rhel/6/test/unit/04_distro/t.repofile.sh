@@ -20,7 +20,7 @@ declare distro_ver=6
 function test_repofile_required_opts_empty() {
   local reponame= baseurl= gpgkey= keepcache=
 
-  repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache} | egrep -q ^baseurl=${baseurl}
+  repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache} 2>/dev/null | egrep -q ^baseurl=${baseurl}
   assertNotEquals $? 0
 }
 
@@ -29,7 +29,7 @@ function test_repofile_required_reponame() {
   local reponame=${distro_name}
   local baseurl= gpgkey=
 
-  repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache} | egrep -q ^baseurl=${baseurl}
+  repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache} 2>/dev/null | egrep -q ^baseurl=${baseurl}
   assertNotEquals $? 0
 }
 
@@ -38,7 +38,7 @@ function test_repofile_required_reponame_baseurl() {
   local reponame=${distro_name}
   local gpgkey=
 
-  repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache} | egrep -q ^baseurl=${baseurl}
+  repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache} 2>/dev/null | egrep -q ^baseurl=${baseurl}
   assertNotEquals $? 0
 }
 

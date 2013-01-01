@@ -28,14 +28,14 @@ function tearDown() {
 function test_install_menu_lst_grub_ver1() {
   local preferred_grub=grub
 
-  install_menu_lst ${chroot_dir} ${disk_filename}
+  install_menu_lst ${chroot_dir} ${disk_filename} >/dev/null
   assertEquals $? 0
 }
 
 function test_install_menu_lst_grub_ver2() {
   local preferred_grub=grub2
 
-  install_menu_lst ${chroot_dir} ${disk_filename}
+  install_menu_lst ${chroot_dir} ${disk_filename} >/dev/null
   assertEquals $? 0
 }
 

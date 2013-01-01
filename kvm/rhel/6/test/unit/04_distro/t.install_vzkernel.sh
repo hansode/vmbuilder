@@ -26,7 +26,7 @@ function tearDown() {
 }
 
 function test_install_vzkernel() {
-  install_vzkernel ${chroot_dir} | egrep vzkernel
+  install_vzkernel ${chroot_dir} | egrep -q -w vzkernel
   assertEquals $? 0
 }
 

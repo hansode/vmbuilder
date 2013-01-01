@@ -13,12 +13,12 @@
 ## public functions
 
 function test_preflight_check_uri_empty() {
-  preflight_check_uri
+  preflight_check_uri >/dev/null 2>&1
   assertNotEquals $? 0
 }
 
 function test_preflight_check_uri_http() {
-  preflight_check_uri http://ftp.riken.go.jp/pub/Linux/centos/6/os/x86_64/
+  preflight_check_uri http://ftp.riken.go.jp/pub/Linux/centos/6/os/x86_64/ >/dev/null
   assertEquals $? 0
 }
 

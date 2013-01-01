@@ -26,30 +26,30 @@ function tearDown() {
 function test_configure_sshd_password_authentication_file_not_found() {
   rm ${chroot_dir}/etc/ssh/sshd_config
 
-  configure_sshd_password_authentication ${chroot_dir}
+  configure_sshd_password_authentication ${chroot_dir} 2>/dev/null
   assertEquals $? 0
 }
 
 function test_configure_sshd_password_authentication_empty() {
-  configure_sshd_password_authentication ${chroot_dir}
+  configure_sshd_password_authentication ${chroot_dir} >/dev/null
 
-  egrep "^PasswordAuthentication no" ${chroot_dir}/etc/ssh/sshd_config
+  egrep -q -w "^PasswordAuthentication no" ${chroot_dir}/etc/ssh/sshd_config
   assertEquals $? 0
 }
 
 function test_configure_sshd_password_authentication_yes() {
   local passauth=yes
-  configure_sshd_password_authentication ${chroot_dir} ${passauth}
+  configure_sshd_password_authentication ${chroot_dir} ${passauth} >/dev/null
 
-  egrep "^PasswordAuthentication ${passauth}" ${chroot_dir}/etc/ssh/sshd_config
+  egrep -q -w "^PasswordAuthentication ${passauth}" ${chroot_dir}/etc/ssh/sshd_config
   assertEquals $? 0
 }
 
 function test_configure_sshd_password_authentication_no() {
   local passauth=no
-  configure_sshd_password_authentication ${chroot_dir} ${passauth}
+  configure_sshd_password_authentication ${chroot_dir} ${passauth} >/dev/null
 
-  egrep "^PasswordAuthentication ${passauth}" ${chroot_dir}/etc/ssh/sshd_config
+  egrep -q -w "^PasswordAuthentication ${passauth}" ${chroot_dir}/etc/ssh/sshd_config
   assertEquals $? 0
 }
 

@@ -24,7 +24,7 @@ function setUp() {
 	${abs_dirname}/foo /tmp/var
 	${abs_dirname}/zzz /tmp/zzz
 	EOS
-  #function cp() { echo cp $*; }
+  function rsync() { echo rsync $*; }
 }
 
 function tearDown() {
@@ -35,15 +35,12 @@ function tearDown() {
 }
 
 function test_run_copy_found() {
-  run_copy ${chroot_dir} ${copyfile}
-  assertEquals $? 0
-
-  diff ${abs_dirname}/src ${chroot_dir}/tmp/dst
+  run_copy ${chroot_dir} ${copyfile} >/dev/null
   assertEquals $? 0
 }
 
 function test_run_copy_not_found() {
-  run_copy ${chroot_dir} ${abs_dirname}/_$$.copy
+  run_copy ${chroot_dir} ${abs_dirname}/_$$.copy 2>/dev/null
   assertNotEquals $? 0
 }
 

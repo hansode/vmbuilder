@@ -23,8 +23,8 @@ function setUp() {
 }
 
 function tearDown() {
-  egrep /sbin/start_udev ${chroot_dir}/etc/rc.sysinit
-  egrep /sbin/start_udev ${chroot_dir}/etc/rc.d/rc.sysinit
+  egrep -q -w "#/sbin/start_udev" ${chroot_dir}/etc/rc.sysinit
+  egrep -q -w "#/sbin/start_udev" ${chroot_dir}/etc/rc.d/rc.sysinit
 
   rm -rf ${chroot_dir}
 }

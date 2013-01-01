@@ -13,15 +13,13 @@
 ## public functions
 
 function test_get_distro_major_ver_exists() {
-  get_distro_major_ver 6.0
-  assertEquals $? 0
+  assertEquals "$(get_distro_major_ver 6.0)" "6"
 
-  get_distro_major_ver 6
-  assertEquals $? 0
+  assertEquals "$(get_distro_major_ver 6)" "6"
 }
 
 function test_get_distro_major_ver_empty() {
-  get_distro_major_ver ""
+  get_distro_major_ver "" 2>/dev/null
   assertNotEquals $? 0
 }
 

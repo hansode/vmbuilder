@@ -26,7 +26,8 @@ function tearDown() {
 }
 
 function test_config_routing() {
-  config_routing ${chroot_dir}
+  config_routing ${chroot_dir} >/dev/null
+  assertEquals $? 0
 }
 
 ## shunit2

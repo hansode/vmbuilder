@@ -30,7 +30,7 @@ function test_config_host_and_domainname() {
 function test_config_host_and_domainname_with_host() {
   local hostname=github.com
 
-  config_host_and_domainname ${chroot_dir}
+  config_host_and_domainname ${chroot_dir} | egrep -q -w ^HOSTNAME=${hostname}
   assertEquals $? 0
 }
 

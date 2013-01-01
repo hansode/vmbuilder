@@ -29,14 +29,14 @@ function tearDown() {
 function test_verify_kernel_installation_exists_initrd() {
   local preferred_initrd=initrd
 
-  verify_kernel_installation ${chroot_dir}
+  verify_kernel_installation ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 
 function test_verify_kernel_installation_exists_initramfs() {
   local preferred_initrd=initramfs
 
-  verify_kernel_installation ${chroot_dir}
+  verify_kernel_installation ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 
@@ -47,7 +47,7 @@ function test_verify_kernel_installation_not_found_initrd() {
 
   rm -f ${chroot_dir}/boot/initrd-asdf
 
-  verify_kernel_installation ${chroot_dir}
+  verify_kernel_installation ${chroot_dir} >/dev/null 2>&1
   assertNotEquals $? 0
 }
 
@@ -56,7 +56,7 @@ function test_verify_kernel_installation_not_found_initramfs() {
 
   rm -f ${chroot_dir}/boot/initramfs-asdf
 
-  verify_kernel_installation ${chroot_dir}
+  verify_kernel_installation ${chroot_dir} >/dev/null 2>&1
   assertNotEquals $? 0
 }
 

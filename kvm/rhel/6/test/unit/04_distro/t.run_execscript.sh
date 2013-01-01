@@ -14,6 +14,9 @@
 
 function setUp() {
   mkdir -p ${chroot_dir}
+
+  distro_name=centos
+  distro_ver=6
 }
 
 function tearDown() {
@@ -21,12 +24,12 @@ function tearDown() {
 }
 
 function test_run_execscript_executable() {
-  run_execscript ${chroot_dir} /bin/echo
+  run_execscript ${chroot_dir} /bin/echo >/dev/null
   assertEquals $? 0
 }
 
 function test_run_execscript_inexecutable() {
-  run_execscript ${chroot_dir} /dev/null
+  run_execscript ${chroot_dir} /dev/null 2>/dev/null
   assertEquals $? 0
 }
 

@@ -22,7 +22,7 @@ function test_add_option_distro_ver_empty() {
   local distro_ver=
   local old_distro_ver=${distro_ver}
 
-  add_option_distro
+  add_option_distro  >/dev/null 2>&1
   assertEquals "${old_distro_ver}" "${distro_ver}"
 }
 

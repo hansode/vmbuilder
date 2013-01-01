@@ -28,7 +28,12 @@ function tearDown() {
 }
 
 function test_configure_networking() {
-  configure_networking ${chroot_dir}
+  configure_networking ${chroot_dir} >/dev/null
+
+  [[ -f ${chroot_dir}/etc/sysconfig/network ]]
+  assertEquals $? 0
+
+  egrep -q -w ^NETWORKING=yes ${chroot_dir}/etc/sysconfig/network
   assertEquals $? 0
 }
 

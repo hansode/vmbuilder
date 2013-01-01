@@ -24,12 +24,12 @@ function tearDown() {
 function test_config_udev_persistent_net_file_not_found() {
   rm ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules
 
-  config_udev_persistent_net ${chroot_dir}
+  config_udev_persistent_net ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 
 function test_config_udev_persistent_net() {
-  config_udev_persistent_net ${chroot_dir}
+  config_udev_persistent_net ${chroot_dir} >/dev/null
 
   [[ -L ${chroot_dir}/etc/udev/rules.d/70-persistent-net.rules ]]
   assertEquals $? 0
