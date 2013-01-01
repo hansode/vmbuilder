@@ -19,6 +19,8 @@ declare hypervisor=lxc
 ## public functions
 
 function setUp() {
+  function checkroot() { :; }
+
   function install_os() { echo install_os $*; }
 }
 
@@ -29,7 +31,7 @@ function tearDown() {
 function test_create_vm_tree() {
   declare distro_dir=${abs_dirname}/distro_dir.$$
 
-  create_vm_tree ${chroot_dir} ${distro_dir}
+  create_vm_tree ${chroot_dir} ${distro_dir} >/dev/null
   assertEquals $? 0
 }
 
