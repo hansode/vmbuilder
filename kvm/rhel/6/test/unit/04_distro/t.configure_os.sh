@@ -20,7 +20,6 @@ function setUp() {
   function prevent_daemons_starting() { echo prevent_daemons_starting $*; }
  #function create_initial_user() { echo create_initial_user $*; }
   function set_timezone() { echo set_timezone $*; }
-  function install_resolv_conf() { echo install_resolv_conf $*; }
   function install_extras() { echo install_extras $*; }
 }
 

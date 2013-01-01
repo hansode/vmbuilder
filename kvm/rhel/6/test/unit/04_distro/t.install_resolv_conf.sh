@@ -13,7 +13,7 @@
 ## public functions
 
 function setUp() {
-  mkdir -p ${chroot_dir}/etc/sysconfig
+  mkdir -p ${chroot_dir}/etc
 }
 
 function tearDown() {
@@ -21,7 +21,9 @@ function tearDown() {
 }
 
 function test_install_resolv_conf() {
-  install_resolv_conf ${chroot_dir}
+  install_resolv_conf ${chroot_dir} >/dev/null
+
+  [[ -f ${chroot_dir}/etc/resolv.conf ]]
   assertEquals $? 0
 }
 
