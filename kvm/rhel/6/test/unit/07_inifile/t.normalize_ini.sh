@@ -21,17 +21,17 @@ function tearDown() {
 }
 
 function test_normalize_ini_filter() {
-  mycnf | normalize_ini
+  mycnf | normalize_ini >/dev/null
   assertEquals $? 0
 }
 
 function test_normalize_ini_file() {
-  normalize_ini ${inifile}
+  normalize_ini ${inifile} >/dev/null
   assertEquals $? 0
 }
 
 function test_normalize_ini_redirect() {
-  normalize_ini < ${inifile}
+  normalize_ini < ${inifile} >/dev/null
   assertEquals $? 0
 }
 
