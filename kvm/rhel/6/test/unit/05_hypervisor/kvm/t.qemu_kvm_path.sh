@@ -13,7 +13,7 @@
 ## public functions
 
 function test_qemu_kvm_path() {
-  qemu_kvm_path
+  qemu_kvm_path >/dev/null
   assertEquals $? 0
 }
 

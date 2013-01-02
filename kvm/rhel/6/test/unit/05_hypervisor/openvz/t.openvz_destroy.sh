@@ -15,12 +15,14 @@
 function setUp() {
   add_option_hypervisor_openvz
 
-  function checkroot() { echo checkroot $*; }
-  function shlog() { echo shlog $*; }
+  function checkroot() { :; }
+  function shlog() { echo $*; }
 }
 
 function test_openvz_destroy() {
-  openvz_destroy vmbuilder
+  local name=vmbuilder
+
+  assertEquals "$(openvz_destroy ${name})" "vzctl destroy ${name}"
 }
 
 ## shunit2

@@ -14,13 +14,21 @@
 
 function setUp() {
   add_option_hypervisor_lxc
+  mkdir ${rootfs_dir}
 
-  function checkroot() { echo checkroot $*; }
-  function shlog() { echo shlog $*; }
+  function checkroot() { :; }
+  function shlog() { echo $*; }
+}
+
+function tearDown() {
+  rm -f ${abs_dirname}/lxc.conf
+  rm -rf ${rootfs_dir}
 }
 
 function test_lxc_create() {
-  lxc_create vmbuilder
+  local name=vmbuilder
+
+  lxc_create ${name} | egrep -q -w "lxc-create -f ${abs_dirname}/lxc.conf -n ${name}"
 }
 
 ## shunit2

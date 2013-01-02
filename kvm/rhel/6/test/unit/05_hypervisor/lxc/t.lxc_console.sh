@@ -15,13 +15,13 @@
 function setUp() {
   add_option_hypervisor_lxc
 
-  function checkroot() { echo checkroot $*; }
-  function shlog() { echo shlog $*; }
+  function checkroot() { :; }
+  function shlog() { echo $*; }
 }
 
 function test_lxc_console() {
-  lxc_console vmbuilder
-  assertEquals $? 0
+  local name=vmbuilder
+  assertEquals "$(lxc_console ${name})" "lxc-console -n ${name}"
 }
 
 ## shunit2

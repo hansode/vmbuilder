@@ -24,12 +24,7 @@ function tearDown() {
   rm -rf ${chroot_dir}
 }
 
-function test_next_ctid_no_opts() {
-  next_ctid
-  assertEquals $? 0
-}
-
-function test_next_ctid_dir_defined() {
+function test_next_ctid() {
   assertEquals "$(next_ctid ${vz_conf_dir})" 101
 }
 
