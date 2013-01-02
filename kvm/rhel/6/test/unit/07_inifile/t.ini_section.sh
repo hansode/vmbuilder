@@ -13,7 +13,7 @@
 ## functions
 
 function test_ini_section_no_opts() {
-  mycnf | ini_section
+  mycnf | ini_section 2>/dev/null
   assertNotEquals $? 0
 }
 
