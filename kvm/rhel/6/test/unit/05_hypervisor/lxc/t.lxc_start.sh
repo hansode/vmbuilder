@@ -15,12 +15,15 @@
 function setUp() {
   add_option_hypervisor_lxc
 
-  function checkroot() { echo checkroot $*; }
-  function shlog() { echo shlog $*; }
+  function checkroot() { :; }
+  function shlog() { echo $*; }
 }
 
 function test_lxc_start() {
-  lxc_start vmbuilder
+  local name=vmbuilder
+
+  lxc_start ${name} | egrep -q -w "lxc-start -n ${name} -d -l DEBUG -o ${abs_dirname}/lxc.log"
+  assertEquals $? 0
 }
 
 ## shunit2

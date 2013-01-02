@@ -15,12 +15,14 @@
 function setUp() {
   add_option_hypervisor_lxc
 
-  function checkroot() { echo checkroot $*; }
-  function shlog() { echo shlog $*; }
+  function checkroot() { :; }
+  function shlog() { echo $*; }
 }
 
 function test_lxc_stop() {
-  lxc_stop vmbuilder
+  local name=vmbuilder
+
+  lxc_stop ${name} | egrep -q -w "lxc-stop -n ${name}"
   assertEquals $? 0
 }
 

@@ -18,13 +18,13 @@ function setUp() {
 }
 
 function test_kvm_console_no_opts() {
-  kvm_console
-  assertEquals $? 0
+  assertEquals "$(kvm_console)" "telnet 127.0.0.1 5555"
 }
 
 function test_kvm_console_set_bindaddr() {
-  kvm_console 127.0.0.1 5556
-  assertEquals $? 0
+  local host=127.0.0.1 port=5556
+
+  assertEquals "$(kvm_console ${host} ${port})" "telnet ${host} ${port}"
 }
 
 ## shunit2

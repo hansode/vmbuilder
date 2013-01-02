@@ -19,7 +19,7 @@ function setUp() {
 
 function test_kvm_list() {
   # connect to local tcp/22
-  kvm_list
+  kvm_list | grep -q "egrep -v egrep -w"
   assertEquals $? 0
 }
 

@@ -15,12 +15,14 @@
 function setUp() {
   add_option_hypervisor_openvz
 
-  function checkroot() { echo checkroot $*; }
-  function shlog() { echo shlog $*; }
+  function checkroot() { :; }
+  function shlog() { echo $*; }
 }
 
 function test_openvz_status() {
-  openvz_status vmbuilder
+  local name=vmbuilder
+
+  assertEquals "$(openvz_status ${name})" "vzctl status ${name}"
 }
 
 ## shunit2

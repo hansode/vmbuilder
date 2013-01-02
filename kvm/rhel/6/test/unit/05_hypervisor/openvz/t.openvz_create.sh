@@ -26,9 +26,9 @@ function setUp() {
 	VE_PRIVATE=${chroot_dir}/vz/private/\$VEID
 	EOS
 
-  function checkroot() { echo checkroot $*; }
+  function checkroot() { :; }
   function next_ctid() { echo 102; }
-  function shlog() { echo shlog $*; }
+  function shlog() { echo $*; }
 }
 
 function tearDown() {
@@ -36,7 +36,10 @@ function tearDown() {
 }
 
 function test_openvz_create() {
-  openvz_create vmbuilder
+  local name=vmbuilder ctid=$(next_ctid)
+
+  openvz_create ${name} | egrep -q -w "vzctl set ${ctid} --name ${name} --save"
+  openvz_create ${name} | egrep -q -w "vzctl set ${ctid} --cpus 1 --save"
 }
 
 ## shunit2

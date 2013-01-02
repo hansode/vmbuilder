@@ -13,14 +13,14 @@
 ## public functions
 
 function test_build_kvm_opts() {
-  build_kvm_opts
+  build_kvm_opts >/dev/null
   assertEquals $? 0
 }
 
 function test_build_kvm_opts_name() {
   local name=vmbulder
 
-  build_kvm_opts | egrep -- "-name ${name}"
+  build_kvm_opts | egrep -q -w -- "-name ${name}"
   assertEquals $? 0
 }
 

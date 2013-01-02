@@ -23,6 +23,8 @@ function add_option_hypervisor_lxc() {
   vif_num=${vif_num:-1}
   viftab=${viftab:-}
 
+  rootfs_dir=${rootfs_dir:-}
+
   vendor_id=${vendor_id:-52:54:00}
 }
 
@@ -82,7 +84,7 @@ function render_lxc_config() {
 
 function lxc_create() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   local lxc_config_path=$(pwd)/lxc.conf
@@ -92,7 +94,7 @@ function lxc_create() {
 
 function lxc_start() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   shlog lxc-start -n ${name} -d -l DEBUG -o $(pwd)/lxc.log
@@ -100,7 +102,7 @@ function lxc_start() {
 
 function lxc_stop() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   shlog lxc-stop -n ${name}
@@ -108,7 +110,7 @@ function lxc_stop() {
 
 function lxc_destroy() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (hypervisor/kvm:${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   shlog lxc-destroy -n ${name}
@@ -119,7 +121,7 @@ function lxc_info() {
   [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
-  shlog lxc-info --name ${name}
+  shlog lxc-info -n ${name}
 }
 
 function lxc_console() {
@@ -127,5 +129,5 @@ function lxc_console() {
   [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
   checkroot || return 1
 
-  shlog lxc-console --name ${name}
+  shlog lxc-console -n ${name}
 }

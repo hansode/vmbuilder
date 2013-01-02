@@ -25,7 +25,7 @@ function tearDown() {
 }
 
 function test_configure_hypervisor() {
-  configure_hypervisor ${chroot_dir}
+  configure_hypervisor ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 

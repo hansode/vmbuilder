@@ -15,12 +15,13 @@
 function setUp() {
   add_option_hypervisor_lxc
 
-  function checkroot() { echo checkroot $*; }
-  function shlog() { echo shlog $*; }
+  function checkroot() { :; }
+  function shlog() { echo $*; }
 }
 
 function test_lxc_destroy() {
-  lxc_destroy vmbuilder
+  local name=vmbuilder
+  lxc_destroy ${name} | egrep -q -w "lxc-destroy -n ${name}"
 }
 
 ## shunit2

@@ -17,10 +17,7 @@ declare chroot_dir=${abs_dirname}/chroot_dir.$$
 function setUp() {
   mkdir ${chroot_dir}
 
-  function chroot() { echo chroot $*; }
-  function prevent_udev_starting() { echo prevent_udev_starting $*; }
-  function reconfigure_fstab() { echo reconfigure_fstab $*; }
-  function reconfigure_mtab() { echo reconfigure_mtab $*; }
+  function configure_container() { echo configure_container $*; }
 }
 
 function tearDown() {
@@ -28,7 +25,7 @@ function tearDown() {
 }
 
 function test_configure_hypervisor() {
-  configure_hypervisor ${chroot_dir}
+  configure_hypervisor ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 

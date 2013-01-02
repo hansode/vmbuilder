@@ -17,7 +17,7 @@ function setUp() {
 }
 
 function test_render_openvz_config() {
-  render_openvz_config
+  render_openvz_config >/dev/null
   assertEquals $? 0
 }
 
