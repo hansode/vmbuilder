@@ -5,7 +5,7 @@
 #
 # requires:
 #  bash, basename
-#  pwd, dirname, stat, chroot
+#  pwd, stat, chroot
 #  cat, xargs, cut, sed
 #
 # imports:
@@ -50,7 +50,7 @@ function extract_dirname() {
   local filepath=$1
   [[ -a "${filepath}" ]] || { echo "[ERROR] file not found: ${filepath} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
-  cd $(dirname ${filepath}) && pwd
+  cd ${filepath%/*} && pwd
 }
 
 function expand_path() {

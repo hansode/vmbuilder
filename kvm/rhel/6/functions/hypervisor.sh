@@ -44,7 +44,7 @@ function load_hypervisor_driver() {
   local driver_name=$1
   [[ -n "${driver_name}" ]] || { echo "[ERROR] Invalid argument: driver_name:${driver_name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
-  local driver_path=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/hypervisor/${driver_name}.sh
+  local driver_path=$(cd ${BASH_SOURCE[0]%/*} && pwd)/hypervisor/${driver_name}.sh
   [[ -f "${driver_path}" ]] || { echo "[ERROR] no such driver: ${driver_path} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   . ${driver_path}

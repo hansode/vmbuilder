@@ -2,12 +2,12 @@
 #
 # requires:
 #  bash
-#  dirname, pwd
+#  pwd
 #
 
 ## include files
 
-. $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
+. $(cd ${BASH_SOURCE[0]%/*} && pwd)/helper_shunit2.sh
 
 ## variables
 
