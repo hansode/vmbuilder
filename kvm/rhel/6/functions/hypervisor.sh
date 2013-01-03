@@ -4,7 +4,7 @@
 #  Hypervisor
 #
 # requires:
-#  bash, basename
+#  bash
 #  pwd, date
 #  mount, umount
 #  mkdir, rmdir
@@ -34,7 +34,7 @@ function add_option_hypervisor() {
     load_hypervisor_driver ${hypervisor}
     ;;
   *)
-    echo "[ERROR] no mutch hypervisor ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
+    echo "[ERROR] no mutch hypervisor (${BASH_SOURCE[0]##*/}:${LINENO})" >&2
     return 1
     ;;
   esac
@@ -42,10 +42,10 @@ function add_option_hypervisor() {
 
 function load_hypervisor_driver() {
   local driver_name=$1
-  [[ -n "${driver_name}" ]] || { echo "[ERROR] Invalid argument: driver_name:${driver_name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${driver_name}" ]] || { echo "[ERROR] Invalid argument: driver_name:${driver_name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   local driver_path=$(cd ${BASH_SOURCE[0]%/*} && pwd)/hypervisor/${driver_name}.sh
-  [[ -f "${driver_path}" ]] || { echo "[ERROR] no such driver: ${driver_path} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -f "${driver_path}" ]] || { echo "[ERROR] no such driver: ${driver_path} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   . ${driver_path}
   add_option_hypervisor_${driver_name}
@@ -59,8 +59,8 @@ function preflight_check_hypervisor() {
 
 function mount_ptab_root() {
   local disk_filename=$1 chroot_dir=$2
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   xptabproc <<'EOS'
@@ -76,8 +76,8 @@ EOS
 
 function mount_ptab_nonroot() {
   local disk_filename=$1 chroot_dir=$2
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   xptabproc <<'EOS'
@@ -95,8 +95,8 @@ EOS
 
 function mount_ptab() {
   local disk_filename=$1 chroot_dir=$2
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   mount_ptab_root    ${disk_filename} ${chroot_dir}
@@ -105,7 +105,7 @@ function mount_ptab() {
 
 function umount_ptab() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   umount_nonroot ${chroot_dir}
@@ -121,8 +121,8 @@ function sync_os() {
   # **The argument order is depending on rsync**
   #
   local distro_dir=$1 chroot_dir=$2
-  [[ -d "${distro_dir}" ]] || { echo "[ERROR] no such directory: ${distro_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] no such directory: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -d "${distro_dir}" ]] || { echo "[ERROR] no such directory: ${distro_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] no such directory: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   rsync -aHA ${distro_dir}/ ${chroot_dir}
@@ -131,7 +131,7 @@ function sync_os() {
 
 function configure_hypervisor() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] no such directory: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] no such directory: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   # should be implemented in hypervisor-specific function file.
   :
@@ -139,19 +139,19 @@ function configure_hypervisor() {
 
 function install_os() {
   local chroot_dir=$1 distro_dir=$2 disk_filename=$3
-  [[ -d "${chroot_dir}"    ]] && { echo "[ERROR] already exists: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-  [[ -d "${distro_dir}"    ]] || { echo "[ERROR] no such directory: ${distro_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}"    ]] && { echo "[ERROR] already exists: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -d "${distro_dir}"    ]] || { echo "[ERROR] no such directory: ${distro_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   local needs_bootloader=1
   [[ -z "${diskless}" ]] && {
     # needs disk
-    [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+    [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   } || {
     # diskless
     printf "[INFO] Diskless mode\n"
     needs_bootloader=
   }
   # install_kernel depends on distro_name.
-  [[ -n "${distro_name}"   ]] || { echo "[ERROR] Invalid argument: distro_name:${distro_name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${distro_name}"   ]] || { echo "[ERROR] Invalid argument: distro_name:${distro_name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   mkdir -p ${chroot_dir}

@@ -32,12 +32,12 @@ function register_options() {
 
 function nonroot_mounter() {
   local cmd=$1
-  [[ -n "${cmd}" ]] || { echo "[ERROR] Invalid argument: cmd:${cmd} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${cmd}" ]] || { echo "[ERROR] Invalid argument: cmd:${cmd} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   case "${cmd}" in
   mount|umount)
-    [[ -d "${mntpnt_path}" ]] || { echo "[ERROR] no such directory: ${mntpnt_path} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+    [[ -d "${mntpnt_path}" ]] || { echo "[ERROR] no such directory: ${mntpnt_path} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
     case "${cmd}" in
     mount)
@@ -55,7 +55,7 @@ function nonroot_mounter() {
     mount | egrep ${mntpnt_path}
     ;;
   *)
-    echo "[ERROR] no such command: ${cmd} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
+    echo "[ERROR] no such command: ${cmd} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2
     return 1
     ;;
   esac

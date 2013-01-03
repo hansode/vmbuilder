@@ -4,7 +4,7 @@
 #  Virtual disk management
 #
 # requires:
-#  bash, basename
+#  bash
 #  truncate, rm
 #  mkdir, mknod, mount, umount
 #  cat, egrep, awk
@@ -46,7 +46,7 @@ function add_option_disk() {
 function is_dev() {
   local disk_filename=$1
   # do not use "-a" in this case.
-  [[ -n "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   case "${disk_filename}" in
   /dev/*) return 0 ;;
@@ -57,7 +57,7 @@ function is_dev() {
 function is_dmdev() {
   local disk_filename=$1
   # do not use "-a" in this case.
-  [[ -n "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   disk_filename=$(extract_path ${disk_filename})
 
@@ -69,13 +69,13 @@ function is_dmdev() {
 
 function inodeof() {
   local filepath=$1
-  [[ -a "${filepath}" ]] || { echo "[ERROR] file not found: ${filepath} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${filepath}" ]] || { echo "[ERROR] file not found: ${filepath} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   stat --format=%i ${filepath}
 }
 
 function get_suffix() {
-  [[ -n "${1}" ]] || { echo "[ERROR] Invalid argument: empty ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${1}" ]] || { echo "[ERROR] Invalid argument: empty (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   echo ${1##*.}
 }
@@ -87,8 +87,8 @@ function mkdisk() {
   # Creates the disk image (if it doesn't already exist).
   #
   local disk_filename=$1 size=${2:-0} unit=${3:-m}
-  [[ -a "${disk_filename}" ]] && { echo "[ERROR] already exists: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-  [[ "${size}" -gt 0 ]] || { echo "[ERROR] Invalid argument: size:${size} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] && { echo "[ERROR] already exists: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ "${size}" -gt 0 ]] || { echo "[ERROR] Invalid argument: size:${size} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   truncate -s ${size}${unit} ${disk_filename}
 }
@@ -97,7 +97,7 @@ function mkdisk() {
 
 function mkdevice() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   while read name mode; do
@@ -136,14 +136,14 @@ function mkdevice() {
 
 function mkprocdir() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   mkdir ${chroot_dir}/proc
 }
 
 function mount_proc() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   printf "[DEBUG] Mounting %s\n" ${chroot_dir}/proc
@@ -152,7 +152,7 @@ function mount_proc() {
 
 function mount_sys() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   printf "[DEBUG] Mounting %s\n" ${chroot_dir}/sys
@@ -161,7 +161,7 @@ function mount_sys() {
 
 function mount_dev() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   printf "[DEBUG] Mounting %s\n" ${chroot_dir}/dev
@@ -170,7 +170,7 @@ function mount_dev() {
 
 function umount_root() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   printf "[DEBUG] Unmounting %s\n" ${chroot_dir}
@@ -179,7 +179,7 @@ function umount_root() {
 
 function umount_nonroot() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   local mountpoint=
@@ -229,11 +229,11 @@ function mkpart() {
   #
   # fstype: should allow empty for extended parttype
   local disk_filename=$1 parttype=${2:-primary} offset=${3:-0} size=${4:-0} fstype=${5:-}
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   #
   # size == -1 or size > 0. "-1" means whole disk
   #
-  [[ ("${size}" == -1) || ("${size}" -gt 0) ]] || { echo "[ERROR] Invalid argument: size:${size} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ ("${size}" == -1) || ("${size}" -gt 0) ]] || { echo "[ERROR] Invalid argument: size:${size} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   case "${parttype}" in
@@ -244,7 +244,7 @@ function mkpart() {
   extended)
     ;;
   *)
-    echo "[ERROR] Invalid parttype: ${parttype} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
+    echo "[ERROR] Invalid parttype: ${parttype} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2
     return 1
     ;;
   esac
@@ -259,7 +259,7 @@ function mkpart() {
     # for extended parttype
     ;;
   *)
-    echo "[ERROR] Invalid fstype: ${fstype} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
+    echo "[ERROR] Invalid fstype: ${fstype} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2
     return 1
     ;;
   esac
@@ -291,7 +291,7 @@ function mkpart() {
     primary)
       ;;
     *)
-      echo "[ERROR] Invalid parttype: ${parttype} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
+      echo "[ERROR] Invalid parttype: ${parttype} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2
       return 1
       ;;
     esac
@@ -327,7 +327,7 @@ function mkptab() {
   # Should only be called once and only after you've added all partitions.
   #
   local disk_filename=$1
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   printf "[INFO] Adding partition table to disk image: %s\n" ${disk_filename}
   parted --script ${disk_filename} mklabel msdos
@@ -373,7 +373,7 @@ EOS
 
 function is_mapped() {
   local disk_filename=$1 opts=${2:-}
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   local inode=$(inodeof ${disk_filename})
@@ -393,7 +393,7 @@ function mapptab() {
   # Call this after L{partition}.
   #
   local disk_filename=$1
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   # # kpartx -va ${disk_filename}
@@ -409,7 +409,7 @@ function mapptab() {
 
   # already mapped?
   is_mapped ${disk_filename} -q && {
-    echo "[WARN] already mapped: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})"
+    echo "[WARN] already mapped: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})"
     return 2
   } || :
 
@@ -426,12 +426,12 @@ function unmapptab() {
   # Unsets L{Partition}s' and L{Filesystem}s' filename attribute
   #
   local disk_filename=$1
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   # *** don't save 'lsdevmap_output' at this line ***
   [[ -n "$(lsdevmap ${disk_filename})" ]] || {
-    echo "[WARN] not mapped: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})"
+    echo "[WARN] not mapped: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})"
     return 2
   }
 
@@ -456,7 +456,7 @@ function unmapptab() {
 
   local lsdevmap_output="$(lsdevmap ${disk_filename})"
   [[ -n "${lsdevmap_output}" ]] || return 0
-  echo "[WARN] still mapped: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})"
+  echo "[WARN] still mapped: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})"
 
   while read parted_oldmap; do
     # '2>/dev/null' means if device does not exist,
@@ -488,7 +488,7 @@ function unmapptab() {
 
 function mapped_lodev() {
   local disk_filename=$1
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   # /dev/loopXX mapped ?
@@ -500,7 +500,7 @@ function mapped_lodev() {
 
 function lsdevmap() {
   local disk_filename=$1
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   is_dev ${disk_filename} && {
@@ -559,8 +559,8 @@ function devmap2lodev() {
 
 function devname2index() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-  xptabinfo | cat -n | egrep -w "${name}" -q || { echo "[ERROR] no mutch keyword: ${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >& 2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  xptabinfo | cat -n | egrep -w "${name}" -q || { echo "[ERROR] no mutch keyword: ${name} (${BASH_SOURCE[0]##*/}:${LINENO})" >& 2; return 1; }
 
   local part_index=$(xptabinfo | cat -n | egrep -w "${name}" | awk '{print $1}')
   case "${part_index}" in
@@ -581,8 +581,8 @@ function devname2index() {
 
 function mntpnt2path() {
   local disk_filename=$1 mountpoint=$2
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-  [[ -n "${mountpoint}"    ]] || { echo "[ERROR] Invalid argument: mountpoint:${mountpoint} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${mountpoint}"    ]] || { echo "[ERROR] Invalid argument: mountpoint:${mountpoint} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   # 1# # lsdevmap ${disk_filename}
   # loop0p1
@@ -602,8 +602,8 @@ function mntpnt2path() {
 
 function mntpntuuid() {
   local disk_filename=$1 mountpoint=$2
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-  [[ -n "${mountpoint}"    ]] || { echo "[ERROR] Invalid argument: mountpoint:${mountpoint} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${mountpoint}"    ]] || { echo "[ERROR] Invalid argument: mountpoint:${mountpoint} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   local part_filename=$(mntpnt2path ${disk_filename} ${mountpoint})
@@ -615,8 +615,8 @@ function mkfsdisk() {
   # Creates the partitions' filesystems
   #
   local disk_filename=$1 default_filesystem=$2
-  [[ -a "${disk_filename}"      ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-  [[ -n "${default_filesystem}" ]] || { echo "[ERROR] Invalid argument: default_filesystem:${default_filesystem} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}"      ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${default_filesystem}" ]] || { echo "[ERROR] Invalid argument: default_filesystem:${default_filesystem} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   max_mount_count=${max_mount_count:-37}
@@ -651,7 +651,7 @@ EOS
 
 function mkfs_fstype() {
   local fstype=$1
-  [[ -n "${fstype}" ]] || { echo "[ERROR] Invalid argument: fstype:${fstype} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${fstype}" ]] || { echo "[ERROR] Invalid argument: fstype:${fstype} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   case "${fstype}" in
   ext3)
@@ -661,7 +661,7 @@ function mkfs_fstype() {
     echo mkfs.ext4 -F -E lazy_itable_init=1
     ;;
   *)
-    echo "[ERROR] Invalid fstype: ${fsype} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
+    echo "[ERROR] Invalid fstype: ${fsype} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2
     return 1
     ;;
   esac
@@ -679,7 +679,7 @@ function convert_disk() {
   # Convert the disk image
   #
   local disk_filename=$1 dest_dir=${2:-$(pwd)} dest_format=${3:-vdi}
-  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   # build dest_filename
   local base_filename=${disk_filename##*/}
@@ -705,6 +705,6 @@ function qemu_img_path() {
     [[ -x "${exe}" ]] && command_path=${exe} || :
   done
 
-  [[ -n "${command_path}" ]] || { echo "[ERROR] command not found: ${execs} ($(basename ${BASH_SOURCE[0]}):${LINENO})." >&2; return 1; }
+  [[ -n "${command_path}" ]] || { echo "[ERROR] command not found: ${execs} (${BASH_SOURCE[0]##*/}:${LINENO})." >&2; return 1; }
   echo ${command_path}
 }

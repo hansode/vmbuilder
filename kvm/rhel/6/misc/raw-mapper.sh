@@ -30,7 +30,7 @@ function register_options() {
 
 function raw_mapper() {
   local cmd=$1
-  [[ -n "${cmd}" ]] || { echo "[ERROR] Invalid argument: cmd:${cmd} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${cmd}" ]] || { echo "[ERROR] Invalid argument: cmd:${cmd} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   case "${cmd}" in
@@ -41,12 +41,12 @@ function raw_mapper() {
     is_mapped ${image_path} && {
       lsdevmap ${image_path}
     } || {
-      echo "[WARN] file not mapped: ${image_path} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
+      echo "[WARN] file not mapped: ${image_path} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2
       return 2
     }
     ;;
   *)
-    echo "[ERROR] no such command: ${cmd} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
+    echo "[ERROR] no such command: ${cmd} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2
     return 1
     ;;
   esac

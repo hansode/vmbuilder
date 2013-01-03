@@ -4,7 +4,7 @@
 #  Hypervisor kvm
 #
 # requires:
-#  bash, basename
+#  bash
 #  /usr/libexec/qemu-kvm, /usr/bin/kvm
 #  cat, ip, brctl, telnet, ps, egrep
 #  xargs, cut
@@ -43,7 +43,7 @@ function add_option_hypervisor_kvm() {
 
 function configure_hypervisor() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] no such directory: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] no such directory: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   echo "[INFO] ***** Configuring kvm-specific *****"
   configure_acpiphp ${chroot_dir}
@@ -59,7 +59,7 @@ function qemu_kvm_path() {
     [[ -x "${exe}" ]] && command_path=${exe} || :
   done
 
-  [[ -n "${command_path}" ]] || { echo "[ERROR] command not found: ${execs} ($(basename ${BASH_SOURCE[0]}):${LINENO})." >&2; return 1; }
+  [[ -n "${command_path}" ]] || { echo "[ERROR] command not found: ${execs} (${BASH_SOURCE[0]##*/}:${LINENO})." >&2; return 1; }
   echo ${command_path}
 }
 
@@ -125,7 +125,7 @@ EOS
 
 function render_kvm_runscript() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   cat <<-EOS
 	#!/bin/sh -e
@@ -169,7 +169,7 @@ function render_kvm_runscript() {
 
 function kvm_start() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   shlog ${kvm_path} $(build_kvm_opts)
@@ -178,8 +178,8 @@ function kvm_start() {
 
 function kvm_stop() {
   local monitor_addr=${1:-127.0.0.1} monitor_port=${2:-4444}
-  [[ -n "${monitor_addr}" ]] || { echo "[ERROR] Invalid argument: monitor_addr:${monitor_addr} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-  [[ -n "${monitor_port}" ]] || { echo "[ERROR] Invalid argument: monitor_port:${monitor_port} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${monitor_addr}" ]] || { echo "[ERROR] Invalid argument: monitor_addr:${monitor_addr} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${monitor_port}" ]] || { echo "[ERROR] Invalid argument: monitor_port:${monitor_port} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   exec 5<>/dev/tcp/${monitor_addr}/${monitor_port}
   echo quit >&5
@@ -189,8 +189,8 @@ function kvm_stop() {
 
 function kvm_console() {
   local serial_addr=${1:-127.0.0.1} serial_port=${2:-5555}
-  [[ -n "${serial_addr}" ]] || { echo "[ERROR] Invalid argument: serial_addr:${serial_addr} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-  [[ -n "${serial_port}" ]] || { echo "[ERROR] Invalid argument: serial_port:${serial_port} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${serial_addr}" ]] || { echo "[ERROR] Invalid argument: serial_addr:${serial_addr} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${serial_port}" ]] || { echo "[ERROR] Invalid argument: serial_port:${serial_port} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   telnet ${serial_addr} ${serial_port}
 }
@@ -202,14 +202,14 @@ function kvm_list() {
 
 function kvmof() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   kvm_list | egrep -w -- "-name ${name}"
 }
 
 function kvm_info() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   kvmof ${name} | beautify_process_args

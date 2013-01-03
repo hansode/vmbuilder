@@ -35,7 +35,7 @@ function register_options() {
 
 function controll_lxc() {
   local cmd=$1
-  [[ -n "${cmd}" ]] || { echo "[ERROR] Invalid argument: cmd:${cmd} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${cmd}" ]] || { echo "[ERROR] Invalid argument: cmd:${cmd} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   case "${cmd}" in
   build)
@@ -46,7 +46,7 @@ function controll_lxc() {
     lxc_${cmd} ${name}
     ;;
   *)
-    echo "[ERROR] no such command: ${cmd} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
+    echo "[ERROR] no such command: ${cmd} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2
     return 2
   ;;
   esac

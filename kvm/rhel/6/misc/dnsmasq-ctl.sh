@@ -35,12 +35,12 @@ function register_options() {
 
 function controll_dnsmasq() {
   local cmd=$1
-  [[ -n "${cmd}" ]] || { echo "[ERROR] Invalid argument: cmd:${cmd} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${cmd}" ]] || { echo "[ERROR] Invalid argument: cmd:${cmd} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   case "${cmd}" in
   start)
-    [[ -f "${pid_file}" ]] && { echo "[ERROR] pid file exists: ${pid_file} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+    [[ -f "${pid_file}" ]] && { echo "[ERROR] pid file exists: ${pid_file} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
     /usr/sbin/dnsmasq \
      --strict-order \
@@ -55,24 +55,24 @@ function controll_dnsmasq() {
      --dhcp-no-override
     ;;
   stop)
-    [[ -f "${pid_file}" ]] || { echo "[ERROR] file not found: ${pid_file} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+    [[ -f "${pid_file}" ]] || { echo "[ERROR] file not found: ${pid_file} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
     local pid=$(cat ${pid_file})
-    [[ -n "${pid}" ]] || { echo "[ERROR] pid not found: ${pid} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+    [[ -n "${pid}" ]] || { echo "[ERROR] pid not found: ${pid} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
     kill  ${pid}
     rm -f ${pid_file}
     ;;
   status)
-    [[ -f "${pid_file}" ]] || { echo "[ERROR] file not found: ${pid_file} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+    [[ -f "${pid_file}" ]] || { echo "[ERROR] file not found: ${pid_file} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
     local pid=$(cat ${pid_file})
-    [[ -n "${pid}" ]] || { echo "[ERROR] pid not found: ${pid} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
-    [[ -f "${dhcp_leasefile}" ]] || { echo "[WARN] file not found: ${dhcp_leasefile} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 0; }
+    [[ -n "${pid}" ]] || { echo "[ERROR] pid not found: ${pid} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+    [[ -f "${dhcp_leasefile}" ]] || { echo "[WARN] file not found: ${dhcp_leasefile} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 0; }
 
     ps -ef | awk "\$2 == ${pid}"
     cat ${dhcp_leasefile}
     ;;
   *)
-    echo "[ERROR] no such command: ${cmd} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2
+    echo "[ERROR] no such command: ${cmd} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2
     return 2
   ;;
   esac

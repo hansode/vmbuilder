@@ -4,7 +4,7 @@
 #  Hypervisor lxc
 #
 # requires:
-#  bash, basename,
+#  bash,
 #  cat
 #
 # imports:
@@ -30,7 +30,7 @@ function add_option_hypervisor_lxc() {
 
 function configure_hypervisor() {
   local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] no such directory: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] no such directory: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   echo "[INFO] ***** Configuring lxc-specific *****"
   configure_container ${chroot_dir}
@@ -84,7 +84,7 @@ function render_lxc_config() {
 
 function lxc_create() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   local lxc_config_path=$(pwd)/lxc.conf
@@ -94,7 +94,7 @@ function lxc_create() {
 
 function lxc_start() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   shlog lxc-start -n ${name} -d -l DEBUG -o $(pwd)/lxc.log
@@ -102,7 +102,7 @@ function lxc_start() {
 
 function lxc_stop() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   shlog lxc-stop -n ${name}
@@ -110,7 +110,7 @@ function lxc_stop() {
 
 function lxc_destroy() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   shlog lxc-destroy -n ${name}
@@ -118,7 +118,7 @@ function lxc_destroy() {
 
 function lxc_info() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   shlog lxc-info -n ${name}
@@ -126,7 +126,7 @@ function lxc_info() {
 
 function lxc_console() {
   local name=$1
-  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   shlog lxc-console -n ${name}
