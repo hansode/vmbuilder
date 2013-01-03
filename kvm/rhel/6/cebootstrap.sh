@@ -5,7 +5,7 @@
 #
 # requires:
 #  bash
-#  dirname, pwd
+#  pwd
 #
 # import:
 #   distro: build_chroot
@@ -38,7 +38,7 @@ export LC_ALL=C
 
 ### read-only variables
 
-readonly abs_dirname=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
+readonly abs_dirname=$(cd ${BASH_SOURCE[0]%/*} && pwd)
 
 ### include files
 

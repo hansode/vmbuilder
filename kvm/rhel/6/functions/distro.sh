@@ -92,7 +92,7 @@ function load_distro_driver() {
   local driver_name=$1
   [[ -n "${driver_name}" ]] || { echo "[ERROR] Invalid argument: driver_name:${driver_name} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
-  local distro_driver_path=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/distro/${driver_name}.sh
+  local distro_driver_path=$(cd ${BASH_SOURCE[0]%/*} && pwd)/distro/${driver_name}.sh
   [[ -f "${distro_driver_path}" ]] || { echo "[ERROR] no such distro driver: ${distro_driver_path} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
 
   . ${distro_driver_path}
@@ -1283,7 +1283,7 @@ function run_copy() {
   while read line; do
     set ${line}
     [[ $# == 2 ]] || continue
-    local destdir=${chroot_dir}$(dirname ${2})
+    local destdir=${chroot_dir}${2%/*}
     [[ -d "${destdir}" ]] || mkdir -p ${destdir}
     rsync -aHA ${1} ${chroot_dir}${2} || :
   done < <(egrep -v '^$' ${copy})

@@ -5,7 +5,7 @@
 #
 # requires:
 #  bash
-#  dirname, pwd
+#  pwd
 #  sed, head
 #  cat
 #  dnsmasq, ps, rm
@@ -80,7 +80,7 @@ function controll_dnsmasq() {
 
 ### read-only variables
 
-readonly abs_dirname=$(cd $(dirname ${BASH_SOURCE[0]}) && pwd)
+readonly abs_dirname=$(cd ${BASH_SOURCE[0]%/*} && pwd)
 
 ### include files
 

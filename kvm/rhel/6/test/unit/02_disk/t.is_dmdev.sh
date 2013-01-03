@@ -2,18 +2,20 @@
 #
 # requires:
 #  bash
-#  cd, dirname
+#  cd
 #
 
 ## include files
 
-. $(cd $(dirname ${BASH_SOURCE[0]}) && pwd)/helper_shunit2.sh
+. $(cd ${BASH_SOURCE[0]%/*} && pwd)/helper_shunit2.sh
 
 ## functions
 
 function test_is_dmdev_device() {
-  is_dmdev /dev/dm-0
-  assertEquals "$?" "0"
+  [[ -b /dev/dm-0 ]] && {
+    is_dmdev /dev/dm-0
+    assertEquals "$?" "0"
+  } || :
 }
 
 function test_is_dmdev_text() {
