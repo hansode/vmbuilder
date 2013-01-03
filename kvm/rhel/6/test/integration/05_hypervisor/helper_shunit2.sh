@@ -25,7 +25,7 @@ declare rootsize=800
 declare swapsize=0
 declare optsize=0
 
-declare hypervisor=kvm
+declare hypervisor=null
 
 declare distro_dir=${abs_dirname}/_distro_dir
 declare distro_name=centos
