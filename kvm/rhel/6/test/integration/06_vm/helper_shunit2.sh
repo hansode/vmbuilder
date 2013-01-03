@@ -24,7 +24,7 @@ declare chroot_dir=${abs_dirname}/_chroot.$$
 declare disk_filename=${abs_dirname}/_disk.$$.raw
 declare distro_name=centos
 declare distro_ver=6
-declare hypervisor=kvm
+declare hypervisor=null
 
 ## for create_vm
 

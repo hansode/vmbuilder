@@ -10,14 +10,38 @@
 
 ## variables
 
-declare hypervisor=kvm
+declare hypervisor=
 
 ## public functions
 
 ### hypervisor
 
+function test_add_option_hypervisor_hypervisor_null() {
+  local hypervisor=null
+  local old_hypervisor=${hypervisor}
+
+  add_option_hypervisor >/dev/null
+  assertEquals "${old_hypervisor}" "${hypervisor}"
+}
+
 function test_add_option_hypervisor_hypervisor_kvm() {
   local hypervisor=kvm
+  local old_hypervisor=${hypervisor}
+
+  add_option_hypervisor >/dev/null
+  assertEquals "${old_hypervisor}" "${hypervisor}"
+}
+
+function test_add_option_hypervisor_hypervisor_lxc() {
+  local hypervisor=lxc
+  local old_hypervisor=${hypervisor}
+
+  add_option_hypervisor >/dev/null
+  assertEquals "${old_hypervisor}" "${hypervisor}"
+}
+
+function test_add_option_hypervisor_hypervisor_openvz() {
+  local hypervisor=openvz
   local old_hypervisor=${hypervisor}
 
   add_option_hypervisor >/dev/null
