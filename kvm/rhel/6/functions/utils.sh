@@ -4,7 +4,7 @@
 #  Various utility functions
 #
 # requires:
-#  bash, basename
+#  bash, basename, dirname
 #  pwd, stat, chroot
 #  cat, xargs, cut, sed
 #
@@ -48,21 +48,22 @@ function extract_args() {
 
 function extract_dirname() {
   local filepath=$1
-  [[ -a "${filepath}" ]] || { echo "[ERROR] file not found: ${filepath} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${filepath}" ]] || { echo "[ERROR] file not found: ${filepath} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
-  cd ${filepath%/*} && pwd
+ #cd ${filepath%/*} && pwd
+  cd $(dirname ${filepath}) && pwd
 }
 
 function expand_path() {
   local filepath=$1
-  [[ -a "${filepath}" ]] || { echo "[ERROR] file not found: ${filepath} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${filepath}" ]] || { echo "[ERROR] file not found: ${filepath} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   echo $(extract_dirname ${filepath})/$(basename ${filepath})
 }
 
 function extract_path() {
   local filepath=$1
-  [[ -a "${filepath}" ]] || { echo "[ERROR] file not found: ${filepath} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${filepath}" ]] || { echo "[ERROR] file not found: ${filepath} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   local tmp_path=${filepath}
   local tmp_dirname=$(extract_dirname ${filepath})
@@ -84,7 +85,7 @@ function extract_path() {
 
 function run_in_target() {
   local chroot_dir=$1; shift; local args="$*"
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   chroot ${chroot_dir} bash -e -c "${args}"
 }
@@ -101,7 +102,7 @@ function checkroot() {
 
 function load_config() {
   local config_path=$1
-  [[ -a "${config_path}" ]] || { echo "[ERROR] file not found: ${config_path} ($(basename ${BASH_SOURCE[0]}):${LINENO})" >&2; return 1; }
+  [[ -a "${config_path}" ]] || { echo "[ERROR] file not found: ${config_path} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   . ${config_path}
 }
