@@ -290,9 +290,13 @@ function repofile() {
   [[ -n "${baseurl}"  ]] || { echo "[ERROR] Invalid argument: baseurl:${baseurl} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   [[ -n "${gpgkey}"   ]] || { echo "[ERROR] Invalid argument: gpgkey:${gpgkey} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
+  local cachedir=/var/cache/yum
+  [[ -z "${basearch}"   ]] || cachedir=${cachedir}/${basearch}
+  [[ -z "${distro_ver}" ]] || cachedir=${cachedir}/$(get_distro_major_ver ${distro_ver})
+
   cat <<-EOS
 	[main]
-	cachedir=/var/cache/yum
+	cachedir=${cachedir}
 	keepcache=1
 	debuglevel=2
 	logfile=/var/log/yum.log
