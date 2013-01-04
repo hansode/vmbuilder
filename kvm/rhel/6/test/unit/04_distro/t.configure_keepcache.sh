@@ -21,31 +21,8 @@ function tearDown() {
   rm -rf ${chroot_dir}
 }
 
-function test_configure_keepcache_empty() {
-  local keepcache=
-
-  configure_keepcache ${chroot_dir} | egrep -q -w ^keepcache=0
-  assertEquals $? 0
-}
-
-function test_configure_keepcache_0() {
-  local keepcache=0
-
-  configure_keepcache ${chroot_dir} | egrep -q -w ^keepcache=0
-  assertEquals $? 0
-}
-
-function test_configure_keepcache_1() {
-  local keepcache=1
-
+function test_configure_keepcache() {
   configure_keepcache ${chroot_dir} | egrep -q -w ^keepcache=1
-  assertEquals $? 0
-}
-
-function test_configure_keepcache_2() {
-  local keepcache=2
-
-  configure_keepcache ${chroot_dir} | egrep -q -w ^keepcache=0
   assertEquals $? 0
 }
 

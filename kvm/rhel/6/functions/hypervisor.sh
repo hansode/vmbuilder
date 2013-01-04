@@ -19,7 +19,7 @@
 #  distro: add_option_distro, preflight_check_distro, install_kernel, install_bootloader, install_epel, install_addedpkgs, mount_proc
 #          create_initial_user, install_authorized_keys
 #          mount_dev, mount_sys, configure_networking, configure_mounting, configure_keepcache, configure_console
-#          run_copy, run_execscript, install_firstboot, install_firstlogin
+#          run_copy, run_execscript, install_firstboot, install_firstlogin, clean_packages
 #
 
 ## depending on global variables
@@ -195,6 +195,7 @@ function install_os() {
 
   install_epel         ${chroot_dir}
   install_addedpkgs    ${chroot_dir}
+  clean_packages       ${chroot_dir}
   run_copy             ${chroot_dir} ${copy}
   run_execscript       ${chroot_dir} ${execscript}
   install_firstboot    ${chroot_dir} ${firstboot}

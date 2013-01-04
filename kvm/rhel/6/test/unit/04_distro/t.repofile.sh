@@ -50,26 +50,6 @@ function test_repofile_required_reponame_baseurl_gpgkey() {
   assertEquals $? 0
 }
 
-### optional options
-
-function test_repofile_optonal_keepcache_empty() {
-  add_option_distro
-  local reponame=${distro_name}
-  local keepcache=
-
-  repofile ${reponame} "${baseurl}" "${gpgkey}" | egrep -q ^keepcache=1
-  assertEquals $? 0
-}
-
-function test_repofile_optonal_keepcache_exists() {
-  add_option_distro
-  local reponame=${distro_name}
-  local keepcache=1
-
-  repofile ${reponame} "${baseurl}" "${gpgkey}" | egrep -q ^keepcache=${keepcache}
-  assertEquals $? 0
-}
-
 ## shunit2
 
 . ${shunit2_file}
