@@ -324,7 +324,7 @@ function run_yum() {
   # install_kernel depends on distro_name.
   [[ -n "${distro_name}" ]] || { echo "[ERROR] Invalid argument: distro_name:${distro_name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
-  local reponame=${distro_name}
+  local reponame=${yumrepo:-${distro_name}}
   local tmpdir=${chroot_dir}/tmp
   local repofile=${tmpdir}/yum-${reponame}.repo
 

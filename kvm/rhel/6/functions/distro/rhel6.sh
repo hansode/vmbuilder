@@ -13,6 +13,10 @@
 function add_option_distro_rhel6() {
   load_distro_driver rhel5
 
+  case ${distro_ver} in
+  6) distro_ver=6.3 ;;
+  esac
+
   preferred_filesystem=ext4
   preferred_initrd=initramfs
 }
