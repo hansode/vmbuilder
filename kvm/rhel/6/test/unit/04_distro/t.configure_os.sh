@@ -20,8 +20,7 @@ function setUp() {
   function checkroot() { :; }
   function mount() { echo mount $*; }
   function prevent_daemons_starting() { echo prevent_daemons_starting $*; }
- #function create_initial_user() { echo create_initial_user $*; }
-  function set_timezone() { echo set_timezone $*; }
+  function configure_keepcache() { echo configure_keepcache $*; }
   function install_extras() { echo install_extras $*; }
 }
 
