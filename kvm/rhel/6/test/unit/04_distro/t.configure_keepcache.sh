@@ -22,22 +22,30 @@ function tearDown() {
 }
 
 function test_configure_keepcache_empty() {
+  local keepcache=
+
   configure_keepcache ${chroot_dir} | egrep -q -w ^keepcache=0
   assertEquals $? 0
 }
 
 function test_configure_keepcache_0() {
-  configure_keepcache ${chroot_dir} 0 | egrep -q -w ^keepcache=0
+  local keepcache=0
+
+  configure_keepcache ${chroot_dir} | egrep -q -w ^keepcache=0
   assertEquals $? 0
 }
 
 function test_configure_keepcache_1() {
-  configure_keepcache ${chroot_dir} 1 | egrep -q -w ^keepcache=1
+  local keepcache=1
+
+  configure_keepcache ${chroot_dir} | egrep -q -w ^keepcache=1
   assertEquals $? 0
 }
 
 function test_configure_keepcache_2() {
-  configure_keepcache ${chroot_dir} 2 | egrep -q -w ^keepcache=0
+  local keepcache=2
+
+  configure_keepcache ${chroot_dir} | egrep -q -w ^keepcache=0
   assertEquals $? 0
 }
 

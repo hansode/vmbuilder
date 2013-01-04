@@ -245,7 +245,7 @@ function configure_os() {
   prevent_daemons_starting ${chroot_dir}
   # moved to hypervisor in order to use cached distro dir
  #create_initial_user      ${chroot_dir}
-  set_timezone             ${chroot_dir}
+  configure_keepcache      ${chroot_dir}
 
   install_extras           ${chroot_dir}
   umount_nonroot           ${chroot_dir}
@@ -286,7 +286,7 @@ function configure_openvz() {
 ## yum
 
 function repofile() {
-  local reponame=$1 baseurl="$2" gpgkey="$3" keepcache=${4:-0}
+  local reponame=$1 baseurl="$2" gpgkey="$3"
   [[ -n "${reponame}" ]] || { echo "[ERROR] Invalid argument: reponame:${reponame} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   [[ -n "${baseurl}"  ]] || { echo "[ERROR] Invalid argument: baseurl:${baseurl} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   [[ -n "${gpgkey}"   ]] || { echo "[ERROR] Invalid argument: gpgkey:${gpgkey} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
@@ -294,7 +294,7 @@ function repofile() {
   cat <<-EOS
 	[main]
 	cachedir=/var/cache/yum
-	keepcache=${keepcache}
+	keepcache=${keepcache:-1}
 	debuglevel=2
 	logfile=/var/log/yum.log
 	exactarch=1
@@ -326,7 +326,7 @@ function run_yum() {
   local repofile=${tmpdir}/yum-${reponame}.repo
 
   [[ -d "${tmpdir}" ]] || mkdir ${tmpdir}
-  repofile ${reponame} "${baseurl}" "${gpgkey}" ${keepcache:-0} > ${repofile}
+  repofile ${reponame} "${baseurl}" "${gpgkey}" > ${repofile}
 
   yum \
    -c ${repofile} \
@@ -340,7 +340,7 @@ function run_yum() {
 }
 
 function configure_keepcache() {
-  local chroot_dir=$1 keepcache=${2:-0}
+  local chroot_dir=$1
   [[ -a "${chroot_dir}/etc/yum.conf" ]] || { echo "[ERROR] file not found: ${chroot_dir}/etc/yum.conf (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   case "${keepcache}" in

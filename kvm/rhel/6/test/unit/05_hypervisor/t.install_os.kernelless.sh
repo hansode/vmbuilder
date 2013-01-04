@@ -28,6 +28,7 @@ function setUp() {
   function mount_sys() { echo mount_sys $*; }
   function create_initial_user() { echo create_initial_user $*; }
   function install_authorized_keys() { echo install_authorized_keys $*; }
+  function set_timezone() { echo set_timezone $*; }
   function configure_networking() { echo configure_networking $*; }
   function configure_mounting() { echo configure_mounting $*; }
   function configure_keepcache() { echo configure_keepcache $*; }

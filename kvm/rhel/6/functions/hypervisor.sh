@@ -172,6 +172,7 @@ function install_os() {
   # moved from distro in order to use cached distro dir
   create_initial_user     ${chroot_dir}
   install_authorized_keys ${chroot_dir}
+  set_timezone            ${chroot_dir}
 
   configure_networking ${chroot_dir}
   [[ -n "${diskless}" ]] || {
