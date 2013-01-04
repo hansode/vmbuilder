@@ -8,9 +8,9 @@
 #
 
 function add_option_distro_rhel5() {
-  baseurl=${baseurl:-}
-  gpgkey=${gpgkey:-}
+  load_distro_driver rhel4
 
-  preferred_filesystem=ext3
-  preferred_initrd=initrd
+  case ${distro_ver} in
+  5) distro_ver=5.8 ;;
+  esac
 }

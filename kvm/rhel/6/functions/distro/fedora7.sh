@@ -11,6 +11,8 @@
 #
 
 function add_option_distro_fedora7() {
+  load_distro_driver fedora
+
   baseurl=${baseurl:-http://archive.fedoraproject.org/pub/archive/fedora/linux/releases/${distro_ver}/Fedora/${basearch}/os}
   gpgkey=${gpgkey:-${baseurl}/RPM-GPG-KEY ${baseurl}/RPM-GPG-KEY-fedora}
 

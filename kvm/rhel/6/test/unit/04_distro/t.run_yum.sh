@@ -36,6 +36,12 @@ function test_run_yum_distro_name_exists_repolist() {
   assertEquals $? 0
 }
 
+function test_run_yum_yumrepo() {
+  run_yum ${chroot_dir} repolist | egrep -q -w -- "--enablerepo=base"
+  assertEquals $? 0
+}
+
+
 ## shunit2
 
 . ${shunit2_file}

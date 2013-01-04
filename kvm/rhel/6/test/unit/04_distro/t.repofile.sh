@@ -50,25 +50,26 @@ function test_repofile_required_reponame_baseurl_gpgkey() {
   assertEquals $? 0
 }
 
-### optional options
-
-function test_repofile_optonal_keepcache_empty() {
+function test_repofile_cachedir_i386() {
+  local distro_arch=i686 distro_ver=6.3
   add_option_distro
-  local reponame=${distro_name}
-  local keepcache=
 
-  repofile ${reponame} "${baseurl}" "${gpgkey}" | egrep -q ^keepcache=1
+  local reponame=${distro_name}
+
+  repofile ${reponame} "${baseurl}" "${gpgkey}" | egrep -q -w ^cachedir=/var/cache/yum/i386/6
   assertEquals $? 0
 }
 
-function test_repofile_optonal_keepcache_exists() {
+function test_repofile_cachedir_x86_64() {
+  local distro_arch=x86_64 distro_ver=6.3
   add_option_distro
-  local reponame=${distro_name}
-  local keepcache=1
 
-  repofile ${reponame} "${baseurl}" "${gpgkey}" | egrep -q ^keepcache=${keepcache}
+  local reponame=${distro_name}
+
+  repofile ${reponame} "${baseurl}" "${gpgkey}" | egrep -q -w ^cachedir=/var/cache/yum/x86_64
   assertEquals $? 0
 }
+
 
 ## shunit2
 

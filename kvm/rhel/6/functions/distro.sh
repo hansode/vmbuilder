@@ -171,7 +171,7 @@ function distroinfo() {
 	distro_name: ${distro_name}
 	distro_ver:  ${distro_ver}
 	chroot_dir:  ${chroot_dir}
-	keepcache:   ${keepcache}
+	keepcache:   1
 	baseurl:     ${baseurl}
 	gpgkey:      ${gpgkey}
 	--------------------
@@ -244,7 +244,6 @@ function configure_os() {
   #  so far following three functions are defined in distro.
   prevent_daemons_starting ${chroot_dir}
   # moved to hypervisor in order to use cached distro dir
- #create_initial_user      ${chroot_dir}
   configure_keepcache      ${chroot_dir}
 
   install_extras           ${chroot_dir}
@@ -291,10 +290,14 @@ function repofile() {
   [[ -n "${baseurl}"  ]] || { echo "[ERROR] Invalid argument: baseurl:${baseurl} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   [[ -n "${gpgkey}"   ]] || { echo "[ERROR] Invalid argument: gpgkey:${gpgkey} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
+  local cachedir=/var/cache/yum
+  [[ -z "${basearch}"   ]] || cachedir=${cachedir}/${basearch}
+  [[ -z "${distro_ver}" ]] || cachedir=${cachedir}/$(get_distro_major_ver ${distro_ver})
+
   cat <<-EOS
 	[main]
-	cachedir=/var/cache/yum
-	keepcache=${keepcache:-1}
+	cachedir=${cachedir}
+	keepcache=1
 	debuglevel=2
 	logfile=/var/log/yum.log
 	exactarch=1
@@ -321,7 +324,7 @@ function run_yum() {
   # install_kernel depends on distro_name.
   [[ -n "${distro_name}" ]] || { echo "[ERROR] Invalid argument: distro_name:${distro_name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
-  local reponame=${distro_name}
+  local reponame=${yumrepo:-${distro_name}}
   local tmpdir=${chroot_dir}/tmp
   local repofile=${tmpdir}/yum-${reponame}.repo
 
@@ -343,10 +346,7 @@ function configure_keepcache() {
   local chroot_dir=$1
   [[ -a "${chroot_dir}/etc/yum.conf" ]] || { echo "[ERROR] file not found: ${chroot_dir}/etc/yum.conf (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
-  case "${keepcache}" in
-  [01]) ;;
-  *)    keepcache=0 ;;
-  esac
+  local keepcache=1
 
   printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
   egrep -q ^keepcache= ${chroot_dir}/etc/yum.conf && {
@@ -356,6 +356,25 @@ function configure_keepcache() {
   }
 
   egrep ^keepcache= ${chroot_dir}/etc/yum.conf
+}
+
+function clean_packages() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  case "${keepcache}" in
+  1) ;;
+  *) keepcache=0 ;;
+  esac
+
+  case "${keepcache}" in
+  0)
+    run_yum       ${chroot_dir} clean packages
+    run_in_target ${chroot_dir} yum clean packages
+    ;;
+  *)
+    ;;
+  esac
 }
 
 ## other system configuration
