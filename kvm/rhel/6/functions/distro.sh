@@ -244,7 +244,8 @@ function configure_os() {
   #  so far following three functions are defined in distro.
   prevent_daemons_starting ${chroot_dir}
   # moved to hypervisor in order to use cached distro dir
-  configure_keepcache      ${chroot_dir}
+  # always set keepcache=1 at first installation phase
+  configure_keepcache      ${chroot_dir} 1
 
   install_extras           ${chroot_dir}
   umount_nonroot           ${chroot_dir}
@@ -343,10 +344,13 @@ function run_yum() {
 }
 
 function configure_keepcache() {
-  local chroot_dir=$1
+  local chroot_dir=$1 keepcache=${2:-${keepcache}}
   [[ -a "${chroot_dir}/etc/yum.conf" ]] || { echo "[ERROR] file not found: ${chroot_dir}/etc/yum.conf (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
-  local keepcache=1
+  case "${keepcache}" in
+  0) ;;
+  *) keepcache=1 ;;
+  esac
 
   printf "[INFO] Setting /etc/yum.conf: keepcache=%s\n" ${keepcache}
   egrep -q ^keepcache= ${chroot_dir}/etc/yum.conf && {
