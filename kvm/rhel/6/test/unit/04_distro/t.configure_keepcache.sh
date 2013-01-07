@@ -21,8 +21,55 @@ function tearDown() {
   rm -rf ${chroot_dir}
 }
 
-function test_configure_keepcache() {
+function test_configure_keepcache_default() {
+  local keepcache=
+
   configure_keepcache ${chroot_dir} | egrep -q -w ^keepcache=1
+  assertEquals $? 0
+}
+
+function test_configure_keepcache_arg_0() {
+  local keepcache=
+
+  configure_keepcache ${chroot_dir} 0 | egrep -q -w ^keepcache=0
+  assertEquals $? 0
+}
+
+function test_configure_keepcache_arg_1() {
+  local keepcache=
+
+  configure_keepcache ${chroot_dir} 1 | egrep -q -w ^keepcache=1
+  assertEquals $? 0
+}
+
+function test_configure_keepcache_param_0() {
+  local keepcache=0
+
+  configure_keepcache ${chroot_dir} | egrep -q -w ^keepcache=${keepcache}
+  assertEquals $? 0
+}
+
+function test_configure_keepcache_param_1() {
+  local keepcache=1
+
+  configure_keepcache ${chroot_dir} | egrep -q -w ^keepcache=${keepcache}
+  assertEquals $? 0
+}
+
+function test_configure_keepcache_complex() {
+  local keepcache=1
+
+  configure_keepcache ${chroot_dir} 0 | egrep -q -w ^keepcache=0
+  assertEquals $? 0
+
+  configure_keepcache ${chroot_dir}   | egrep -q -w ^keepcache=${keepcache}
+  assertEquals $? 0
+
+  configure_keepcache ${chroot_dir} 1 | egrep -q -w ^keepcache=1
+  assertEquals $? 0
+
+  keepcache=0
+  configure_keepcache ${chroot_dir}   | egrep -q -w ^keepcache=${keepcache}
   assertEquals $? 0
 }
 
