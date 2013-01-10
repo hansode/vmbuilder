@@ -398,8 +398,13 @@ function configure_selinux() {
 }
 
 function configure_sshd_password_authentication() {
-  local chroot_dir=$1 passauth=${2:-no}
+  local chroot_dir=$1 passauth=${2:-${sshd_passauth}}
   [[ -a "${chroot_dir}/etc/ssh/sshd_config" ]] || { echo "[WARN] file not found: ${chroot_dir}/etc/ssh/sshd_config (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 0; }
+
+  case "${passauth}" in
+  yes|no) ;;
+  *) passauth=yes ;;
+  esac
 
   printf "[INFO] Configuring sshd PasswordAuthentication: %s\n" ${passauth}
   egrep "^PasswordAuthentication" ${chroot_dir}/etc/ssh/sshd_config -q || {
