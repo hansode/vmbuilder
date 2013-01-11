@@ -283,6 +283,13 @@ function configure_openvz() {
   install_menu_lst_vzkernel ${chroot_dir}
 }
 
+function configure_virtualbox() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  install_virtualbox ${chroot_dir}
+}
+
 ## yum
 
 function repofile() {
@@ -649,7 +656,7 @@ function install_vzkernel() {
   local chroot_dir=$1
 
   [[ -f ${chroot_dir}/etc/yum.repos.d/openvz.repo ]] || {
-    curl http://download.openvz.org/openvz.repo -o ${chroot_dir}/etc/yum.repos.d/openvz.repo
+    curl -f http://download.openvz.org/openvz.repo -o ${chroot_dir}/etc/yum.repos.d/openvz.repo
   }
 
   run_in_target ${chroot_dir} yum install -y vzkernel
@@ -660,6 +667,33 @@ function install_vzutils() {
   local chroot_dir=$1
 
   run_in_target ${chroot_dir} yum install -y vzctl vzquota
+}
+
+### virtualbox
+
+function install_virtualbox() {
+  local chroot_dir=$1
+
+  [[ -f ${chroot_dir}/etc/yum.repos.d/virtualbox.repo ]] || {
+    curl -f http://download.virtualbox.org/virtualbox/rpm/el/virtualbox.repo -o ${chroot_dir}/etc/yum.repos.d/virtualbox.repo
+  }
+
+  # TODO
+  #
+  # 1. should run "/etc/init.d/vboxdrv setup" in order to build VirtualBox kernel module after booting system
+  #    ex) --firstboot [filename]
+  #    --------------------------------------------------
+  #    #!/bin/bash
+  #
+  #    /etc/init.d/vboxdrv setup
+  #    reboot
+  #    --------------------------------------------------
+  #
+  # 2. should install packages though "/etc/init.d/vboxdrv setup" depends on make kernel-devel gcc perl
+  #    ex) --addpkg [name] ...
+  #        --addpkg make --addpkg kernel-devel --addpkg gcc --addpkg perl
+  #
+  run_in_target ${chroot_dir} yum install -y VirtualBox-4.2
 }
 
 ## kernel configuration
