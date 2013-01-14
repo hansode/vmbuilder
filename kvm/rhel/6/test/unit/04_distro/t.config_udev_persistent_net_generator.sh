@@ -27,7 +27,7 @@ function test_config_udev_persistent_net_generator_file_not_found() {
   rm ${chroot_dir}/lib/udev/rules.d/75-persistent-net-generator.rules
 
   config_udev_persistent_net_generator ${chroot_dir} >/dev/null 2>&1
-  assertNotEquals $? 0
+  assertEquals $? 0
 }
 
 function test_config_udev_persistent_net_generator() {
