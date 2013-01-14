@@ -226,6 +226,7 @@ function bootstrap() {
   mkprocdir      ${chroot_dir}
   mount_proc     ${chroot_dir}
   run_yum        ${chroot_dir} groupinstall Core
+  run_yum        ${chroot_dir} install yum
   umount_nonroot ${chroot_dir}
 }
 
