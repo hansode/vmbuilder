@@ -675,8 +675,7 @@ function install_kernel() {
 function install_extras() {
   local chroot_dir=$1
 
-  # rhel4's Core package does not include yum
-  run_yum ${chroot_dir} install openssh openssh-clients openssh-server rpm yum curl dhclient passwd vim-minimal yum
+  run_yum ${chroot_dir} install openssh openssh-clients openssh-server rpm yum curl dhclient passwd vim-minimal sudo
 }
 
 function install_addedpkgs() {
