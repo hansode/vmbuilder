@@ -1027,6 +1027,8 @@ function config_udev_persistent_net() {
 function config_udev_persistent_net_generator() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  # Over rhel version 6 has the following file.
+  [[ -a "${chroot_dir}/lib/udev/rules.d/75-persistent-net-generator.rules" ]] || { echo "[WARN] file not found: ${chroot_dir}/lib/udev/rules.d/75-persistent-net-generator.rules (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 0; }
 
   # append virtual interface ignore rules to 75-persistent-net-generator.rules.
   # * udev creates persistent network rule for KVM virtual interface: http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=638159
