@@ -23,7 +23,7 @@ function tearDown() {
 }
 
 function test_install_extras() {
-  install_extras ${chroot_dir} | egrep -q -w "openssh openssh-clients openssh-server rpm yum curl dhclient passwd vim-minimal"
+  install_extras ${chroot_dir} | egrep -q -w "openssh openssh-clients openssh-server rpm yum curl dhclient passwd vim-minimal sudo"
   assertEquals $? 0
 }
 
