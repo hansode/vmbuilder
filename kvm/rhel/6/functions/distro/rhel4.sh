@@ -16,4 +16,5 @@ function add_option_distro_rhel4() {
 
   preferred_filesystem=ext3
   preferred_initrd=initrd
+  preferred_rpmdb_hash_ver=8
 }

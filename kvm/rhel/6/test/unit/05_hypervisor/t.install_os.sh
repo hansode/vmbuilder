@@ -40,6 +40,7 @@ function setUp() {
   function install_bootloader() { echo install_bootloader $*; }
   function install_epel() { echo install_epel $*; }
   function install_addedpkgs() { echo install_addedpkgs $*; }
+  function convert_rpmdb_hash() { echo convert_rpmdb_hash $*; }
   function clean_packages() { echo clean_packages $*; }
   function run_copy()       { echo run_copy       $*; }
   function run_execscript() { echo run_execscript $*; }

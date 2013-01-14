@@ -19,4 +19,5 @@ function add_option_distro_rhel6() {
 
   preferred_filesystem=ext4
   preferred_initrd=initramfs
+  preferred_rpmdb_hash_ver=9
 }
