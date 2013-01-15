@@ -103,6 +103,7 @@ function build_kvm_opts() {
   echo \
    ${kvm_opts} \
    -name     ${name} \
+   -cpu      host \
    -m        ${mem_size} \
    -smp      ${cpu_num} \
    -vnc      ${vnc_addr}:${vnc_port} \
