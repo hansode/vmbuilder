@@ -31,5 +31,13 @@ symbolic-links=0
 [mysqld_safe]
 log-error=/var/log/mysqld.log
 pid-file=/var/run/mysqld/mysqld.pid
+
+[ifcfg-eth0]
+ip=192.168.2.10
+net=192.168.2.0
+
+[ifcfg-eth1]
+ip=192.168.2.11
+net=192.168.2.0
 EOS
 }

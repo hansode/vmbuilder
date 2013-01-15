@@ -29,6 +29,10 @@ function ini_section() {
   sed -n -e "/^\[${section}\]/,/^\s*\[/{/^[^;].*\=.*/p;}" <(normalize_ini <(cat))
 }
 
+function list_ini_section() {
+  egrep '^\[' <(normalize_ini <(cat)) | sed 's,^\[,,g; s,\]$,,g'
+}
+
 function inikey2sh() {
   # '-' -> '_'
 
