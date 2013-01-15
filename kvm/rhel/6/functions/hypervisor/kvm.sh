@@ -112,6 +112,7 @@ function build_kvm_opts() {
    -serial   telnet:${serial_addr}:${serial_port},server,nowait \
    $(build_drive_opt) \
    $(build_vif_opt ${vif_num}) \
+   $([[ -z "${pidfile}" ]] || echo -pidfile ${pidfile}) \
    -daemonize
 }
 

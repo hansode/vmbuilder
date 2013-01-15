@@ -24,6 +24,22 @@ function test_build_kvm_opts_name() {
   assertEquals $? 0
 }
 
+## pidfile
+
+function test_build_kvm_opts_no_pidfile() {
+  local pidfile=
+
+  build_kvm_opts | egrep -q -w -- "-pidfile ${pidfile}"
+  assertNotEquals $? 0
+}
+
+function test_build_kvm_opts_with_pidfile() {
+  local pidfile=${abs_dirname}/kvm.pid
+
+  build_kvm_opts | egrep -q -w -- "-pidfile ${pidfile}"
+  assertEquals $? 0
+}
+
 ## shunit2
 
 . ${shunit2_file}
