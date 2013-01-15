@@ -103,6 +103,7 @@ function build_kvm_opts() {
   echo \
    ${kvm_opts} \
    -name     ${name} \
+   -cpu      host \
    -m        ${mem_size} \
    -smp      ${cpu_num} \
    -vnc      ${vnc_addr}:${vnc_port} \
@@ -111,6 +112,7 @@ function build_kvm_opts() {
    -serial   telnet:${serial_addr}:${serial_port},server,nowait \
    $(build_drive_opt) \
    $(build_vif_opt ${vif_num}) \
+   $([[ -z "${pidfile}" ]] || echo -pidfile ${pidfile}) \
    -daemonize
 }
 
