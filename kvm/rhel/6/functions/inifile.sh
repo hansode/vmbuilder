@@ -30,7 +30,7 @@ function ini_section() {
 }
 
 function list_ini_section() {
-  egrep '^\[' <(normalize_ini <(cat)) | sed 's,^\[,,g; s,\]$,,g'
+  egrep '^\[' <(normalize_ini <(cat $*)) | sed 's,^\[,,g; s,\]$,,g'
 }
 
 function inikey2sh() {
