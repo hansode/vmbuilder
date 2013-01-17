@@ -33,6 +33,7 @@ function add_option_distro() {
 
   keepcache=${keepcache:-0}
   selinux=${selinux:-0}
+  sudo_requiretty=${sudo_requiretty}
 
   distro_name=$(get_normalized_distro_name ${distro_name})
 
@@ -460,6 +461,30 @@ function configure_sshd_password_authentication() {
     echo "PasswordAuthentication ${passauth}" >> ${chroot_dir}/etc/ssh/sshd_config
   }
   sed -i "s/^\(PasswordAuthentication\).*/\1 ${passauth}/" ${chroot_dir}/etc/ssh/sshd_config
+}
+
+function configure_sudo_requiretty() {
+  local chroot_dir=$1 requiretty=${2:-${sudo_requiretty}}
+  [[ -a "${chroot_dir}/etc/sudoers" ]] || { echo "[WARN] file not found: ${chroot_dir}/etc/sudoers (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 0; }
+
+  case "${requiretty}" in
+  0|1) ;;
+  *) requiretty=1 ;;
+  esac
+
+  printf "[INFO] Configuring sudo-requiretty: %s\n" ${requiretty}
+  case "${requiretty}" in
+  0)
+    egrep "^Defaults.+requiretty" ${chroot_dir}/etc/sudoers -q && {
+      sed -i "s/^\(^Defaults\s*requiretty\).*/# \1/" ${chroot_dir}/etc/sudoers
+    } || :
+   ;;
+  1)
+    egrep "^Defaults.+requiretty" ${chroot_dir}/etc/sudoers -q || {
+      echo "Defaults    requiretty" >> ${chroot_dir}/etc/sudoers
+    }
+   ;;
+  esac
 }
 
 function set_timezone() {
