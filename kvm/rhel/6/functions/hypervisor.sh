@@ -19,6 +19,7 @@
 #  distro: add_option_distro, preflight_check_distro, install_kernel, install_bootloader, install_epel, install_addedpkgs, mount_proc
 #          create_initial_user, install_authorized_keys
 #          mount_dev, mount_sys, configure_networking, configure_mounting, configure_keepcache, configure_console
+#          configure_hypervisor, configure_selinux, configure_sshd_password_authentication, configure_sudo_requiretty
 #          run_copy, run_execscript, install_firstboot, install_firstlogin, convert_rpmdb_hash, clean_packages
 #
 
@@ -192,6 +193,7 @@ function install_os() {
     install_bootloader ${chroot_dir} ${disk_filename}
   }
   configure_sshd_password_authentication ${chroot_dir} ${sshd_passauth}
+  configure_sudo_requiretty              ${chroot_dir} ${sudo_requiretty}
 
   install_epel         ${chroot_dir}
   install_addedpkgs    ${chroot_dir}
