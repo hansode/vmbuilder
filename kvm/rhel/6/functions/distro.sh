@@ -1430,6 +1430,16 @@ function run_copy() {
   done < <(egrep -v '^$' ${copy})
 }
 
+function run_xexecscript() {
+  local chroot_dir=$1; shift
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  while [[ $# -ne 0 ]]; do
+    run_execscript ${chroot_dir} $1
+    shift
+  done
+}
+
 function run_execscript() {
   local chroot_dir=$1 execscript=$2
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
