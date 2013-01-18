@@ -1404,6 +1404,16 @@ function detect_distro() {
 
 ## post_install
 
+function run_xcopy() {
+  local chroot_dir=$1; shift
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  while [[ $# -ne 0 ]]; do
+    run_copy ${chroot_dir} $1
+    shift
+  done
+}
+
 function run_copy() {
   local chroot_dir=$1 copy=$2
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
