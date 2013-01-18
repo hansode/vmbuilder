@@ -44,7 +44,7 @@ function setUp() {
   function convert_rpmdb_hash() { echo convert_rpmdb_hash $*; }
   function clean_packages() { echo clean_packages $*; }
   function run_xcopy()      { echo run_xcopy      $*; }
-  function run_execscript() { echo run_execscript $*; }
+  function run_xexecscript() { echo run_xexecscript $*; }
   function install_firstboot() { echo install_firstboot $*; }
   function install_firstlogin() { echo install_firstlogin $*; }
 }
