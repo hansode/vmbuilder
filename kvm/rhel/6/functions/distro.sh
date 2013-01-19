@@ -85,6 +85,7 @@ function add_option_distro() {
 
   # post_install
   copy=${copy:-}
+  copydir=${copydir:-}
   execscript=${execscript:-}
   firstboot=${firstboot:-}
   firstlogin=${firstlogin:-}
@@ -1435,6 +1436,25 @@ function run_copy() {
     [[ -d "${destdir}" ]] || mkdir -p ${destdir}
     rsync -aHA ${1} ${chroot_dir}${2} || :
   done < <(egrep -v '^$' ${copy})
+}
+
+function xsync_dir() {
+  local chroot_dir=$1; shift
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  while [[ $# -ne 0 ]]; do
+    sync_dir ${chroot_dir} $1
+    shift
+  done
+}
+
+function sync_dir() {
+  local chroot_dir=$1 sync_dir=$2
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -d "${sync_dir}"   ]] || { echo "[ERROR] directory not found: ${sync_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  printf "[INFO] Syncing directory: %s\n" ${sync_dir}
+  rsync -aHA ${sync_dir} ${chroot_dir}/
 }
 
 function run_xexecscript() {
