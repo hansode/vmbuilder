@@ -38,6 +38,7 @@ function setUp() {
   function install_addedpkgs() { echo install_addedpkgs $*; }
   function clean_packages() { echo clean_packages $*; }
   function run_xcopy()      { echo run_xcopy      $*; }
+  function xsync_dir()      { echo xsync_dir      $*; }
   function run_xexecscript() { echo run_xexecscript $*; }
   function install_firstboot() { echo install_firstboot $*; }
   function install_firstlogin() { echo install_firstlogin $*; }
@@ -52,7 +53,7 @@ function test_install_os_diskless() {
   local distro_name=centos
   local diskless=1
 
-  install_os ${chroot_dir} ${distro_dir} >/dev/null
+  install_os ${chroot_dir} ${distro_dir} >/dev/null 2>&1
   assertEquals $? 0
 }
 

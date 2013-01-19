@@ -43,6 +43,7 @@ function setUp() {
   function install_addedpkgs() { echo install_addedpkgs $*; }
   function clean_packages() { echo clean_packages $*; }
   function run_copy()       { echo run_copy       $*; }
+  function xsync_dir()      { echo xsync_dir      $*; }
   function run_xexecscript() { echo run_xexecscript $*; }
   function install_firstboot() { echo install_firstboot $*; }
   function install_firstlogin() { echo install_firstlogin $*; }
