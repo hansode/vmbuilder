@@ -463,6 +463,13 @@ function configure_sshd_password_authentication() {
   sed -i "s/^\(PasswordAuthentication\).*/\1 ${passauth}/" ${chroot_dir}/etc/ssh/sshd_config
 }
 
+function check_sudo_requiretty() {
+  local sudoers_path=$1
+  [[ -a "${sudoers_path}" ]] || { echo "[ERROR] file not found: ${sudoers_path} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  egrep "^Defaults.+requiretty" ${sudoers_path} -q
+}
+
 function configure_sudo_requiretty() {
   local chroot_dir=$1 requiretty=${2:-${sudo_requiretty}}
   [[ -a "${chroot_dir}/etc/sudoers" ]] || { echo "[WARN] file not found: ${chroot_dir}/etc/sudoers (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 0; }
@@ -475,12 +482,12 @@ function configure_sudo_requiretty() {
   printf "[INFO] Configuring sudo-requiretty: %s\n" ${requiretty}
   case "${requiretty}" in
   0)
-    egrep "^Defaults.+requiretty" ${chroot_dir}/etc/sudoers -q && {
+    check_sudo_requiretty ${chroot_dir}/etc/sudoers && {
       sed -i "s/^\(^Defaults\s*requiretty\).*/# \1/" ${chroot_dir}/etc/sudoers
     } || :
    ;;
   1)
-    egrep "^Defaults.+requiretty" ${chroot_dir}/etc/sudoers -q || {
+    check_sudo_requiretty ${chroot_dir}/etc/sudoers || {
       echo "Defaults    requiretty" >> ${chroot_dir}/etc/sudoers
     }
    ;;
