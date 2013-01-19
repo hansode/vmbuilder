@@ -20,7 +20,7 @@
 #          create_initial_user, install_authorized_keys
 #          mount_dev, mount_sys, configure_networking, configure_mounting, configure_keepcache, configure_console
 #          configure_hypervisor, configure_selinux, configure_sshd_password_authentication, configure_sudo_requiretty
-#          run_xcopy, run_xexecscript, install_firstboot, install_firstlogin, convert_rpmdb_hash, clean_packages
+#          run_xcopy, xsync_dir, run_xexecscript, install_firstboot, install_firstlogin, convert_rpmdb_hash, clean_packages
 #
 
 ## depending on global variables
@@ -200,6 +200,7 @@ function install_os() {
   convert_rpmdb_hash   ${chroot_dir}
   clean_packages       ${chroot_dir}
   run_xcopy            ${chroot_dir} ${copy}
+  xsync_dir            ${chroot_dir} ${copydir}
   run_xexecscript      ${chroot_dir} ${execscript}
   install_firstboot    ${chroot_dir} ${firstboot}
   install_firstlogin   ${chroot_dir} ${firstlogin}
