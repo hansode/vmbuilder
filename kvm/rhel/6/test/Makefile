@@ -1,6 +1,9 @@
-all: unit
+all: unit integration
 
 unit:
 	(cd $@ && make)
 
-.PHONY: unit
+integration:
+	(cd $@ && make)
+
+.PHONY: unit integration
