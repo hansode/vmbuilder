@@ -13,7 +13,11 @@
 ## public functions
 
 function test_qemu_kvm_path() {
-  qemu_kvm_path >/dev/null
+  [ -f /usr/bin/qemu-img -o -f /usr/bin/kvm-img ] && {
+    qemu_kvm_path >/dev/null
+  } || {
+    :
+  }
   assertEquals $? 0
 }
 
