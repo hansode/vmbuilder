@@ -1,4 +1,6 @@
-all: 02_disk 03_mbr 04_distro 05_hypervisor 06_vm
+all: test
+
+test: 02_disk 03_mbr 06_vm
 
 02_disk:
 	(cd $@ && make)
