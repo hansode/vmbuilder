@@ -14,7 +14,11 @@
 ## public functions
 
 function test_qemu_img_path() {
-  assertEquals $(qemu_img_path | wc -l) 1
+  [ -f /usr/bin/qemu-img -o -f /usr/bin/kvm-img ] && {
+    assertEquals $(qemu_img_path | wc -l) 1
+  } || {
+    assertEquals $(qemu_img_path | wc -l) 0
+  }
 }
 
 ## shunit2
