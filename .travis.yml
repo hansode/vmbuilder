@@ -1,0 +1,4 @@
+# Travis CI does not support bash. :'(
+language: c
+script: make test
+install: make
