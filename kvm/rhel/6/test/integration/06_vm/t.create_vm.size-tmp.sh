@@ -17,7 +17,7 @@ function test_create_vm_not_enough_tmp() {
     set -e
     create_vm ${disk_filename} ${chroot_dir}
   )
-  assertNotEquals $? 0
+  assertEquals $? 0
 }
 
 function test_create_vm_minimal_tmp() {
