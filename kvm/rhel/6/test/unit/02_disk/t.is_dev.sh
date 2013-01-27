@@ -17,7 +17,7 @@ function test_is_dev_device() {
 }
 
 function test_is_dev_text() {
-  is_dev /var/log/messages
+  is_dev /var/log/messages >/dev/null
   assertNotEquals "$?" "0"
 }
 
