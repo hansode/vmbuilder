@@ -39,6 +39,7 @@ function setUp() {
   function checkroot() { :; }
   function ps() { echo "${ps_output}"; }
   function ls() { echo "${ls_output}"; }
+  function qemu_kvm_path() { echo /usr/libexec/qemu-kvm; }
 }
 
 function test_kvm_info_no_opts() {
