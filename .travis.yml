@@ -1,4 +1,6 @@
 # Travis CI does not support bash. :'(
 language: c
+install: make
+before_install:
+  - "sudo apt-get -qq install coreutils util-linux yum rpm kpartx parted e2fsprogs mount dmsetup curl mount"
 script: make test
-install: make coreutils util-linux yum rpm kpartx parted e2fsprogs mount dmsetup curl mount
