@@ -1,5 +1,7 @@
-all: 01_utils 02_disk 03_mbr 04_distro 05_hypervisor 06_vm 07_inifile
+all: 00_required-pkg 01_utils 02_disk 03_mbr 04_distro 05_hypervisor 06_vm 07_inifile
 
+00_required-pkg:
+	(cd $@ && make)
 01_utils:
 	(cd $@ && make)
 02_disk:
@@ -15,4 +17,4 @@ all: 01_utils 02_disk 03_mbr 04_distro 05_hypervisor 06_vm 07_inifile
 07_inifile:
 	(cd $@ && make)
 
-.PHONY: 01_utils 02_disk 03_mbr 04_distro 05_hypervisor 06_vm 07_inifile
+.PHONY: 00_required-pkg 01_utils 02_disk 03_mbr 04_distro 05_hypervisor 06_vm 07_inifile
