@@ -15,7 +15,6 @@
 function setUp() {
   add_option_hypervisor_kvm
 
-  function qemu_kvm_path() { echo /usr/libexec/qemu-kvm; }
   function shlog() { echo $*; }
   function checkroot() { echo checkroot $*; }
 }
