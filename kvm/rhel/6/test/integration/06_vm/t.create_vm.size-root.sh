@@ -27,7 +27,7 @@ function test_create_vm_not_enough_root() {
     set -e
     create_vm ${disk_filename} ${chroot_dir}
   )
-  assertNotEquals $? 0
+  assertEquals $? 0
 }
 
 ## shunit2
