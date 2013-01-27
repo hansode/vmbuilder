@@ -11,8 +11,13 @@
 ## functions
 
 function test_qemu_kvm() {
-  which qemu-kvm
-  assertEquals "$?" "0"
+  if [[ -f /usr/bin/kvm ]]; then
+    which kvm
+    assertEquals "$?" "0"
+  elif [[ -f /usr/libexec/qemu-kvm ]]; then
+    which qemu-kvm
+    assertEquals "$?" "0"
+  fi
 }
 
 ## shunit2
