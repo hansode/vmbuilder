@@ -314,7 +314,9 @@ function mkpart() {
   }
 
   printf "[INFO] Adding type %s partition to disk image: %s\n" ${fstype} ${disk_filename}
-  parted --script -- ${disk_filename} mkpart ${parttype} ${fstype} ${partition_start} ${partition_end}
+  # parted default unit is not "mib" but "mb"
+  local unit=mib
+  parted --script -- ${disk_filename} mkpart ${parttype} ${fstype} ${partition_start}${unit} ${partition_end}${unit}
   # for physical /dev/XXX
   udevadm settle
 }
