@@ -307,8 +307,8 @@ function mkpart() {
     ;;
   esac && {
     printf "[INFO] Partition at beginning of disk - reserving first cylinder\n"
-    partition_start=$((${partition_start} + 63))s
-    unit_start=
+    partition_start=$((${partition_start} + 63))
+    unit_start=s
   } || :
 
   # whole disk
