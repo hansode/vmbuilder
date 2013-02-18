@@ -49,6 +49,7 @@ function setUp() {
   function run_xexecscript() { echo run_xexecscript $*; }
   function install_firstboot() { echo install_firstboot $*; }
   function install_firstlogin() { echo install_firstlogin $*; }
+  function cleanup_distro() { echo cleanup_distro $*; }
 }
 
 function tearDown() {
