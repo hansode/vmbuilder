@@ -36,6 +36,7 @@ function setUp() {
   function configure_hypervisor() { echo configure_hypervisor $*; }
   function configure_selinux() { echo configure_selinux $*; }
   function configure_sshd_password_authentication() { echo configure_sshd_password_authentication $*; }
+  function configure_sshd_permit_root_login() { echo configure_sshd_permit_root_login $*; }
   function configure_sudo_requiretty() { echo configure_sudo_requiretty $*; }
   function install_kernel() { echo install_kernel $*; }
   function install_bootloader() { echo install_bootloader $*; }

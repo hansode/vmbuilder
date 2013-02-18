@@ -80,6 +80,7 @@ function add_option_distro() {
   ssh_key=${ssh_key:-}
   ssh_user_key=${ssh_user_key:-}
   sshd_passauth=${sshd_passauth:-}
+  sshd_permit_root_login=${sshd_permit_root_login:-}
 
   fstab_type=${fstab_type:-uuid}
 
@@ -462,6 +463,20 @@ function configure_sshd_password_authentication() {
     echo "PasswordAuthentication ${passauth}" >> ${chroot_dir}/etc/ssh/sshd_config
   }
   sed -i "s/^\(PasswordAuthentication\).*/\1 ${passauth}/" ${chroot_dir}/etc/ssh/sshd_config
+}
+
+function configure_sshd_permit_root_login() {
+  local chroot_dir=$1 permit_root_login=${2:-${sshd_permit_root_login}}
+  [[ -a "${chroot_dir}/etc/ssh/sshd_config" ]] || { echo "[WARN] file not found: ${chroot_dir}/etc/ssh/sshd_config (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 0; }
+
+  case "${permit_root_login}" in
+  yes|no|without-password|forced-commands-only) ;;
+  *) permit_root_login=yes ;;
+  esac
+
+  printf "[INFO] Configuring sshd PermitRootLogin: %s\n" ${permit_root_login}
+  sed -i "s/^#\(PermitRootLogin\).*/\1 ${permit_root_login}/" ${chroot_dir}/etc/ssh/sshd_config
+  sed -i "s/^\(PermitRootLogin\).*/\1 ${permit_root_login}/"  ${chroot_dir}/etc/ssh/sshd_config
 }
 
 function check_sudo_requiretty() {
