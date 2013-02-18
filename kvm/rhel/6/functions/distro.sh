@@ -652,7 +652,13 @@ function update_passwords() {
 
   printf "[INFO] Updating passwords\n"
   run_in_target ${chroot_dir} pwconv
-  run_in_target ${chroot_dir} "echo root:${rootpass:-root} | chpasswd"
+
+  # Lock root account only if we didn't set the root password
+  [[ -n "${rootpass}" ]] && {
+    run_in_target ${chroot_dir} "echo root:${rootpass} | chpasswd"
+  } || {
+    run_in_target ${chroot_dir} "usermod -L root"
+  }
 
   [[ -z "${devel_user}" ]] || {
     run_in_target ${chroot_dir} "echo ${devel_user}:${devel_pass:-${devel_user}} | chpasswd"
