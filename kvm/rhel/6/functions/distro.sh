@@ -82,6 +82,7 @@ function add_option_distro() {
   sshd_passauth=${sshd_passauth:-}
   sshd_gssapi_auth=${sshd_gssapi_auth:-}
   sshd_permit_root_login=${sshd_permit_root_login:-}
+  sshd_use_dns=${sshd_use_dns:-}
 
   fstab_type=${fstab_type:-uuid}
 
@@ -497,6 +498,20 @@ function configure_sshd_permit_root_login() {
   printf "[INFO] Configuring sshd PermitRootLogin: %s\n" ${permit_root_login}
   sed -i "s/^#\(PermitRootLogin\).*/\1 ${permit_root_login}/" ${chroot_dir}/etc/ssh/sshd_config
   sed -i "s/^\(PermitRootLogin\).*/\1 ${permit_root_login}/"  ${chroot_dir}/etc/ssh/sshd_config
+}
+
+function configure_sshd_use_dns() {
+  local chroot_dir=$1 use_dns=${2:-${sshd_use_dns}}
+  [[ -a "${chroot_dir}/etc/ssh/sshd_config" ]] || { echo "[WARN] file not found: ${chroot_dir}/etc/ssh/sshd_config (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 0; }
+
+  case "${use_dns}" in
+  yes|no) ;;
+  *) use_dns=yes ;;
+  esac
+
+  printf "[INFO] Configuring sshd UseDNS: %s\n" ${use_dns}
+  sed -i "s/^#\(UseDNS\).*/\1 ${use_dns}/" ${chroot_dir}/etc/ssh/sshd_config
+  sed -i "s/^\(UseDNS\).*/\1 ${use_dns}/"  ${chroot_dir}/etc/ssh/sshd_config
 }
 
 function check_sudo_requiretty() {
