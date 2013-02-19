@@ -454,6 +454,30 @@ function configure_selinux() {
   cat ${chroot_dir}/etc/sysconfig/selinux
 }
 
+function config_sshd_config() {
+  local keyword=$1 value=$2
+  [[ -n "${keyword}" ]] || { echo "[ERROR] Invalid argument: keyword:${keyword} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${value}"   ]] || { echo "[ERROR] Invalid argument: value:${value} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -a "${chroot_dir}/etc/ssh/sshd_config" ]] || { echo "[ERROR] file not found: ${chroot_dir}/etc/ssh/sshd_config (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  egrep -q -w "^${keyword}" ${chroot_dir}/etc/ssh/sshd_config && {
+    # enabled
+    sed -i "s/^${keyword}.*/${keyword} ${value}/"  ${chroot_dir}/etc/ssh/sshd_config
+  } || {
+    # commented parameter is "^#keyword value".
+    # therefore this case should *not* be included white spaces between # and keyword.
+    egrep -q -w "^#${keyword}" ${chroot_dir}/etc/ssh/sshd_config && {
+      # disabled
+      sed -i "s/^#${keyword}.*/${keyword} ${value}/" ${chroot_dir}/etc/ssh/sshd_config
+    } || {
+      # no match
+      echo "${keyword} ${value}" >> ${chroot_dir}/etc/ssh/sshd_config
+    }
+  }
+
+  egrep -q -w "^${keyword} ${value}" ${chroot_dir}/etc/ssh/sshd_config
+}
+
 function configure_sshd_password_authentication() {
   local chroot_dir=$1 passauth=${2:-${sshd_passauth}}
   [[ -a "${chroot_dir}/etc/ssh/sshd_config" ]] || { echo "[WARN] file not found: ${chroot_dir}/etc/ssh/sshd_config (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 0; }
