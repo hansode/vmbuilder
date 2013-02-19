@@ -20,7 +20,7 @@
 #          create_initial_user, install_authorized_keys
 #          mount_dev, mount_sys, configure_networking, configure_mounting, configure_keepcache, configure_console
 #          configure_hypervisor, configure_selinux, configure_sshd_password_authentication, configure_sshd_permit_root_login, configure_sudo_requiretty
-#          run_xcopy, xsync_dir, run_xexecscript, install_firstboot, install_firstlogin, convert_rpmdb_hash, clean_packages
+#          run_xcopy, xsync_dir, run_xexecscript, install_firstboot, install_firstlogin, convert_rpmdb_hash, clean_packages, cleanup_distro
 #
 
 ## depending on global variables
@@ -205,6 +205,8 @@ function install_os() {
   run_xexecscript      ${chroot_dir} ${execscript}
   install_firstboot    ${chroot_dir} ${firstboot}
   install_firstlogin   ${chroot_dir} ${firstlogin}
+
+  cleanup_distro       ${chroot_dir}
 
   [[ -n "${diskless}" ]] && {
     umount_nonroot ${chroot_dir}
