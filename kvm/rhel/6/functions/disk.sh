@@ -264,8 +264,10 @@ function mkpart() {
     ;;
   esac
 
-  local partition_start=${offset}
-  local partition_end=$((${offset} + ${size} - 1))
+  # parted default unit is not "mib" but "mb"
+  local unit=mib
+  local partition_start=${offset}                  unit_start=${unit}
+  local partition_end=$((${offset} + ${size} - 1)) unit_end=${unit}
 
   # # parted --script -- ${disk_filename} unit s print
   # Model:  (file)
@@ -305,18 +307,18 @@ function mkpart() {
     ;;
   esac && {
     printf "[INFO] Partition at beginning of disk - reserving first cylinder\n"
-    partition_start=$((${partition_start} + 63))s
+    partition_start=$((${partition_start} + 63))
+    unit_start=s
   } || :
 
   # whole disk
   [[ "${size}" == -1 ]] && {
     partition_end=-1
+    unit_end=
   }
 
   printf "[INFO] Adding type %s partition to disk image: %s\n" ${fstype} ${disk_filename}
-  # parted default unit is not "mib" but "mb"
-  local unit=mib
-  parted --script -- ${disk_filename} mkpart ${parttype} ${fstype} ${partition_start}${unit} ${partition_end}${unit}
+  parted --script -- ${disk_filename} mkpart ${parttype} ${fstype} ${partition_start}${unit_start} ${partition_end}${unit_end}
   # for physical /dev/XXX
   udevadm settle
 }
