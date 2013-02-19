@@ -80,6 +80,7 @@ function add_option_distro() {
   ssh_key=${ssh_key:-}
   ssh_user_key=${ssh_user_key:-}
   sshd_passauth=${sshd_passauth:-}
+  sshd_gssapi_auth=${sshd_gssapi_auth:-}
   sshd_permit_root_login=${sshd_permit_root_login:-}
 
   fstab_type=${fstab_type:-uuid}
@@ -466,6 +467,22 @@ function configure_sshd_password_authentication() {
     echo "PasswordAuthentication ${passauth}" >> ${chroot_dir}/etc/ssh/sshd_config
   }
   sed -i "s/^\(PasswordAuthentication\).*/\1 ${passauth}/" ${chroot_dir}/etc/ssh/sshd_config
+}
+
+function configure_sshd_gssapi_authentication() {
+  local chroot_dir=$1 gssapi_auth=${2:-${sshd_gssapi_auth}}
+  [[ -a "${chroot_dir}/etc/ssh/sshd_config" ]] || { echo "[WARN] file not found: ${chroot_dir}/etc/ssh/sshd_config (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 0; }
+
+  case "${gssapi_auth}" in
+  yes|no) ;;
+  *) gssapi_auth=yes ;;
+  esac
+
+  printf "[INFO] Configuring sshd GSSAPIAuthentication: %s\n" ${gssapi_auth}
+  egrep "^GSSAPIAuthentication" ${chroot_dir}/etc/ssh/sshd_config -q || {
+    echo "GSSAPIAuthentication ${gssapi_auth}" >> ${chroot_dir}/etc/ssh/sshd_config
+  }
+  sed -i "s/^\(GSSAPIAuthentication\).*/\1 ${gssapi_auth}/" ${chroot_dir}/etc/ssh/sshd_config
 }
 
 function configure_sshd_permit_root_login() {
