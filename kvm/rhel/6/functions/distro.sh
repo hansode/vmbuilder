@@ -80,7 +80,9 @@ function add_option_distro() {
   ssh_key=${ssh_key:-}
   ssh_user_key=${ssh_user_key:-}
   sshd_passauth=${sshd_passauth:-}
+  sshd_gssapi_auth=${sshd_gssapi_auth:-}
   sshd_permit_root_login=${sshd_permit_root_login:-}
+  sshd_use_dns=${sshd_use_dns:-}
 
   fstab_type=${fstab_type:-uuid}
 
@@ -452,6 +454,30 @@ function configure_selinux() {
   cat ${chroot_dir}/etc/sysconfig/selinux
 }
 
+function config_sshd_config() {
+  local keyword=$1 value=$2
+  [[ -n "${keyword}" ]] || { echo "[ERROR] Invalid argument: keyword:${keyword} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${value}"   ]] || { echo "[ERROR] Invalid argument: value:${value} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -a "${chroot_dir}/etc/ssh/sshd_config" ]] || { echo "[ERROR] file not found: ${chroot_dir}/etc/ssh/sshd_config (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  egrep -q -w "^${keyword}" ${chroot_dir}/etc/ssh/sshd_config && {
+    # enabled
+    sed -i "s/^${keyword}.*/${keyword} ${value}/"  ${chroot_dir}/etc/ssh/sshd_config
+  } || {
+    # commented parameter is "^#keyword value".
+    # therefore this case should *not* be included white spaces between # and keyword.
+    egrep -q -w "^#${keyword}" ${chroot_dir}/etc/ssh/sshd_config && {
+      # disabled
+      sed -i "s/^#${keyword}.*/${keyword} ${value}/" ${chroot_dir}/etc/ssh/sshd_config
+    } || {
+      # no match
+      echo "${keyword} ${value}" >> ${chroot_dir}/etc/ssh/sshd_config
+    }
+  }
+
+  egrep -q -w "^${keyword} ${value}" ${chroot_dir}/etc/ssh/sshd_config
+}
+
 function configure_sshd_password_authentication() {
   local chroot_dir=$1 passauth=${2:-${sshd_passauth}}
   [[ -a "${chroot_dir}/etc/ssh/sshd_config" ]] || { echo "[WARN] file not found: ${chroot_dir}/etc/ssh/sshd_config (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 0; }
@@ -462,10 +488,20 @@ function configure_sshd_password_authentication() {
   esac
 
   printf "[INFO] Configuring sshd PasswordAuthentication: %s\n" ${passauth}
-  egrep "^PasswordAuthentication" ${chroot_dir}/etc/ssh/sshd_config -q || {
-    echo "PasswordAuthentication ${passauth}" >> ${chroot_dir}/etc/ssh/sshd_config
-  }
-  sed -i "s/^\(PasswordAuthentication\).*/\1 ${passauth}/" ${chroot_dir}/etc/ssh/sshd_config
+  config_sshd_config PasswordAuthentication ${passauth}
+}
+
+function configure_sshd_gssapi_authentication() {
+  local chroot_dir=$1 gssapi_auth=${2:-${sshd_gssapi_auth}}
+  [[ -a "${chroot_dir}/etc/ssh/sshd_config" ]] || { echo "[WARN] file not found: ${chroot_dir}/etc/ssh/sshd_config (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 0; }
+
+  case "${gssapi_auth}" in
+  yes|no) ;;
+  *) gssapi_auth=yes ;;
+  esac
+
+  printf "[INFO] Configuring sshd GSSAPIAuthentication: %s\n" ${gssapi_auth}
+  config_sshd_config GSSAPIAuthentication ${gssapi_auth}
 }
 
 function configure_sshd_permit_root_login() {
@@ -478,8 +514,20 @@ function configure_sshd_permit_root_login() {
   esac
 
   printf "[INFO] Configuring sshd PermitRootLogin: %s\n" ${permit_root_login}
-  sed -i "s/^#\(PermitRootLogin\).*/\1 ${permit_root_login}/" ${chroot_dir}/etc/ssh/sshd_config
-  sed -i "s/^\(PermitRootLogin\).*/\1 ${permit_root_login}/"  ${chroot_dir}/etc/ssh/sshd_config
+  config_sshd_config PermitRootLogin ${permit_root_login}
+}
+
+function configure_sshd_use_dns() {
+  local chroot_dir=$1 use_dns=${2:-${sshd_use_dns}}
+  [[ -a "${chroot_dir}/etc/ssh/sshd_config" ]] || { echo "[WARN] file not found: ${chroot_dir}/etc/ssh/sshd_config (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 0; }
+
+  case "${use_dns}" in
+  yes|no) ;;
+  *) use_dns=yes ;;
+  esac
+
+  printf "[INFO] Configuring sshd UseDNS: %s\n" ${use_dns}
+  config_sshd_config UseDNS ${use_dns}
 }
 
 function check_sudo_requiretty() {
