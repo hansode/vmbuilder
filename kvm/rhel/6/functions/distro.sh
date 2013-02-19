@@ -488,10 +488,7 @@ function configure_sshd_password_authentication() {
   esac
 
   printf "[INFO] Configuring sshd PasswordAuthentication: %s\n" ${passauth}
-  egrep "^PasswordAuthentication" ${chroot_dir}/etc/ssh/sshd_config -q || {
-    echo "PasswordAuthentication ${passauth}" >> ${chroot_dir}/etc/ssh/sshd_config
-  }
-  sed -i "s/^\(PasswordAuthentication\).*/\1 ${passauth}/" ${chroot_dir}/etc/ssh/sshd_config
+  config_sshd_config PasswordAuthentication ${passauth}
 }
 
 function configure_sshd_gssapi_authentication() {
@@ -504,10 +501,7 @@ function configure_sshd_gssapi_authentication() {
   esac
 
   printf "[INFO] Configuring sshd GSSAPIAuthentication: %s\n" ${gssapi_auth}
-  egrep "^GSSAPIAuthentication" ${chroot_dir}/etc/ssh/sshd_config -q || {
-    echo "GSSAPIAuthentication ${gssapi_auth}" >> ${chroot_dir}/etc/ssh/sshd_config
-  }
-  sed -i "s/^\(GSSAPIAuthentication\).*/\1 ${gssapi_auth}/" ${chroot_dir}/etc/ssh/sshd_config
+  config_sshd_config GSSAPIAuthentication ${gssapi_auth}
 }
 
 function configure_sshd_permit_root_login() {
@@ -520,8 +514,7 @@ function configure_sshd_permit_root_login() {
   esac
 
   printf "[INFO] Configuring sshd PermitRootLogin: %s\n" ${permit_root_login}
-  sed -i "s/^#\(PermitRootLogin\).*/\1 ${permit_root_login}/" ${chroot_dir}/etc/ssh/sshd_config
-  sed -i "s/^\(PermitRootLogin\).*/\1 ${permit_root_login}/"  ${chroot_dir}/etc/ssh/sshd_config
+  config_sshd_config PermitRootLogin ${permit_root_login}
 }
 
 function configure_sshd_use_dns() {
@@ -534,8 +527,7 @@ function configure_sshd_use_dns() {
   esac
 
   printf "[INFO] Configuring sshd UseDNS: %s\n" ${use_dns}
-  sed -i "s/^#\(UseDNS\).*/\1 ${use_dns}/" ${chroot_dir}/etc/ssh/sshd_config
-  sed -i "s/^\(UseDNS\).*/\1 ${use_dns}/"  ${chroot_dir}/etc/ssh/sshd_config
+  config_sshd_config UseDNS ${use_dns}
 }
 
 function check_sudo_requiretty() {
