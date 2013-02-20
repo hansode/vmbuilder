@@ -773,7 +773,8 @@ function install_authorized_keys() {
     add_authorized_keys ${chroot_dir}/root ${ssh_key}
   } || :
 
-  [[ -f "${ssh_user_key}" && -n "${devel_user}" ]] && {
+  [[ -n "${devel_user}" ]] || return 0
+  [[ -f "${ssh_user_key}" ]] && {
     add_authorized_keys ${chroot_dir}/home/${devel_user} ${ssh_user_key}
     run_in_target ${chroot_dir} "chown -R ${devel_user}:${devel_user} /home/${devel_user}/.ssh/"
   } || :
