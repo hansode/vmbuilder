@@ -25,7 +25,7 @@ function add_option_hypervisor_kvm() {
   mem_size=${mem_size:-1024}
   cpu_num=${cpu_num:-1}
 
-  vnc_addr=${vnc_addr:-0.0.0.0}
+  vnc_addr=${vnc_addr:-127.0.0.1}
   vnc_port=${vnc_port:-1001}
   vnc_keymap=${vnc_keymap:-en-us} # [ en-us | ja ]
 

@@ -24,7 +24,7 @@ function test_kvm_dump() {
   assertEquals "${kvm_opts}"     ""
   assertEquals "${mem_size}"     "1024"
   assertEquals "${cpu_num}"      "1"
-  assertEquals "${vnc_addr}"     "0.0.0.0"
+  assertEquals "${vnc_addr}"     "127.0.0.1"
   assertEquals "${vnc_port}"     "1001"
   assertEquals "${monitor_addr}" "127.0.0.1"
   assertEquals "${monitor_port}" "4444"
