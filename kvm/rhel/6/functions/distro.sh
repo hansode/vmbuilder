@@ -757,9 +757,11 @@ function add_authorized_keys() {
   # make sure to create file
   [[ -f "${authorized_keys_path}" ]] || : > ${authorized_keys_path}
 
+  local ssh_key_path
   for ssh_key_path in ${ssh_key_paths}; do
-    cat ${ssh_key_path}
-  done >> ${authorized_keys_path}
+    printf "[DEBUG] Adding authorized_keys %s\n" ${ssh_key_path}
+    cat ${ssh_key_path} >> ${authorized_keys_path}
+  done
 
   # make sure to file attribute is 0644
   chmod 0644 ${authorized_keys_path}
