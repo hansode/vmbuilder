@@ -739,24 +739,49 @@ function create_initial_user() {
   update_passwords ${chroot_dir}
 }
 
+function add_authorized_keys() {
+  local user_dir=$1; shift
+  local ssh_key_paths="$@"
+  [[ -d "${user_dir}"      ]] || { echo "[ERROR] directory not found: ${user_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${ssh_key_paths}" ]] || { echo "[ERROR] Invalid argument: ssh_key_paths:${ssh_key_paths} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  local user_ssh_dir=${user_dir}/.ssh
+  local authorized_keys_path=${user_ssh_dir}/authorized_keys
+
+  printf "[INFO] Installing authorized_keys %s\n" ${authorized_keys_path}
+
+  [[ -d "${user_ssh_dir}" ]] || mkdir -m 0700 ${user_ssh_dir}
+  # make sure to directory attribute is 0700
+  chmod 0700 ${user_ssh_dir}
+
+  # make sure to create file
+  [[ -f "${authorized_keys_path}" ]] || : > ${authorized_keys_path}
+
+  local ssh_key_path
+  for ssh_key_path in ${ssh_key_paths}; do
+    printf "[DEBUG] Adding authorized_keys %s\n" ${ssh_key_path}
+    cat ${ssh_key_path} >> ${authorized_keys_path}
+  done
+
+  # make sure to file attribute is 0644
+  chmod 0644 ${authorized_keys_path}
+}
+
 function install_authorized_keys() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
-  [[ -f "${ssh_key}" ]] && {
-    printf "[INFO] Installing authorized_keys %s\n" /root/.ssh/authorized_keys
-    mkdir -m 0700 ${chroot_dir}/root/.ssh
-    rsync -a ${ssh_key} ${chroot_dir}/root/.ssh/authorized_keys
-    chmod 0644 ${chroot_dir}/root/.ssh/authorized_keys
-  } || :
+  # root
+  [[ -z "${ssh_key}" ]] || {
+    add_authorized_keys ${chroot_dir}/root ${ssh_key}
+  }
 
-  [[ -f "${ssh_user_key}" && -n "${devel_user}" ]] && {
-    printf "[INFO] Installing authorized_keys %s\n" /home/${devel_user}/.ssh/authorized_keys
-    mkdir -m 0700 ${chroot_dir}/home/${devel_user}/.ssh
-    rsync -a ${ssh_user_key} ${chroot_dir}/home/${devel_user}/.ssh/authorized_keys
-    chmod 0644  ${chroot_dir}/home/${devel_user}/.ssh/authorized_keys
+  # devel_user
+  [[ -n "${devel_user}" ]] || return 0
+  [[ -z "${ssh_user_key}" ]] || {
+    add_authorized_keys ${chroot_dir}/home/${devel_user} ${ssh_user_key}
     run_in_target ${chroot_dir} "chown -R ${devel_user}:${devel_user} /home/${devel_user}/.ssh/"
-  } || :
+  }
 }
 
 ## package configuration
