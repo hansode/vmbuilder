@@ -25,7 +25,8 @@ function tearDown() {
 }
 
 function test_config_sshd_config_file_not_found() {
-  config_sshd_config ${param_name} no 2>/dev/null
+  rm -f ${sshd_config_path}
+  config_sshd_config ${sshd_config_path} ${param_name} no 2>/dev/null
   assertNotEquals $? 0
 }
 
@@ -34,7 +35,7 @@ function test_config_sshd_config_enabled() {
 	${param_name} ${default_value}
 	EOS
 
-  config_sshd_config ${param_name} no
+  config_sshd_config ${sshd_config_path} ${param_name} no
   assertEquals $? 0
 }
 
@@ -43,7 +44,7 @@ function test_config_sshd_config_disabled_comment() {
 	#${param_name} ${default_value}
 	EOS
 
-  config_sshd_config ${param_name} no
+  config_sshd_config ${sshd_config_path} ${param_name} no
   assertEquals $? 0
 }
 
@@ -52,7 +53,7 @@ function test_config_sshd_config_disabled_comment_whitespace() {
 	#  ${param_name} ${default_value}
 	EOS
 
-  config_sshd_config ${param_name} no
+  config_sshd_config ${sshd_config_path} ${param_name} no
   assertEquals $? 0
 }
 
@@ -60,7 +61,7 @@ function test_config_sshd_config_disabled_comment_not_exists() {
   cat <<-EOS > ${sshd_config_path}
 	EOS
 
-  config_sshd_config ${param_name} no
+  config_sshd_config ${sshd_config_path} ${param_name} no
   assertEquals $? 0
 }
 
