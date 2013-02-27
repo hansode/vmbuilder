@@ -42,7 +42,8 @@ function setUp() {
   function clean_packages() { echo clean_packages $*; }
   function run_xcopy()      { echo run_xcopy      $*; }
   function xsync_dir()      { echo xsync_dir      $*; }
-  function run_xexecscript() { echo run_xexecscript $*; }
+  function run_execscripts() { echo run_execscripts $*; }
+  function run_xexecscripts() { echo run_xexecscripts $*; }
   function install_firstboot() { echo install_firstboot $*; }
   function install_firstlogin() { echo install_firstlogin $*; }
   function cleanup_distro() { echo cleanup_distro $*; }

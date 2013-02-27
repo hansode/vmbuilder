@@ -32,13 +32,18 @@ function tearDown() {
   rm -rf ${chroot_dir}
 }
 
-function test_run_xexecscript_executable() {
-  run_xexecscript ${chroot_dir} ${xexecscript_path} >/dev/null
+function test_run_xexecscripts_file() {
+  run_xexecscripts ${chroot_dir} ${xexecscript_path} >/dev/null
   assertEquals $? 0
 }
 
-function test_run_xexecscript_inexecutable() {
-  run_xexecscript ${chroot_dir} /dev/null 2>/dev/null
+function test_run_xexecscripts_files() {
+  run_xexecscripts ${chroot_dir} ${xexecscript_path} ${xexecscript_path} >/dev/null
+  assertEquals $? 0
+}
+
+function test_run_xexecscripts_no_opts() {
+  run_xexecscripts ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 
