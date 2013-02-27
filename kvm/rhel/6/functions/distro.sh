@@ -90,6 +90,7 @@ function add_option_distro() {
   copy=${copy:-}
   copydir=${copydir:-}
   execscript=${execscript:-}
+  xexecscript=${xexecscript:-}
   firstboot=${firstboot:-}
   firstlogin=${firstlogin:-}
 }
@@ -1575,6 +1576,31 @@ function run_execscript() {
 
   setarch ${distro_arch} ${execscript} ${chroot_dir} || {
     echo "[ERROR] execscript failed: exitcode=$? (${BASH_SOURCE[0]##*/}:${LINENO})" >&2
+    return 1
+  }
+}
+
+function run_xexecscripts() {
+  local chroot_dir=$1; shift
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  while [[ $# -ne 0 ]]; do
+    run_xexecscript ${chroot_dir} $1
+    shift
+  done
+}
+
+function run_xexecscript() {
+  local chroot_dir=$1 xexecscript=$2
+  [[ -d "${chroot_dir}"  ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${xexecscript}" ]] || return 0
+  [[ -x "${xexecscript}" ]] || { echo "[WARN] cannot execute script: ${xexecscript} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 0; }
+
+  printf "[INFO] Excecuting script: %s\n" ${xexecscript}
+  [[ -n "${distro_arch}" ]] || add_option_distro
+
+  (. ${xexecscript} ${chroot_dir}) || {
+    echo "[ERROR] xexecscript failed: exitcode=$? (${BASH_SOURCE[0]##*/}:${LINENO})" >&2
     return 1
   }
 }
