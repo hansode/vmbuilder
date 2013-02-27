@@ -21,7 +21,7 @@
 #          mount_dev, mount_sys, configure_networking, configure_mounting, configure_keepcache, configure_console
 #          configure_hypervisor, configure_selinux
 #          configure_sshd_password_authentication, configure_sshd_gssapi_authentication, configure_sshd_permit_root_login, configure_sudo_requiretty, configure_sshd_use_dns
-#          run_xcopy, xsync_dir, run_execscripts, install_firstboot, install_firstlogin, convert_rpmdb_hash, clean_packages, cleanup_distro
+#          run_xcopy, xsync_dir, run_execscripts, run_xexecscripts, install_firstboot, install_firstlogin, convert_rpmdb_hash, clean_packages, cleanup_distro
 #
 
 ## depending on global variables
@@ -206,6 +206,7 @@ function install_os() {
   run_xcopy            ${chroot_dir} ${copy}
   xsync_dir            ${chroot_dir} ${copydir}
   run_execscripts      ${chroot_dir} ${execscript}
+  run_xexecscripts     ${chroot_dir} ${xexecscript}
   install_firstboot    ${chroot_dir} ${firstboot}
   install_firstlogin   ${chroot_dir} ${firstlogin}
 
