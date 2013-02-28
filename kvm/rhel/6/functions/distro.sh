@@ -713,7 +713,7 @@ function update_passwords() {
   }
 
   [[ -z "${devel_user}" ]] || {
-    run_in_target ${chroot_dir} "echo ${devel_user}:${devel_pass:-${devel_user}} | chpasswd"
+    update_user_password ${chroot_dir} ${devel_user} ${devel_pass:-${devel_user}}
   }
 }
 
@@ -733,6 +733,15 @@ function create_user_account() {
   egrep -q ^umask ${chroot_dir}/${user_home}/.bashrc || {
     echo umask 022 >> ${chroot_dir}/${user_home}/.bashrc
   }
+}
+
+function update_user_password() {
+  local chroot_dir=$1 user_name=$2 user_pass=$3
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${user_name}"  ]] || { echo "[ERROR] Invalid argument: user_name:${user_name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${user_pass}"  ]] || { echo "[ERROR] Invalid argument: user_pass:${user_pass} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  run_in_target ${chroot_dir} "echo ${user_name}:${user_pass} | chpasswd"
 }
 
 function configure_sudo_sudoers() {
