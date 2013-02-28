@@ -735,14 +735,21 @@ function create_user_account() {
   }
 }
 
+function configure_sudo_sudoers() {
+  local chroot_dir=$1 user_name=$2
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${user_name}"  ]] || { echo "[ERROR] Invalid argument: user_name:${user_name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  egrep ^${user_name} -w ${chroot_dir}/etc/sudoers || { echo "${user_name} ALL=(ALL) NOPASSWD: ALL" >> ${chroot_dir}/etc/sudoers; }
+}
+
 function create_initial_user() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   [[ -z "${devel_user}" ]] || {
-    create_user_account ${chroot_dir} ${devel_user}
-
-    egrep ^${devel_user} -w ${chroot_dir}/etc/sudoers || { echo "${devel_user} ALL=(ALL) NOPASSWD: ALL" >> ${chroot_dir}/etc/sudoers; }
+    create_user_account    ${chroot_dir} ${devel_user}
+    configure_sudo_sudoers ${chroot_dir} ${devel_user}
   }
 
   update_passwords ${chroot_dir}

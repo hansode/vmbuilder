@@ -20,9 +20,9 @@ function setUp() {
   mkdir -p ${chroot_dir}/etc
   mkdir -p ${chroot_dir}/${devel_home}
 
-  touch ${chroot_dir}/etc/sudoers
   touch ${chroot_dir}/${devel_home}/.bashrc
 
+  function configure_sudo_sudoers() { echo configure_sudo_sudoers $*; }
   function chroot() { echo chroot $*; }
 }
 
@@ -50,11 +50,6 @@ function test_create_initial_user_devel_umask() {
 
   egrep -q -w "^umask 022" ${chroot_dir}/${devel_home}/.bashrc
   assertEquals $? 0
-}
-
-function test_create_initial_user_devel_sudoers() {
-  create_initial_user ${chroot_dir} >/dev/null
-  assertEquals "$(egrep -w "^${devel_user}" ${chroot_dir}/etc/sudoers)" "${devel_user} ALL=(ALL) NOPASSWD: ALL"
 }
 
 ## shunit2
