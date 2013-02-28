@@ -713,8 +713,43 @@ function update_passwords() {
   }
 
   [[ -z "${devel_user}" ]] || {
-    run_in_target ${chroot_dir} "echo ${devel_user}:${devel_pass:-${devel_user}} | chpasswd"
+    update_user_password ${chroot_dir} ${devel_user} ${devel_pass:-${devel_user}}
   }
+}
+
+function create_user_account() {
+  local chroot_dir=$1 user_name=$2
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${user_name}"  ]] || { echo "[ERROR] Invalid argument: user_name:${user_name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  printf "[INFO] Creating user: %s\n" ${user_name}
+
+  local user_group=${user_name}
+  local user_home=/home/${user_name}
+
+  run_in_target ${chroot_dir} "getent group  ${user_group} >/dev/null || groupadd ${user_group}"
+  run_in_target ${chroot_dir} "getent passwd ${user_name}  >/dev/null || useradd -g ${user_group} -d ${user_home} -s /bin/bash -m ${user_name}"
+
+  egrep -q ^umask ${chroot_dir}/${user_home}/.bashrc || {
+    echo umask 022 >> ${chroot_dir}/${user_home}/.bashrc
+  }
+}
+
+function update_user_password() {
+  local chroot_dir=$1 user_name=$2 user_pass=$3
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${user_name}"  ]] || { echo "[ERROR] Invalid argument: user_name:${user_name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${user_pass}"  ]] || { echo "[ERROR] Invalid argument: user_pass:${user_pass} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  run_in_target ${chroot_dir} "echo ${user_name}:${user_pass} | chpasswd"
+}
+
+function configure_sudo_sudoers() {
+  local chroot_dir=$1 user_name=$2
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${user_name}"  ]] || { echo "[ERROR] Invalid argument: user_name:${user_name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  egrep ^${user_name} -w ${chroot_dir}/etc/sudoers || { echo "${user_name} ALL=(ALL) NOPASSWD: ALL" >> ${chroot_dir}/etc/sudoers; }
 }
 
 function create_initial_user() {
@@ -722,19 +757,8 @@ function create_initial_user() {
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   [[ -z "${devel_user}" ]] || {
-    printf "[INFO] Creating user: %s\n" ${devel_user}
-
-    local devel_group=${devel_user}
-    local devel_home=/home/${devel_user}
-
-    run_in_target ${chroot_dir} "getent group  ${devel_group} >/dev/null || groupadd ${devel_group}"
-    run_in_target ${chroot_dir} "getent passwd ${devel_user}  >/dev/null || useradd -g ${devel_group} -d ${devel_home} -s /bin/bash -m ${devel_user}"
-
-    egrep -q ^umask ${chroot_dir}/${devel_home}/.bashrc || {
-      echo umask 022 >> ${chroot_dir}/${devel_home}/.bashrc
-    }
-
-    egrep ^${devel_user} -w ${chroot_dir}/etc/sudoers || { echo "${devel_user} ALL=(ALL) NOPASSWD: ALL" >> ${chroot_dir}/etc/sudoers; }
+    create_user_account    ${chroot_dir} ${devel_user}
+    configure_sudo_sudoers ${chroot_dir} ${devel_user}
   }
 
   update_passwords ${chroot_dir}

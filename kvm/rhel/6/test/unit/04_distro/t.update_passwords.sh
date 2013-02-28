@@ -15,6 +15,7 @@
 function setUp() {
   mkdir -p ${chroot_dir}
 
+  function update_user_password() { echo update_user_password $*; }
   function chroot() { echo chroot $*; }
 }
 
