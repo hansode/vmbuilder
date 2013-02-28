@@ -90,6 +90,7 @@ function add_option_distro() {
   copy=${copy:-}
   copydir=${copydir:-}
   execscript=${execscript:-}
+  xexecscript=${xexecscript:-}
   firstboot=${firstboot:-}
   firstlogin=${firstlogin:-}
 }
@@ -455,27 +456,27 @@ function configure_selinux() {
 }
 
 function config_sshd_config() {
-  local keyword=$1 value=$2
+  local sshd_config_path=$1 keyword=$2 value=$3
+  [[ -a "${sshd_config_path}" ]] || { echo "[ERROR] file not found: ${sshd_config_path} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   [[ -n "${keyword}" ]] || { echo "[ERROR] Invalid argument: keyword:${keyword} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   [[ -n "${value}"   ]] || { echo "[ERROR] Invalid argument: value:${value} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
-  [[ -a "${chroot_dir}/etc/ssh/sshd_config" ]] || { echo "[ERROR] file not found: ${chroot_dir}/etc/ssh/sshd_config (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
-  egrep -q -w "^${keyword}" ${chroot_dir}/etc/ssh/sshd_config && {
+  egrep -q -w "^${keyword}" ${sshd_config_path} && {
     # enabled
-    sed -i "s/^${keyword}.*/${keyword} ${value}/"  ${chroot_dir}/etc/ssh/sshd_config
+    sed -i "s/^${keyword}.*/${keyword} ${value}/"  ${sshd_config_path}
   } || {
     # commented parameter is "^#keyword value".
     # therefore this case should *not* be included white spaces between # and keyword.
-    egrep -q -w "^#${keyword}" ${chroot_dir}/etc/ssh/sshd_config && {
+    egrep -q -w "^#${keyword}" ${sshd_config_path} && {
       # disabled
-      sed -i "s/^#${keyword}.*/${keyword} ${value}/" ${chroot_dir}/etc/ssh/sshd_config
+      sed -i "s/^#${keyword}.*/${keyword} ${value}/" ${sshd_config_path}
     } || {
       # no match
-      echo "${keyword} ${value}" >> ${chroot_dir}/etc/ssh/sshd_config
+      echo "${keyword} ${value}" >> ${sshd_config_path}
     }
   }
 
-  egrep -q -w "^${keyword} ${value}" ${chroot_dir}/etc/ssh/sshd_config
+  egrep -q -w "^${keyword} ${value}" ${sshd_config_path}
 }
 
 function configure_sshd_password_authentication() {
@@ -488,7 +489,7 @@ function configure_sshd_password_authentication() {
   esac
 
   printf "[INFO] Configuring sshd PasswordAuthentication: %s\n" ${passauth}
-  config_sshd_config PasswordAuthentication ${passauth}
+  config_sshd_config ${chroot_dir}/etc/ssh/sshd_config PasswordAuthentication ${passauth}
 }
 
 function configure_sshd_gssapi_authentication() {
@@ -501,7 +502,7 @@ function configure_sshd_gssapi_authentication() {
   esac
 
   printf "[INFO] Configuring sshd GSSAPIAuthentication: %s\n" ${gssapi_auth}
-  config_sshd_config GSSAPIAuthentication ${gssapi_auth}
+  config_sshd_config ${chroot_dir}/etc/ssh/sshd_config GSSAPIAuthentication ${gssapi_auth}
 }
 
 function configure_sshd_permit_root_login() {
@@ -514,7 +515,7 @@ function configure_sshd_permit_root_login() {
   esac
 
   printf "[INFO] Configuring sshd PermitRootLogin: %s\n" ${permit_root_login}
-  config_sshd_config PermitRootLogin ${permit_root_login}
+  config_sshd_config ${chroot_dir}/etc/ssh/sshd_config PermitRootLogin ${permit_root_login}
 }
 
 function configure_sshd_use_dns() {
@@ -527,7 +528,7 @@ function configure_sshd_use_dns() {
   esac
 
   printf "[INFO] Configuring sshd UseDNS: %s\n" ${use_dns}
-  config_sshd_config UseDNS ${use_dns}
+  config_sshd_config ${chroot_dir}/etc/ssh/sshd_config UseDNS ${use_dns}
 }
 
 function check_sudo_requiretty() {
@@ -712,8 +713,43 @@ function update_passwords() {
   }
 
   [[ -z "${devel_user}" ]] || {
-    run_in_target ${chroot_dir} "echo ${devel_user}:${devel_pass:-${devel_user}} | chpasswd"
+    update_user_password ${chroot_dir} ${devel_user} ${devel_pass:-${devel_user}}
   }
+}
+
+function create_user_account() {
+  local chroot_dir=$1 user_name=$2
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${user_name}"  ]] || { echo "[ERROR] Invalid argument: user_name:${user_name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  printf "[INFO] Creating user: %s\n" ${user_name}
+
+  local user_group=${user_name}
+  local user_home=/home/${user_name}
+
+  run_in_target ${chroot_dir} "getent group  ${user_group} >/dev/null || groupadd ${user_group}"
+  run_in_target ${chroot_dir} "getent passwd ${user_name}  >/dev/null || useradd -g ${user_group} -d ${user_home} -s /bin/bash -m ${user_name}"
+
+  egrep -q ^umask ${chroot_dir}/${user_home}/.bashrc || {
+    echo umask 022 >> ${chroot_dir}/${user_home}/.bashrc
+  }
+}
+
+function update_user_password() {
+  local chroot_dir=$1 user_name=$2 user_pass=$3
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${user_name}"  ]] || { echo "[ERROR] Invalid argument: user_name:${user_name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${user_pass}"  ]] || { echo "[ERROR] Invalid argument: user_pass:${user_pass} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  run_in_target ${chroot_dir} "echo ${user_name}:${user_pass} | chpasswd"
+}
+
+function configure_sudo_sudoers() {
+  local chroot_dir=$1 user_name=$2
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${user_name}"  ]] || { echo "[ERROR] Invalid argument: user_name:${user_name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  egrep ^${user_name} -w ${chroot_dir}/etc/sudoers || { echo "${user_name} ALL=(ALL) NOPASSWD: ALL" >> ${chroot_dir}/etc/sudoers; }
 }
 
 function create_initial_user() {
@@ -721,19 +757,8 @@ function create_initial_user() {
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   [[ -z "${devel_user}" ]] || {
-    printf "[INFO] Creating user: %s\n" ${devel_user}
-
-    local devel_group=${devel_user}
-    local devel_home=/home/${devel_user}
-
-    run_in_target ${chroot_dir} "getent group  ${devel_group} >/dev/null || groupadd ${devel_group}"
-    run_in_target ${chroot_dir} "getent passwd ${devel_user}  >/dev/null || useradd -g ${devel_group} -d ${devel_home} -s /bin/bash -m ${devel_user}"
-
-    egrep -q ^umask ${chroot_dir}/${devel_home}/.bashrc || {
-      echo umask 022 >> ${chroot_dir}/${devel_home}/.bashrc
-    }
-
-    egrep ^${devel_user} -w ${chroot_dir}/etc/sudoers || { echo "${devel_user} ALL=(ALL) NOPASSWD: ALL" >> ${chroot_dir}/etc/sudoers; }
+    create_user_account    ${chroot_dir} ${devel_user}
+    configure_sudo_sudoers ${chroot_dir} ${devel_user}
   }
 
   update_passwords ${chroot_dir}
@@ -819,7 +844,7 @@ function install_epel() {
 
   # need to periodically update uri
   # ex) http://ftp.riken.jp/Linux/fedora/epel/6/i386/epel-release-6-8.noarch.rpm
-  [[ -z "${epel_uri}" ]] || run_in_target ${chroot_dir} yum install -y ${epel_uri}
+  [[ -z "${epel_uri}" ]] || run_in_target ${chroot_dir} rpm -Uvh ${epel_uri}
 }
 
 ### openvz kernel
@@ -1554,7 +1579,7 @@ function sync_dir() {
   rsync -aHA ${sync_dir} ${chroot_dir}/
 }
 
-function run_xexecscript() {
+function run_execscripts() {
   local chroot_dir=$1; shift
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
@@ -1575,6 +1600,31 @@ function run_execscript() {
 
   setarch ${distro_arch} ${execscript} ${chroot_dir} || {
     echo "[ERROR] execscript failed: exitcode=$? (${BASH_SOURCE[0]##*/}:${LINENO})" >&2
+    return 1
+  }
+}
+
+function run_xexecscripts() {
+  local chroot_dir=$1; shift
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  while [[ $# -ne 0 ]]; do
+    run_xexecscript ${chroot_dir} $1
+    shift
+  done
+}
+
+function run_xexecscript() {
+  local chroot_dir=$1 xexecscript=$2
+  [[ -d "${chroot_dir}"  ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${xexecscript}" ]] || return 0
+  [[ -x "${xexecscript}" ]] || { echo "[WARN] cannot execute script: ${xexecscript} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 0; }
+
+  printf "[INFO] Excecuting script: %s\n" ${xexecscript}
+  [[ -n "${distro_arch}" ]] || add_option_distro
+
+  (. ${xexecscript} ${chroot_dir}) || {
+    echo "[ERROR] xexecscript failed: exitcode=$? (${BASH_SOURCE[0]##*/}:${LINENO})" >&2
     return 1
   }
 }
