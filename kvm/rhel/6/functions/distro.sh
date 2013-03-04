@@ -1315,7 +1315,7 @@ function install_interface() {
 
   iftype=$(echo ${iftype} | tr A-Z a-z)
   case ${iftype} in
-  ethernet|ovsbridge)
+  ethernet|ovsport|ovsbridge)
     ;;
   bridge)
     run_yum ${chroot_dir} install bridge-utils
@@ -1386,6 +1386,18 @@ function render_interface_bridge() {
   cat <<-EOS
 	DEVICE=${ifname}
 	TYPE=Bridge
+	EOS
+}
+
+function render_interface_ovsport() {
+  local ifname=${1:-eth0}
+
+  cat <<-EOS
+	DEVICE=${ifname}
+	TYPE=OVSPort
+	NM_CONTROLLED=no
+	DEVICETYPE=ovs
+	$([[ -z "${bridge}" ]] || echo "OVS_BRIDGE=${bridge}")
 	EOS
 }
 
