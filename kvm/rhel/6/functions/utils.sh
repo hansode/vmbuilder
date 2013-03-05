@@ -124,3 +124,13 @@ function beautify_process_args() {
     esac
   done < <(cat | dump_process_args)
 }
+
+function basearch() {
+  local arch=${1:-$(arch)}
+
+  case "${arch}" in
+  i[3-6]86) echo i386   ;;
+    x86_64) echo x86_64 ;;
+         *) return 1    ;;
+  esac
+}

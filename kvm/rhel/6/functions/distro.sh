@@ -15,7 +15,7 @@
 #  file, db_dump, db43_load
 #
 # imports:
-#  utils: checkroot, run_in_target, expand_path
+#  utils: checkroot, run_in_target, expand_path, basearch
 #  disk: is_dev, mkdevice, mkprocdir, mount_proc, umount_nonroot, xptabinfo, mntpntuuid, get_grub_id, lsdevmap, devmap2lodev
 #
 
@@ -23,9 +23,10 @@
 
 function add_option_distro() {
   distro_arch=${distro_arch:-$(arch)}
-  case "${distro_arch}" in
-  i*86)   basearch=i386 distro_arch=i686 ;;
-  x86_64) basearch=${distro_arch} ;;
+  basearch=$(basearch ${distro_arch})
+
+  case "${basearch}" in
+  i386) distro_arch=i686 ;;
   esac
 
   distro_name=${distro_name}
