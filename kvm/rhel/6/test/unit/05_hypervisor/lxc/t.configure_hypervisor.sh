@@ -18,6 +18,7 @@ function setUp() {
   mkdir ${chroot_dir}
 
   function configure_container() { echo configure_container $*; }
+  function prevent_plymouth_starting() { echo prevent_plymouth_starting $*; }
 }
 
 function tearDown() {
