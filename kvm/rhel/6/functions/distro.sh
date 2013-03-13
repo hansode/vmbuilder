@@ -1284,7 +1284,7 @@ function config_host_and_domainname() {
   }
 }
 
-function configure_console() {
+function configure_serial_console() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
