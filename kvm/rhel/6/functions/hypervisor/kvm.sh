@@ -47,6 +47,7 @@ function configure_hypervisor() {
 
   echo "[INFO] ***** Configuring kvm-specific *****"
   configure_acpiphp ${chroot_dir}
+  configure_serial_console ${chroot_dir}
 }
 
 ## command path
