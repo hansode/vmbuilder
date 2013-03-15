@@ -593,11 +593,29 @@ function unprevent_daemons_starting() {
 
 function prevent_udev_starting() {
   local chroot_dir=$1
-
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
   sed -i 's,/sbin/start_udev,#\0,' \
     ${chroot_dir}/etc/rc.sysinit   \
     ${chroot_dir}/etc/rc.d/rc.sysinit
+}
+
+function prevent_plymouth_starting() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  sed -i 's|\[ "$PROMPT" != no \] && plymouth|[ "$PROMPT" != no ] \&\& [ -n "$PLYMOUTH" ] \&\& plymouth|' \
+    ${chroot_dir}/etc/rc.sysinit \
+    ${chroot_dir}/etc/rc.d/rc.sysinit
+
+  local upstart_system_jobs="
+    plymouth-shutdown.conf
+    quit-plymouth.conf
+    splash-manager.conf
+  "
+  for upstart_system_job in ${upstart_system_jobs}; do
+    [[ -f ${chroot_dir}/etc/init/${upstart_system_job} ]] && { rm -f ${chroot_dir}/etc/init/${upstart_system_job}; } || :
+  done
 }
 
 ## mounting
@@ -1266,7 +1284,7 @@ function config_host_and_domainname() {
   }
 }
 
-function configure_console() {
+function configure_serial_console() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 

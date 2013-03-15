@@ -23,8 +23,8 @@ function tearDown() {
   rm -rf ${chroot_dir}
 }
 
-function test_configure_console() {
-  configure_console ${chroot_dir} >/dev/null
+function test_configure_serial_console() {
+  configure_serial_console ${chroot_dir} >/dev/null
 
   egrep -w '^ACTIVE_CONSOLES=' ${chroot_dir}/etc/sysconfig/init | egrep -q -w '/dev/ttyS0'
   assertEquals $? 0

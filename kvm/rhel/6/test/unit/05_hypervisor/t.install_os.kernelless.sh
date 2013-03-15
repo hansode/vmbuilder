@@ -32,7 +32,6 @@ function setUp() {
   function configure_networking() { echo configure_networking $*; }
   function configure_mounting() { echo configure_mounting $*; }
   function configure_keepcache() { echo configure_keepcache $*; }
-  function configure_console() { echo configure_console $*; }
   function configure_hypervisor() { echo configure_hypervisor $*; }
   function configure_selinux() { echo configure_selinux $*; }
   function configure_sshd_password_authentication() { echo configure_sshd_password_authentication $*; }

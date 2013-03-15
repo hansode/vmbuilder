@@ -35,8 +35,7 @@ function configure_hypervisor() {
   echo "[INFO] ***** Configuring lxc-specific *****"
   configure_container ${chroot_dir}
 
- #run_in_target ${chroot_dir} chkconfig udev-post off
- #run_in_target ${chroot_dir} chkconfig network on
+  prevent_plymouth_starting ${chroot_dir}
 }
 
 function render_lxc_config() {

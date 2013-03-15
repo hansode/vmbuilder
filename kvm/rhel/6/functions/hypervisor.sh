@@ -18,7 +18,7 @@
 #  disk: xptabproc, mntpnt2path
 #  distro: add_option_distro, preflight_check_distro, install_kernel, install_bootloader, install_epel, install_addedpkgs, mount_proc
 #          create_initial_user, install_authorized_keys
-#          mount_dev, mount_sys, configure_networking, configure_mounting, configure_keepcache, configure_console
+#          mount_dev, mount_sys, configure_networking, configure_mounting, configure_keepcache
 #          configure_hypervisor, configure_selinux
 #          configure_sshd_password_authentication, configure_sshd_gssapi_authentication, configure_sshd_permit_root_login, configure_sudo_requiretty, configure_sshd_use_dns
 #          run_xcopy, xsync_dir, run_execscripts, run_xexecscripts, install_firstboot, install_firstlogin, convert_rpmdb_hash, clean_packages, cleanup_distro
@@ -181,7 +181,6 @@ function install_os() {
     configure_mounting ${chroot_dir} ${disk_filename}
   }
   configure_keepcache  ${chroot_dir}
-  configure_console    ${chroot_dir}
   configure_hypervisor ${chroot_dir}
   configure_selinux    ${chroot_dir}
 
