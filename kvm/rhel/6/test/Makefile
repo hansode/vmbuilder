@@ -1,4 +1,4 @@
-all: unit integration
+all: unit
 
 unit:
 	(cd $@ && make)
