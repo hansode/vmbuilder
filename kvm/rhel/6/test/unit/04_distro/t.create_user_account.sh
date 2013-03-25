@@ -53,6 +53,19 @@ function test_create_user_account_umask() {
   assertEquals $? 0
 }
 
+function test_create_user_account_defined_gid() {
+  local uid=500 gid=500
+  create_user_account ${chroot_dir} ${username} ${gid} ${uid} | egrep -q -w "groupadd --gid ${gid}"
+  assertEquals $? 0
+}
+
+function test_create_user_account_defined_uid() {
+  local uid=500 gid=500
+  create_user_account ${chroot_dir} ${username} ${gid} ${uid} | egrep -q -w "useradd --uid ${uid}"
+  assertEquals $? 0
+}
+
+
 ## shunit2
 
 . ${shunit2_file}
