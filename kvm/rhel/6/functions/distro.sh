@@ -743,7 +743,7 @@ function update_passwords() {
 }
 
 function create_user_account() {
-  local chroot_dir=$1 user_name=$2
+  local chroot_dir=$1 user_name=$2 gid=$3 uid=$4
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   [[ -n "${user_name}"  ]] || { echo "[ERROR] Invalid argument: user_name:${user_name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
@@ -752,8 +752,8 @@ function create_user_account() {
   local user_group=${user_name}
   local user_home=/home/${user_name}
 
-  run_in_target ${chroot_dir} "getent group  ${user_group} >/dev/null || groupadd ${user_group}"
-  run_in_target ${chroot_dir} "getent passwd ${user_name}  >/dev/null || useradd -g ${user_group} -d ${user_home} -s /bin/bash -m ${user_name}"
+  run_in_target ${chroot_dir} "getent group  ${user_group} >/dev/null || groupadd $([[ -z ${gid} ]] || echo --gid ${gid}) ${user_group}"
+  run_in_target ${chroot_dir} "getent passwd ${user_name}  >/dev/null || useradd  $([[ -z ${uid} ]] || echo --uid ${uid}) -g ${user_group} -d ${user_home} -s /bin/bash -m ${user_name}"
 
   egrep -q ^umask ${chroot_dir}/${user_home}/.bashrc || {
     echo umask 022 >> ${chroot_dir}/${user_home}/.bashrc
