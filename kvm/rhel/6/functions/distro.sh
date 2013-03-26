@@ -1673,7 +1673,7 @@ function install_firstboot() {
   [[ -f "${firstboot}"  ]] || { echo "[ERROR] The path to the first-boot directive is invalid: ${firstboot}. Make sure you are providing a full path. (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   printf "[DEBUG] Installing firstboot script %s\n" ${firstboot}
-  rsync -aHA ${firstboot} ${chroot_dir}/root/firstboot.sh
+  rsync -aL ${firstboot} ${chroot_dir}/root/firstboot.sh
   chmod 0700 ${chroot_dir}/root/firstboot.sh
 
   mv ${chroot_dir}/etc/rc.d/rc.local ${chroot_dir}/etc/rc.d/rc.local.orig
@@ -1698,7 +1698,7 @@ function install_firstlogin() {
   [[ -f "${firstlogin}" ]] || { echo "[ERROR] The path to the first-login directive is invalid: ${firstlogin}. Make sure you are providing a full path. (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   printf "[DEBUG] Installing first login script %s\n" ${firstlogin}
-  rsync -aHA ${firstlogin} ${chroot_dir}/root/firstlogin.sh
+  rsync -aL ${firstlogin} ${chroot_dir}/root/firstlogin.sh
   chmod 0755 ${chroot_dir}/root/firstlogin.sh
 
   cp ${chroot_dir}/etc/bashrc ${chroot_dir}/etc/bashrc.orig
