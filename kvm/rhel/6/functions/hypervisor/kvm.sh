@@ -41,7 +41,6 @@ function add_option_hypervisor_kvm() {
   vendor_id=${vendor_id:-52:54:00}
 
   pidfile=${pidfile:-kvm.pid}
-  drive_type=${drive_type:-virtio} # [ 'virtio', 'scsi' ]
 }
 
 function configure_hypervisor() {
@@ -92,7 +91,7 @@ function build_drive_opt() {
   local i=0 img_path= boot=on
 
   for img_path in ${image_path}; do
-    echo -drive file=${img_path},media=disk,boot=${boot},index=${i},cache=none,if=${drive_type}
+    echo -drive file=${img_path},media=disk,boot=${boot},index=${i},cache=none
     boot=off
     let i++
   done
@@ -147,7 +146,6 @@ function render_kvm_runscript() {
 	monitor_port=${monitor_port}
 	serial_addr=${serial_addr}
 	serial_port=${serial_port}
-	drive_type=${drive_type}
 	pidfile=${pidfile}
 	#
 	EOS
@@ -164,7 +162,6 @@ function render_kvm_runscript() {
     monitor_port='${monitor_port}'
     serial_addr='${serial_addr}'
     serial_port='${serial_port}'
-    drive_type='${drive_type}'
     pidfile='${pidfile}'
 
     # dry run
