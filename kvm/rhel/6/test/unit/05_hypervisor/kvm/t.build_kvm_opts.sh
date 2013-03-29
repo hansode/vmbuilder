@@ -30,7 +30,7 @@ function test_build_kvm_opts_no_pidfile() {
   local pidfile=
 
   build_kvm_opts | egrep -q -w -- "-pidfile ${pidfile}"
-  assertNotEquals $? 0
+  assertEquals $? 0
 }
 
 function test_build_kvm_opts_with_pidfile() {
