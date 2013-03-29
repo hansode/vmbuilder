@@ -40,6 +40,7 @@ function add_option_hypervisor_kvm() {
 
   vendor_id=${vendor_id:-52:54:00}
 
+  pidfile=${pidfile:-kvm.pid}
   drive_type=${drive_type:-virtio} # [ 'virtio', 'scsi' ]
 }
 
@@ -115,7 +116,7 @@ function build_kvm_opts() {
    -serial   telnet:${serial_addr}:${serial_port},server,nowait \
    $(build_drive_opt) \
    $(build_vif_opt ${vif_num}) \
-   $([[ -z "${pidfile}" ]] || echo -pidfile ${pidfile}) \
+   -pidfile ${pidfile} \
    -daemonize
 }
 
@@ -147,6 +148,7 @@ function render_kvm_runscript() {
 	serial_addr=${serial_addr}
 	serial_port=${serial_port}
 	drive_type=${drive_type}
+	pidfile=${pidfile}
 	#
 	EOS
 
@@ -163,6 +165,7 @@ function render_kvm_runscript() {
     serial_addr='${serial_addr}'
     serial_port='${serial_port}'
     drive_type='${drive_type}'
+    pidfile='${pidfile}'
 
     # dry run
     function shlog() { echo $*; }
