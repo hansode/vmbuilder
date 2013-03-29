@@ -31,6 +31,30 @@ function test_build_drive_opt_defined_image_path_and_cdrom() {
   assertEquals "$(build_drive_opt | wc -l)" 3
 }
 
+function test_build_drive_opt_defined_drive_type_ide() {
+  local image_path="${imagefile_path}"
+
+  local drive_type=ide
+  build_drive_opt | egrep -q ,if=ide
+  assertEquals $? 0
+}
+
+function test_build_drive_opt_defined_drive_type_virtio() {
+  local image_path="${imagefile_path}"
+
+  local drive_type=virtio
+  build_drive_opt | egrep -q ,if=virtio
+  assertEquals $? 0
+}
+
+function test_build_drive_opt_defined_drive_type_scsi() {
+  local image_path="${imagefile_path}"
+
+  local drive_type=scsi
+  build_drive_opt | egrep -q ,if=scsi
+  assertEquals $? 0
+}
+
 ## shunit2
 
 . ${shunit2_file}
