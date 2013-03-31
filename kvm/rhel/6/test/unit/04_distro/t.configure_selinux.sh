@@ -13,8 +13,8 @@
 ## public functions
 
 function setUp() {
-  mkdir -p ${chroot_dir}/etc/sysconfig
-  cat <<-EOS > ${chroot_dir}/etc/sysconfig/selinux
+  mkdir -p ${chroot_dir}/etc/selinux
+  cat <<-EOS > ${chroot_dir}/etc/selinux/config
 	# This file controls the state of SELinux on the system.
 	# SELINUX= can take one of these three values:
 	#     enforcing - SELinux security policy is enforced.
@@ -33,7 +33,7 @@ function tearDown() {
 }
 
 function test_configure_selinux_file_not_found() {
-  rm ${chroot_dir}/etc/sysconfig/selinux
+  rm ${chroot_dir}/etc/selinux/config
 
   configure_selinux ${chroot_dir} "" 2>/dev/null
   assertEquals $? 0
