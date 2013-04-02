@@ -30,6 +30,23 @@ function test_configure_sudo_sudoers_devel_sudoers() {
   assertEquals "$(egrep -w "^${username}" ${chroot_dir}/etc/sudoers)" "${username} ALL=(ALL) NOPASSWD: ALL"
 }
 
+function test_configure_sudo_sudoers_no_tag_specs() {
+  configure_sudo_sudoers ${chroot_dir} ${username} >/dev/null
+  assertEquals "$(egrep -w "^${username}" ${chroot_dir}/etc/sudoers)" "${username} ALL=(ALL) NOPASSWD: ALL"
+}
+
+function test_configure_sudo_sudoers_with_tag_spec() {
+  local tag_specs="PASSWD:"
+  configure_sudo_sudoers ${chroot_dir} ${username} ${tag_specs} >/dev/null
+  assertEquals "$(egrep -w "^${username}" ${chroot_dir}/etc/sudoers)" "${username} ALL=(ALL) ${tag_specs} ALL"
+}
+
+function test_configure_sudo_sudoers_with_tag_specs() {
+  local tag_specs="PASSWD: EXEC:"
+  configure_sudo_sudoers ${chroot_dir} ${username} "PASSWD: EXEC:" >/dev/null
+  assertEquals "$(egrep -w "^${username}" ${chroot_dir}/etc/sudoers)" "${username} ALL=(ALL) ${tag_specs} ALL"
+}
+
 ## shunit2
 
 . ${shunit2_file}
