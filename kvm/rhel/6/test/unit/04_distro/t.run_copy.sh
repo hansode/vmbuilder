@@ -22,7 +22,6 @@ function setUp() {
 	${abs_dirname}/src /tmp/dst
 	
 	${abs_dirname}/foo /tmp/var
-	${abs_dirname}/zzz /tmp/zzz
 	EOS
   function rsync() { echo rsync $*; }
 }
