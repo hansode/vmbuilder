@@ -1599,7 +1599,10 @@ function run_copy() {
     [[ $# == 2 ]] || continue
     local destdir=${chroot_dir}${2%/*}
     [[ -d "${destdir}" ]] || mkdir -p ${destdir}
-    rsync -aHA ${1} ${chroot_dir}${2} || :
+    # keep symlink
+   #rsync -aHA ${1} ${chroot_dir}${2} || :
+    # don't keep symlink
+    cp -LpR ${1} ${chroot_dir}${2} || :
   done < <(egrep -v '^$' ${copy})
 }
 
