@@ -41,7 +41,10 @@ function add_option_hypervisor_kvm() {
   vendor_id=${vendor_id:-52:54:00}
 
   pidfile=${pidfile:-kvm.pid}
+
+  # /usr/libexec/qemu-kvm -device ? 2>&1
   drive_type=${drive_type:-ide} # [ 'ide', 'virtio', 'scsi' ]
+  nic_driver=${nic_driver:-virtio-net-pci} # [ 'virtio-net-pci', 'e1000' ]
 }
 
 function configure_hypervisor() {
@@ -84,7 +87,7 @@ function build_vif_opt() {
 
     echo \
       -netdev tap,ifname=${vif_name},id=${netdev_id},script=,downscript= \
-      -device virtio-net-pci,netdev=${netdev_id},mac=${macaddr},bus=pci.0,addr=${addr}
+      -device ${nic_driver},netdev=${netdev_id},mac=${macaddr},bus=pci.0,addr=${addr}
 EOS
 }
 
@@ -148,6 +151,7 @@ function render_kvm_runscript() {
 	serial_addr=${serial_addr}
 	serial_port=${serial_port}
 	drive_type=${drive_type}
+	nic_driver=${nic_driver}
 	pidfile=${pidfile}
 	#
 	EOS
@@ -165,6 +169,7 @@ function render_kvm_runscript() {
     serial_addr='${serial_addr}'
     serial_port='${serial_port}'
     drive_type='${drive_type}'
+    nic_driver='${nic_driver}'
     pidfile='${pidfile}'
 
     # dry run
