@@ -75,6 +75,7 @@ function add_option_distro() {
   # settings for the initial user
   devel_user=${devel_user:-}
   devel_pass=${devel_pass:-}
+  devel_encpass=${devel_encpass:-}
 
   rootpass=${rootpass:-}
   rootencpass=${rootencpass:-}
@@ -742,9 +743,13 @@ function update_passwords() {
     run_in_target ${chroot_dir} "usermod -L root"
   fi
 
-  [[ -z "${devel_user}" ]] || {
-    update_user_password ${chroot_dir} ${devel_user} ${devel_pass:-${devel_user}}
-  }
+  if [[ -n "${devel_user}" ]]; then
+    if [[ -n "${devel_encpass}" ]]; then
+      update_user_encpassword ${chroot_dir} ${devel_user} ${devel_encpass}
+    else
+      update_user_password ${chroot_dir} ${devel_user} ${devel_pass:-${devel_user}}
+    fi
+  fi
 }
 
 function create_user_account() {

@@ -21,6 +21,10 @@ function setUp() {
 
   rootpass=
   rootencpass=
+
+  devel_user=
+  devel_pass=
+  devel_encpass=
 }
 
 function tearDown() {
@@ -50,6 +54,43 @@ function test_update_passwords_rootencpass() {
   update_passwords ${chroot_dir} | egrep -q -w "^update_user_encpassword ${chroot_dir} root ${rootencpass}"
   assertEquals $? 0
 }
+
+function test_update_passwords_devel_pass() {
+  local devel_user=vmbuilder_user
+  local devel_pass=
+  local devel_encpass=vmbuilder_encpass
+
+  update_passwords ${chroot_dir} | egrep -q -w "^update_user_password ${chroot_dir} ${devel_user} ${devel_encpass}"
+  assertNotEquals $? 0
+
+  update_passwords ${chroot_dir} | egrep -q -w "^update_user_encpassword ${chroot_dir} ${devel_user} ${devel_encpass}"
+  assertEquals $? 0
+}
+
+function test_update_passwords_devel_encpass() {
+  local devel_user=vmbuilder_user
+  local devel_pass=vmbuilder_pass
+  local devel_encpass=
+
+  update_passwords ${chroot_dir} | egrep -q -w "^update_user_encpassword ${chroot_dir} ${devel_user} ${devel_encpass}"
+  assertNotEquals $? 0
+
+  update_passwords ${chroot_dir} | egrep -q -w "^update_user_password ${chroot_dir} ${devel_user} ${devel_pass}"
+  assertEquals $? 0
+}
+
+function test_update_passwords_devel_pass_encpass() {
+  local devel_user=vmbuilder_user
+  local devel_pass=vmbuilder_pass
+  local devel_encpass=vmbuilder_encpass
+
+  update_passwords ${chroot_dir} | egrep -q -w "^update_user_password ${chroot_dir} ${devel_user} ${devel_pass}"
+  assertNotEquals $? 0
+
+  update_passwords ${chroot_dir} | egrep -q -w "^update_user_encpassword ${chroot_dir} ${devel_user} ${devel_encpass}"
+  assertEquals $? 0
+}
+
 
 ## shunit2
 
