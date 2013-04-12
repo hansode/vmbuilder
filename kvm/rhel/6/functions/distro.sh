@@ -77,6 +77,7 @@ function add_option_distro() {
   devel_pass=${devel_pass:-}
 
   rootpass=${rootpass:-}
+  rootencpass=${rootencpass:-}
 
   ssh_key=${ssh_key:-}
   ssh_user_key=${ssh_user_key:-}
@@ -731,11 +732,15 @@ function update_passwords() {
   run_in_target ${chroot_dir} pwconv
 
   # Lock root account only if we didn't set the root password
-  [[ -n "${rootpass}" ]] && {
-    update_user_password ${chroot_dir} root ${rootpass}
-  } || {
+  if [ -n "${rootpass}" -o -n "${rootencpass}" ]; then
+    if [[ -n "${rootencpass}" ]]; then
+      update_user_encpassword ${chroot_dir} root ${rootencpass}
+    else
+      update_user_password ${chroot_dir} root ${rootpass}
+    fi
+  else
     run_in_target ${chroot_dir} "usermod -L root"
-  }
+  fi
 
   [[ -z "${devel_user}" ]] || {
     update_user_password ${chroot_dir} ${devel_user} ${devel_pass:-${devel_user}}
