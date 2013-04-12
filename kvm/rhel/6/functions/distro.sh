@@ -75,8 +75,10 @@ function add_option_distro() {
   # settings for the initial user
   devel_user=${devel_user:-}
   devel_pass=${devel_pass:-}
+  devel_encpass=${devel_encpass:-}
 
   rootpass=${rootpass:-}
+  rootencpass=${rootencpass:-}
 
   ssh_key=${ssh_key:-}
   ssh_user_key=${ssh_user_key:-}
@@ -731,15 +733,24 @@ function update_passwords() {
   run_in_target ${chroot_dir} pwconv
 
   # Lock root account only if we didn't set the root password
-  [[ -n "${rootpass}" ]] && {
-    run_in_target ${chroot_dir} "echo root:${rootpass} | chpasswd"
-  } || {
+  if [ -n "${rootpass}" -o -n "${rootencpass}" ]; then
+    if [[ -n "${rootencpass}" ]]; then
+      update_user_encpassword ${chroot_dir} root ${rootencpass}
+    else
+      update_user_password ${chroot_dir} root ${rootpass}
+    fi
+  else
     run_in_target ${chroot_dir} "usermod -L root"
-  }
+  fi
 
-  [[ -z "${devel_user}" ]] || {
+  # devel_user undefined
+  [[ -n "${devel_user}" ]] || return 0
+
+  if [[ -n "${devel_encpass}" ]]; then
+    update_user_encpassword ${chroot_dir} ${devel_user} ${devel_encpass}
+  else
     update_user_password ${chroot_dir} ${devel_user} ${devel_pass:-${devel_user}}
-  }
+  fi
 }
 
 function create_user_account() {
@@ -767,6 +778,15 @@ function update_user_password() {
   [[ -n "${user_pass}"  ]] || { echo "[ERROR] Invalid argument: user_pass:${user_pass} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   run_in_target ${chroot_dir} "echo ${user_name}:${user_pass} | chpasswd"
+}
+
+function update_user_encpassword() {
+  local chroot_dir=$1 user_name=$2 user_encpass=$3
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${user_name}"     ]] || { echo "[ERROR] Invalid argument: user_name:${user_name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${user_encpass}"  ]] || { echo "[ERROR] Invalid argument: user_encpass:${user_encpass} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  run_in_target ${chroot_dir} "echo ${user_name}:${user_encpass} | chpasswd -e"
 }
 
 function configure_sudo_sudoers() {
