@@ -732,7 +732,7 @@ function update_passwords() {
 
   # Lock root account only if we didn't set the root password
   [[ -n "${rootpass}" ]] && {
-    run_in_target ${chroot_dir} "echo root:${rootpass} | chpasswd"
+    update_user_password ${chroot_dir} root ${rootpass}
   } || {
     run_in_target ${chroot_dir} "usermod -L root"
   }

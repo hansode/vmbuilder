@@ -33,7 +33,7 @@ function test_update_passwords_empty_rootpass() {
 function test_update_passwords_rootpass() {
   local rootpass=asdf
 
-  update_passwords ${chroot_dir} | egrep -q -w "^chroot ${chroot_dir} bash -e -c echo root:${rootpass} | chpasswd"
+  update_passwords ${chroot_dir} | egrep -q -w "^update_user_password ${chroot_dir} root ${rootpass}"
   assertEquals $? 0
 }
 
