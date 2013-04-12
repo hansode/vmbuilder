@@ -769,6 +769,15 @@ function update_user_password() {
   run_in_target ${chroot_dir} "echo ${user_name}:${user_pass} | chpasswd"
 }
 
+function update_user_encpassword() {
+  local chroot_dir=$1 user_name=$2 user_encpass=$3
+  [[ -d "${chroot_dir}"    ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${user_name}"     ]] || { echo "[ERROR] Invalid argument: user_name:${user_name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${user_encpass}"  ]] || { echo "[ERROR] Invalid argument: user_encpass:${user_encpass} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  run_in_target ${chroot_dir} "echo ${user_name}:${user_encpass} | chpasswd -e"
+}
+
 function configure_sudo_sudoers() {
   local chroot_dir=$1 user_name=$2 tag_specs=${3:-"NOPASSWD:"}
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
