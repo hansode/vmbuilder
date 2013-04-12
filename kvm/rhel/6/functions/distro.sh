@@ -743,12 +743,13 @@ function update_passwords() {
     run_in_target ${chroot_dir} "usermod -L root"
   fi
 
-  if [[ -n "${devel_user}" ]]; then
-    if [[ -n "${devel_encpass}" ]]; then
-      update_user_encpassword ${chroot_dir} ${devel_user} ${devel_encpass}
-    else
-      update_user_password ${chroot_dir} ${devel_user} ${devel_pass:-${devel_user}}
-    fi
+  # devel_user undefined
+  [[ -n "${devel_user}" ]] || return 0
+
+  if [[ -n "${devel_encpass}" ]]; then
+    update_user_encpassword ${chroot_dir} ${devel_user} ${devel_encpass}
+  else
+    update_user_password ${chroot_dir} ${devel_user} ${devel_pass:-${devel_user}}
   fi
 }
 
