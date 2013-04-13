@@ -37,8 +37,7 @@ function test_update_user_encpassword_user() {
 }
 
 function test_update_user_encpassword_user_encpass() {
-  update_user_encpassword ${chroot_dir} ${username} ${encpassword} | egrep -q -w "echo ${username}:${encpassword} | chpasswd -e"
-  update_user_encpassword ${chroot_dir} ${username} ${encpassword} | egrep -q -w "echo ${username}:${encpassword} | chpasswd -e"
+  update_user_encpassword ${chroot_dir} ${username} ${encpassword} | egrep -q -w "echo '${username}:${encpassword}' | chpasswd -e"
   assertEquals $? 0
 }
 

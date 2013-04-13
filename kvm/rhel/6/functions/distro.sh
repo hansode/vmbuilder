@@ -786,7 +786,7 @@ function update_user_encpassword() {
   [[ -n "${user_name}"     ]] || { echo "[ERROR] Invalid argument: user_name:${user_name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   [[ -n "${user_encpass}"  ]] || { echo "[ERROR] Invalid argument: user_encpass:${user_encpass} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
-  run_in_target ${chroot_dir} "echo ${user_name}:${user_encpass} | chpasswd -e"
+  run_in_target ${chroot_dir} "echo '${user_name}:${user_encpass}' | chpasswd -e"
 }
 
 function configure_sudo_sudoers() {
