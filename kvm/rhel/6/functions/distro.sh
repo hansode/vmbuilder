@@ -1619,12 +1619,13 @@ function run_copy() {
     [[ $# == 2 ]] || continue
     local destdir=${chroot_dir}${2%/*}
     [[ -d "${destdir}" ]] || mkdir -p ${destdir}
+    local srcpath=${1} dstpath=${chroot_dir}${2}
     # keep symlink
     # $ rsync -aHA ${1} ${chroot_dir}${2} || :
     # don't keep symlink
     # $ cp -LpR ${1} ${chroot_dir}${2}
     local mode=0644 owner=root group=root
-    install --mode ${mode} --owner ${owner} --group ${group} ${1} ${chroot_dir}${2}
+    install --mode ${mode} --owner ${owner} --group ${group} ${srcpath} ${dstpath}
   done < <(egrep -v '^$' ${copy})
 }
 
