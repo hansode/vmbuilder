@@ -1616,7 +1616,7 @@ function run_copy() {
   printf "[INFO] Copying files specified by copy in: %s\n" ${copy}
   while read line; do
     set ${line}
-    [[ $# == 2 ]] || continue
+    [[ $# -ge 2 ]] || continue
     local destdir=${chroot_dir}${2%/*}
     [[ -d "${destdir}" ]] || mkdir -p ${destdir}
     local srcpath=${1} dstpath=${chroot_dir}${2}
@@ -1625,8 +1625,13 @@ function run_copy() {
     # don't keep symlink
     # $ cp -LpR ${1} ${chroot_dir}${2}
     (
-      mode=0644 owner=root group=root
-      install --mode ${mode} --owner ${owner} --group ${group} ${srcpath} ${dstpath}
+      # 1. src dst [options]
+      # 2. [options]
+      shift 2
+      # eval [options]
+      eval "$@"
+
+      install --mode ${mode:-0644} --owner ${owner:-root} --group ${group:-root} ${srcpath} ${dstpath}
     )
   done < <(egrep -v '^$' ${copy})
 }
