@@ -24,7 +24,7 @@ function setUp() {
 	${abs_dirname}/foo /tmp/var
 	${abs_dirname}/zzz /tmp/zzz
 	EOS
-  function rsync() { echo rsync $*; }
+  function install() { echo install $*; }
 }
 
 function tearDown() {
@@ -34,18 +34,18 @@ function tearDown() {
   rm -f  ${copyfile}
 }
 
-function test_run_xcopy_file() {
-  run_xcopy ${chroot_dir} ${copyfile} >/dev/null
+function test_run_copies_file() {
+  run_copies ${chroot_dir} ${copyfile} >/dev/null
   assertEquals $? 0
 }
 
-function test_run_xcopy_files() {
-  run_xcopy ${chroot_dir} ${copyfile} ${copyfile} >/dev/null
+function test_run_copies_files() {
+  run_copies ${chroot_dir} ${copyfile} ${copyfile} >/dev/null
   assertEquals $? 0
 }
 
-function test_run_xcopy_no_opts() {
-  run_xcopy ${chroot_dir} >/dev/null
+function test_run_copies_no_opts() {
+  run_copies ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 

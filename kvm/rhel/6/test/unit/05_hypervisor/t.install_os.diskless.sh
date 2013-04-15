@@ -39,7 +39,7 @@ function setUp() {
   function install_epel() { echo install_epel $*; }
   function install_addedpkgs() { echo install_addedpkgs $*; }
   function clean_packages() { echo clean_packages $*; }
-  function run_xcopy()      { echo run_xcopy      $*; }
+  function run_copies()     { echo run_copies     $*; }
   function xsync_dir()      { echo xsync_dir      $*; }
   function run_execscripts() { echo run_execscripts $*; }
   function run_xexecscripts() { echo run_xexecscripts $*; }
