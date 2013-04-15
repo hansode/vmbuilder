@@ -11,7 +11,7 @@
 #  cp, rm, ln, touch, rsync
 #  find, egrep, grep, sed, xargs
 #  mount, umount
-#  ls, tail
+#  ls, tail, cp, install
 #  file, db_dump, db43_load
 #
 # imports:
@@ -1620,9 +1620,11 @@ function run_copy() {
     local destdir=${chroot_dir}${2%/*}
     [[ -d "${destdir}" ]] || mkdir -p ${destdir}
     # keep symlink
-   #rsync -aHA ${1} ${chroot_dir}${2} || :
+    # $ rsync -aHA ${1} ${chroot_dir}${2} || :
     # don't keep symlink
-    cp -LpR ${1} ${chroot_dir}${2} || :
+    # $ cp -LpR ${1} ${chroot_dir}${2}
+    local mode=0644 owner=root group=root
+    install --mode ${mode} --owner ${owner} --group ${group} ${1} ${chroot_dir}${2}
   done < <(egrep -v '^$' ${copy})
 }
 

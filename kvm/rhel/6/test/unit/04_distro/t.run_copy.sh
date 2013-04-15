@@ -23,7 +23,7 @@ function setUp() {
 	
 	${abs_dirname}/foo /tmp/var
 	EOS
-  function rsync() { echo rsync $*; }
+  function install() { echo install $*; }
 }
 
 function tearDown() {
@@ -42,6 +42,12 @@ function test_run_copy_not_found() {
   run_copy ${chroot_dir} ${abs_dirname}/_$$.copy 2>/dev/null
   assertNotEquals $? 0
 }
+
+function test_run_copy_file_attributes() {
+  run_copy ${chroot_dir} ${copyfile} | egrep -q "install --mode 0644 --owner root --group root"
+  assertEquals $? 0
+}
+
 
 ## shunit2
 
