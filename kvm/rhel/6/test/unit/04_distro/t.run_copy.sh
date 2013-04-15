@@ -22,8 +22,9 @@ function setUp() {
 	${abs_dirname}/src /tmp/dst
 	
 	${abs_dirname}/foo /tmp/var
+	${abs_dirname}/sbin/baz /sbin/baz mode=0755 owner=owner group=group
 	EOS
-  function rsync() { echo rsync $*; }
+  function install() { echo install $*; }
 }
 
 function tearDown() {
@@ -41,6 +42,16 @@ function test_run_copy_found() {
 function test_run_copy_not_found() {
   run_copy ${chroot_dir} ${abs_dirname}/_$$.copy 2>/dev/null
   assertNotEquals $? 0
+}
+
+function test_run_copy_file_attributes_no_opts() {
+  run_copy ${chroot_dir} ${copyfile} | egrep -q "install --mode 0644 --owner root --group root"
+  assertEquals $? 0
+}
+
+function test_run_copy_file_attributes_mode_owner_group() {
+  run_copy ${chroot_dir} ${copyfile} | egrep /sbin/baz | egrep -q "install --mode 0755 --owner owner --group group"
+  assertEquals $? 0
 }
 
 ## shunit2

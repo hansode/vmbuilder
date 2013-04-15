@@ -11,7 +11,7 @@
 #  cp, rm, ln, touch, rsync
 #  find, egrep, grep, sed, xargs
 #  mount, umount
-#  ls, tail
+#  ls, tail, cp, install
 #  file, db_dump, db43_load
 #
 # imports:
@@ -1616,13 +1616,23 @@ function run_copy() {
   printf "[INFO] Copying files specified by copy in: %s\n" ${copy}
   while read line; do
     set ${line}
-    [[ $# == 2 ]] || continue
+    [[ $# -ge 2 ]] || continue
     local destdir=${chroot_dir}${2%/*}
     [[ -d "${destdir}" ]] || mkdir -p ${destdir}
+    local srcpath=${1} dstpath=${chroot_dir}${2}
     # keep symlink
-   #rsync -aHA ${1} ${chroot_dir}${2} || :
+    # $ rsync -aHA ${1} ${chroot_dir}${2} || :
     # don't keep symlink
-    cp -LpR ${1} ${chroot_dir}${2} || :
+    # $ cp -LpR ${1} ${chroot_dir}${2}
+    (
+      # 1. src dst [options]
+      # 2. [options]
+      shift 2
+      # eval [options]
+      eval "$@"
+
+      install --mode ${mode:-0644} --owner ${owner:-root} --group ${group:-root} ${srcpath} ${dstpath}
+    )
   done < <(egrep -v '^$' ${copy})
 }
 
