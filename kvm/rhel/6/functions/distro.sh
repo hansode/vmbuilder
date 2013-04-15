@@ -1624,8 +1624,10 @@ function run_copy() {
     # $ rsync -aHA ${1} ${chroot_dir}${2} || :
     # don't keep symlink
     # $ cp -LpR ${1} ${chroot_dir}${2}
-    local mode=0644 owner=root group=root
-    install --mode ${mode} --owner ${owner} --group ${group} ${srcpath} ${dstpath}
+    (
+      local mode=0644 owner=root group=root
+      install --mode ${mode} --owner ${owner} --group ${group} ${srcpath} ${dstpath}
+    )
   done < <(egrep -v '^$' ${copy})
 }
 
