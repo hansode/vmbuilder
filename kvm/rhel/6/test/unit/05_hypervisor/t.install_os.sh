@@ -45,7 +45,7 @@ function setUp() {
   function install_addedpkgs() { echo install_addedpkgs $*; }
   function convert_rpmdb_hash() { echo convert_rpmdb_hash $*; }
   function clean_packages() { echo clean_packages $*; }
-  function run_xcopy()      { echo run_xcopy      $*; }
+  function run_copies()     { echo run_copies     $*; }
   function xsync_dir()      { echo xsync_dir      $*; }
   function run_execscripts() { echo run_execscripts $*; }
   function run_xexecscripts() { echo run_xexecscripts $*; }
