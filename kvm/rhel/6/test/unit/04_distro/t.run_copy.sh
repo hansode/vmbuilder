@@ -23,6 +23,8 @@ function setUp() {
 	
 	${abs_dirname}/foo /tmp/var
 	${abs_dirname}/sbin/baz /sbin/baz mode=0755 owner=owner group=group
+	# SRC  DST
+	# SRC1 DST2
 	EOS
   function install() { echo install $*; }
 }
@@ -52,6 +54,11 @@ function test_run_copy_file_attributes_no_opts() {
 function test_run_copy_file_attributes_mode_owner_group() {
   run_copy ${chroot_dir} ${copyfile} | egrep /sbin/baz | egrep -q "install --mode 0755 --owner owner --group group"
   assertEquals $? 0
+}
+
+function test_run_copy_file_comments() {
+  run_copy ${chroot_dir} ${copyfile} | egrep -q '^#'
+  assertNotEquals $? 0
 }
 
 ## shunit2
