@@ -1633,7 +1633,7 @@ function run_copy() {
 
       install --mode ${mode:-0644} --owner ${owner:-root} --group ${group:-root} ${srcpath} ${dstpath}
     )
-  done < <(egrep -v '^$' ${copy})
+  done < <(egrep -v '^$|^#' ${copy})
 }
 
 function xsync_dir() {
