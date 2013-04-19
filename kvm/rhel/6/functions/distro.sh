@@ -95,6 +95,7 @@ function add_option_distro() {
   execscript=${execscript:-}
   xexecscript=${xexecscript:-}
   firstboot=${firstboot:-}
+  everyboot=${everyboot:-}
   firstlogin=${firstlogin:-}
 }
 
@@ -1724,6 +1725,28 @@ function install_firstboot() {
 	        /root/firstboot.sh
 	    fi
 	    touch /root/firstboot_done
+	fi
+	touch /var/lock/subsys/local
+	EOS
+  chmod 755 ${chroot_dir}/etc/rc.d/rc.local
+}
+
+function install_everyboot() {
+  local chroot_dir=$1 everyboot=$2
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${everyboot}"  ]] || return 0
+  [[ -f "${everyboot}"  ]] || { echo "[ERROR] The path to the first-boot directive is invalid: ${everyboot}. Make sure you are providing a full path. (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  printf "[DEBUG] Installing everyboot script %s\n" ${everyboot}
+  rsync -aL ${everyboot} ${chroot_dir}/root/everyboot.sh
+  chmod 0700 ${chroot_dir}/root/everyboot.sh
+
+  mv ${chroot_dir}/etc/rc.d/rc.local ${chroot_dir}/etc/rc.d/rc.local.orig
+  egrep -v "^touch /var/lock/subsys/local" ${chroot_dir}/etc/rc.d/rc.local.orig > ${chroot_dir}/etc/rc.d/rc.local
+
+  cat <<-'EOS' >> ${chroot_dir}/etc/rc.d/rc.local
+	if [ -e /root/everyboot.sh ]; then
+	    /root/everyboot.sh
 	fi
 	touch /var/lock/subsys/local
 	EOS

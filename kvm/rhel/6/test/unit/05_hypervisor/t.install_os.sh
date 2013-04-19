@@ -50,6 +50,7 @@ function setUp() {
   function run_execscripts() { echo run_execscripts $*; }
   function run_xexecscripts() { echo run_xexecscripts $*; }
   function install_firstboot() { echo install_firstboot $*; }
+  function install_everyboot() { echo install_everyboot $*; }
   function install_firstlogin() { echo install_firstlogin $*; }
   function cleanup_distro() { echo cleanup_distro $*; }
 }
