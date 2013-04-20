@@ -93,6 +93,7 @@ function add_option_distro() {
   copy=${copy:-}
   copydir=${copydir:-}
   postcopy=${postcopy:-}
+  postcopydir=${postcopydir:-}
 
   execscript=${execscript:-}
   xexecscript=${xexecscript:-}

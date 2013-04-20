@@ -210,6 +210,7 @@ function install_os() {
   run_xexecscripts     ${chroot_dir} ${xexecscript}
   # postcopy
   run_copies           ${chroot_dir} ${postcopy}
+  xsync_dir            ${chroot_dir} ${postcopydir}
 
   install_firstboot    ${chroot_dir} ${firstboot}
   install_firstlogin   ${chroot_dir} ${firstlogin}
