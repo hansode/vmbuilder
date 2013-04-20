@@ -201,10 +201,20 @@ function install_os() {
   install_addedpkgs    ${chroot_dir}
   convert_rpmdb_hash   ${chroot_dir}
   clean_packages       ${chroot_dir}
+
+  # copy
   run_copies           ${chroot_dir} ${copy}
   xsync_dir            ${chroot_dir} ${copydir}
+  # execscript
   run_execscripts      ${chroot_dir} ${execscript}
   run_xexecscripts     ${chroot_dir} ${xexecscript}
+  # postcopy
+  run_copies           ${chroot_dir} ${postcopy}
+  xsync_dir            ${chroot_dir} ${postcopydir}
+  # postexecscript
+  run_execscripts      ${chroot_dir} ${postexecscript}
+  run_xexecscripts     ${chroot_dir} ${postxexecscript}
+
   install_firstboot    ${chroot_dir} ${firstboot}
   install_firstlogin   ${chroot_dir} ${firstlogin}
   install_everyboot    ${chroot_dir} ${everyboot}
