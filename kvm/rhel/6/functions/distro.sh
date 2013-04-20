@@ -1638,7 +1638,8 @@ function run_copy() {
       # eval [options]
       eval "$@"
 
-      install --mode ${mode:-0644} --owner ${owner:-root} --group ${group:-root} ${srcpath} ${dstpath}
+      # keep original file mode
+      install $([[ -z "${mode}" ]] || echo --mode ${mode}) --owner ${owner:-root} --group ${group:-root} ${srcpath} ${dstpath}
     )
   done < <(egrep -v '^$|^#' ${copy})
 }

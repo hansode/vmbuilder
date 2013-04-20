@@ -47,7 +47,7 @@ function test_run_copy_not_found() {
 }
 
 function test_run_copy_file_attributes_no_opts() {
-  run_copy ${chroot_dir} ${copyfile} | egrep -q "install --mode 0644 --owner root --group root"
+  run_copy ${chroot_dir} ${copyfile} | egrep -q "install --owner root --group root"
   assertEquals $? 0
 }
 
