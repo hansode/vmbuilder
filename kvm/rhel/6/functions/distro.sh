@@ -97,6 +97,8 @@ function add_option_distro() {
 
   execscript=${execscript:-}
   xexecscript=${xexecscript:-}
+  postexecscript=${postexecscript:-}
+  postxexecscript=${postxexecscript:-}
 
   firstboot=${firstboot:-}
   everyboot=${everyboot:-}
