@@ -92,8 +92,11 @@ function add_option_distro() {
   # post_install
   copy=${copy:-}
   copydir=${copydir:-}
+  postcopy=${postcopy:-}
+
   execscript=${execscript:-}
   xexecscript=${xexecscript:-}
+
   firstboot=${firstboot:-}
   everyboot=${everyboot:-}
   firstlogin=${firstlogin:-}
