@@ -285,7 +285,7 @@ function configure_acpid() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
-  run_in_target          ${chroot_dir} yum install -y acpid
+  run_yum                ${chroot_dir} install acpid
   cause_daemons_starting ${chroot_dir} acpid
 }
 

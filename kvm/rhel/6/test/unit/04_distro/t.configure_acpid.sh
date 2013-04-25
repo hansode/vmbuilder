@@ -16,7 +16,7 @@ function setUp() {
   mkdir -p ${chroot_dir}/etc
 
   function cause_daemons_starting() { echo cause_daemons_starting $*; }
-  function chroot() { echo chroot $*; }
+  function run_yum() { echo run_yum $*; }
 }
 
 function tearDown() {
@@ -24,7 +24,7 @@ function tearDown() {
 }
 
 function test_configure_acpid_installation() {
-  configure_acpid ${chroot_dir} | egrep -q -w "yum install -y acpid"
+  configure_acpid ${chroot_dir} | egrep -q -w "run_yum ${chroot_dir} install acpid"
   assertEquals $? 0
 }
 
