@@ -18,6 +18,7 @@ function setUp() {
   mkdir ${chroot_dir}
 
   function configure_acpiphp() { echo configure_acpiphp $*; }
+  function configure_acpid() { echo configure_acpid $*; }
   function configure_serial_console() { echo configure_serial_console $*; }
 }
 

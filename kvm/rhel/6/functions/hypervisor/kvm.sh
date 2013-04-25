@@ -11,7 +11,7 @@
 #
 # imports:
 #  utils: shlog
-#  hypervisor: viftabproc, configure_acpiphp
+#  hypervisor: viftabproc, configure_acpiphp, configure_acpid
 #
 
 function add_option_hypervisor_kvm() {
@@ -53,6 +53,7 @@ function configure_hypervisor() {
 
   echo "[INFO] ***** Configuring kvm-specific *****"
   configure_acpiphp ${chroot_dir}
+  configure_acpid   ${chroot_dir}
   configure_serial_console ${chroot_dir}
 }
 
