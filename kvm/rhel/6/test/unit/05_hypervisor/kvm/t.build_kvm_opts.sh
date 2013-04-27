@@ -40,6 +40,22 @@ function test_build_kvm_opts_with_pidfile() {
   assertEquals $? 0
 }
 
+## rtc
+
+function test_build_kvm_opts_no_rtc() {
+  local rtc=
+
+  build_kvm_opts | egrep -q -w -- "-rtc ${rtc}"
+  assertEquals $? 0
+}
+
+function test_build_kvm_opts_with_rtc() {
+  local rtc="base=host"
+
+  build_kvm_opts | egrep -q -w -- "-rtc ${rtc}"
+  assertEquals $? 0
+}
+
 ## shunit2
 
 . ${shunit2_file}
