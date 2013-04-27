@@ -35,6 +35,8 @@ function add_option_hypervisor_kvm() {
   serial_addr=${serial_addr:-127.0.0.1}
   serial_port=${serial_port:-5555}
 
+  rtc="${rtc:-base=localtime}"
+
   vif_num=${vif_num:-1}
   viftab=${viftab:-}
 
@@ -116,6 +118,7 @@ function build_kvm_opts() {
    -smp      ${cpu_num} \
    -vnc      ${vnc_addr}:${vnc_port} \
    -k        ${vnc_keymap} \
+   -rtc      ${rtc} \
    -monitor  telnet:${monitor_addr}:${monitor_port},server,nowait \
    -serial   telnet:${serial_addr}:${serial_port},server,nowait \
    $(build_drive_opt) \
@@ -154,6 +157,7 @@ function render_kvm_runscript() {
 	drive_type=${drive_type}
 	nic_driver=${nic_driver}
 	pidfile=${pidfile}
+	rtc="${rtc}"
 	#
 	EOS
 
@@ -172,6 +176,7 @@ function render_kvm_runscript() {
     drive_type='${drive_type}'
     nic_driver='${nic_driver}'
     pidfile='${pidfile}'
+    rtc='${rtc}'
 
     # dry run
     function shlog() { echo $*; }
@@ -264,5 +269,7 @@ function kvm_dump() {
 
 	serial_addr=${serial_addr}
 	serial_port=${serial_port}
+
+	rtc="${rtc}"
 	EOS
 }
