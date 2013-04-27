@@ -678,12 +678,27 @@ function get_grub_id() {
   echo 0
 }
 
+function validate_image_format_type() {
+  local image_format=$1
+  [[ -n "${image_format}" ]] || { echo "[ERROR] file not image_format: ${image_format} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  case "${image_format}" in
+  qcow2|vdi|vmdk)
+    ;;
+  *)
+   echo "[ERROR] not supported image format: ${image_format} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2
+   return 1
+   ;;
+  esac
+}
+
 function convert_disk() {
   #
   # Convert the disk image
   #
   local disk_filename=$1 dest_dir=${2:-$(pwd)} dest_format=${3:-vdi}
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  validate_image_format_type ${dest_format} || return 1
 
   # build dest_filename
   local base_filename=${disk_filename##*/}
