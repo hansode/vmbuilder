@@ -698,6 +698,7 @@ function convert_disk() {
   #
   local disk_filename=$1 dest_dir=${2:-$(pwd)} dest_format=${3:-vdi}
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  validate_image_format_type ${dest_format} || return 1
 
   # build dest_filename
   local base_filename=${disk_filename##*/}

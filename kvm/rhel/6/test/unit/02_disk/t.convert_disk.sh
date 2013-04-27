@@ -53,6 +53,16 @@ function test_convert_disk_filename_destdir_destformat_vmdk() {
   assertEquals $? 0
 }
 
+function test_convert_disk_filename_destdir_destformat_qcow2() {
+  convert_disk ${disk_filename} $(pwd) qcow2 >/dev/null
+  assertEquals $? 0
+}
+
+function test_convert_disk_filename_destdir_destformat_unknown() {
+  convert_disk ${disk_filename} $(pwd) unknown 2>/dev/null
+  assertNotEquals $? 0
+}
+
 ## shunit2
 
 . ${shunit2_file}
