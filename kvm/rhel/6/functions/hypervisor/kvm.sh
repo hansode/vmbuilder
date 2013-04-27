@@ -35,7 +35,9 @@ function add_option_hypervisor_kvm() {
   serial_addr=${serial_addr:-127.0.0.1}
   serial_port=${serial_port:-5555}
 
-  rtc="${rtc:-base=localtime}"
+  # -rtc [base=utc|localtime|date][,clock=host|vm][,driftfix=none|slew]
+  #                 set the RTC base and clock, enable drift fix for clock ticks
+  rtc="${rtc:-base=utc}"
 
   vif_num=${vif_num:-1}
   viftab=${viftab:-}
