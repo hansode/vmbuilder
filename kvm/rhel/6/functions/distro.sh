@@ -1350,8 +1350,9 @@ function nictabinfo() {
     [[ -n "${nictab}" && -f "${nictab}" ]] && {
       cat ${nictab}
     } || {
+      # "echo ${dns}" means removing new-line(s).
       cat <<-EOS
-	ifname=eth0 ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns="${dns}" onboot=${onboot} iftype=ethernet
+	ifname=eth0 ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns="$(echo ${dns})" onboot=${onboot} iftype=ethernet
 	EOS
     }
   } | egrep -v '^$|^#'
