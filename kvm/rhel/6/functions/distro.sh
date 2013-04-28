@@ -1340,6 +1340,14 @@ function configure_serial_console() {
     sed -i "s,^ACTIVE_CONSOLES=.*,ACTIVE_CONSOLES=\"/dev/tty[1-6] /dev/ttyS0\"", ${chroot_dir}/etc/sysconfig/init
   } || :
 
+  # rhel5
+  (
+    eval "$(detect_distro ${chroot_dir})"
+    case "${DISTRIB_RELEASE}" in
+    5.*) echo "S0:2345:respawn:/sbin/agetty ttyS0 115200 linux" >> ${chroot_dir}/etc/inittab ;;
+    esac
+  )
+
   egrep -w "^ttyS0" ${chroot_dir}/etc/securetty || { echo ttyS0 >>  ${chroot_dir}/etc/securetty; }
 }
 
