@@ -22,8 +22,7 @@ function test_render_interface_ovsbridge_br0() {
   assertEquals "${NM_CONTROLLED}" "no"
   assertEquals "${DEVICETYPE}"    "ovs"
   assertEquals "${OVS_EXTRA}"     " set bridge     ${DEVICE} other_config:disable-in-band=true --\
- set-fail-mode  ${DEVICE} secure --\
- set-controller ${DEVICE} unix:/var/run/openvswitch/${DEVICE}.controller
+ set-fail-mode  ${DEVICE} secure --
 "
 }
 
@@ -35,8 +34,7 @@ function test_render_interface_ovsbridge_br1() {
   assertEquals "${NM_CONTROLLED}" "no"
   assertEquals "${DEVICETYPE}"    "ovs"
   assertEquals "${OVS_EXTRA}"     " set bridge     ${DEVICE} other_config:disable-in-band=true --\
- set-fail-mode  ${DEVICE} secure --\
- set-controller ${DEVICE} unix:/var/run/openvswitch/${DEVICE}.controller
+ set-fail-mode  ${DEVICE} secure --
 "
 }
 
