@@ -1486,8 +1486,7 @@ function render_interface_ovsbridge() {
 	DEVICETYPE=ovs
 	OVS_EXTRA="\\
 	 set bridge     \${DEVICE} other_config:disable-in-band=true --\\
-	 set-fail-mode  \${DEVICE} secure --\\
-	 set-controller \${DEVICE} unix:/var/run/openvswitch/\${DEVICE}.controller
+	 set-fail-mode  \${DEVICE} secure --
 	"
 	EOS
 }
