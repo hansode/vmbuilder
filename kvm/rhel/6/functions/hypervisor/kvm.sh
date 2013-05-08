@@ -24,6 +24,7 @@ function add_option_hypervisor_kvm() {
 
   mem_size=${mem_size:-1024}
   cpu_num=${cpu_num:-1}
+  cpu_type=${cpu_type:-host}
 
   vnc_addr=${vnc_addr:-127.0.0.1}
   vnc_port=${vnc_port:-1001}
@@ -115,7 +116,7 @@ function build_kvm_opts() {
   echo \
    ${kvm_opts} \
    -name     ${name} \
-   -cpu      host \
+   -cpu      ${cpu_type} \
    -m        ${mem_size} \
    -smp      ${cpu_num} \
    -vnc      ${vnc_addr}:${vnc_port} \
@@ -147,6 +148,7 @@ function render_kvm_runscript() {
 	#execute kvm command
 	#
 	name=${name}
+	cpu_type=${cpu_type}
 	brname=${brname}
 	mem_size=${mem_size}
 	cpu_num=${cpu_num}
@@ -166,6 +168,7 @@ function render_kvm_runscript() {
   (
     # set non extracted value
     name='${name}'
+    cpu_type='${cpu_type}'
     brname='${brname}'
     mem_size='${mem_size}'
     cpu_num='${cpu_num}'
@@ -251,6 +254,7 @@ function kvm_info() {
 function kvm_dump() {
   cat <<-EOS
 	name=${name}
+	cpu_type=${cpu_type}
 	image_format=${image_format}
 	image_file=${image_file}
 	image_path=${image_path}
