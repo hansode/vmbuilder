@@ -56,6 +56,24 @@ function test_build_kvm_opts_with_rtc() {
   assertEquals $? 0
 }
 
+## cpu_type
+
+function test_build_kvm_opts_no_cpu_type() {
+  local cpu_type=
+
+  build_kvm_opts | egrep -q -w -- "-cpu ${cpu_type}"
+  assertEquals $? 0
+}
+
+function test_build_kvm_opts_with_cpu_type() {
+  local cpu_type="qemu64,+vmx "
+
+  # don't use *e*grep
+  build_kvm_opts | grep -q -w -- "-cpu ${cpu_type}"
+  assertEquals $? 0
+}
+
+
 ## shunit2
 
 . ${shunit2_file}
