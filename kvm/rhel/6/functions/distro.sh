@@ -1326,7 +1326,12 @@ function config_host_and_domainname() {
       echo HOSTNAME=${hostname} >> ${chroot_dir}/etc/sysconfig/network
     }
     cat ${chroot_dir}/etc/sysconfig/network
-    echo 127.0.0.1 ${hostname} >> ${chroot_dir}/etc/hosts
+
+    case "${hostname}" in
+    localhost) ;;
+            *) echo 127.0.0.1 ${hostname} >> ${chroot_dir}/etc/hosts ;;
+    esac
+
     cat ${chroot_dir}/etc/hosts
   }
 }
