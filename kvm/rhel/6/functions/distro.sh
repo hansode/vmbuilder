@@ -1652,6 +1652,7 @@ function run_copy() {
     # $ rsync -aHA ${1} ${chroot_dir}${2} || :
     # don't keep symlink
     # $ cp -LpR ${1} ${chroot_dir}${2}
+    local mode
     (
       # 1. src dst [options]
       # 2. [options]
@@ -1660,7 +1661,8 @@ function run_copy() {
       eval "$@"
 
       # keep original file mode
-      install $([[ -z "${mode}" ]] || echo --mode ${mode}) --owner ${owner:-root} --group ${group:-root} ${srcpath} ${dstpath}
+      [[ -n "${mode}" ]] || mode=$(stat -c %a ${srcpath})
+      install --mode ${mode} --owner ${owner:-root} --group ${group:-root} ${srcpath} ${dstpath}
     )
   done < <(egrep -v '^$|^#' ${copy})
 }

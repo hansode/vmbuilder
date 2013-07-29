@@ -1,6 +1,8 @@
 # Travis CI does not support bash. :'(
 language: c
 install: make
+# http://about.travis-ci.org/docs/user/build-configuration/#Installing-Packages-Using-apt
 before_install:
+  - "sudo apt-get update -qq"
   - "sudo apt-get -qq install coreutils util-linux yum rpm kpartx parted e2fsprogs mount dmsetup curl mount bridge-utils qemu-kvm qemu-utils virtualbox"
 script: make test
