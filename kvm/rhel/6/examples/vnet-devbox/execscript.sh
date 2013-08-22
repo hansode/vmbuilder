@@ -59,7 +59,8 @@ run_in_target ${chroot_dir} \
 
 run_in_target ${chroot_dir} \
   yum -y install wakame-vdc-ruby redis mysql-server make git gcc gcc-c++ \
-  zlib-devel openssl-devel zeromq-devel mysql-devel sqlite-devel libpcap-devel
+  zlib-devel openssl-devel zeromq-devel mysql-devel sqlite-devel libpcap-devel \
+  upstart
 
 #### Install openvswitch separately because it's not in the 3rd party repo atm
 
