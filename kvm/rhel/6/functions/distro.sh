@@ -1400,6 +1400,9 @@ function install_interface() {
   bridge)
     run_yum ${chroot_dir} install bridge-utils
     ;;
+  tap)
+    run_yum ${chroot_dir} install tunctl
+    ;;
   *)
     echo "[ERROR] no mutch iftype: ${iftype} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2
     return 1
@@ -1456,6 +1459,16 @@ function render_interface_ethernet() {
   cat <<-EOS
 	DEVICE=${ifname}
 	TYPE=Ethernet
+	$([[ -z "${bridge}" ]] || echo "BRIDGE=${bridge}")
+	EOS
+}
+
+function render_interface_tap() {
+  local ifname=${1:-tap0}
+
+  cat <<-EOS
+	DEVICE=${ifname}
+	TYPE=Tap
 	$([[ -z "${bridge}" ]] || echo "BRIDGE=${bridge}")
 	EOS
 }
