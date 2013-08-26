@@ -646,6 +646,9 @@ function mkfsdisk() {
         printf "[INFO] Setting interval between check(s): %s\n" ${interval_between_check}
         tune2fs -c ${max_mount_count} -i ${interval_between_check} ${part_filename}
       }
+      # > $ tune2fs -l ${part_filename}
+      # > Default mount options:    acl
+      tune2fs -o acl ${part_filename}
       ;;
     esac
     # Let udev have a chance to extract the UUID for us
