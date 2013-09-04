@@ -26,6 +26,26 @@ function configure_hypervisor() {
   configure_container ${chroot_dir}
 }
 
+function before_mount_dev() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  checkroot || return 1
+
+  while read name mode type major minor; do
+    [[ -a ${chroot_dir}/dev/${name} ]] || \
+      mknod -m ${mode} ${chroot_dir}/dev/${name} ${type} ${major} ${minor}
+  done < <(cat <<-EOS | egrep -v '^#|^$'
+	ram0 640 b 1  0
+	mem  640 c 1  1
+	kmem 600 c 1  2
+	port 640 c 1  4
+	core 600 c 1  6
+	kmsg 600 c 1 11
+	EOS
+	)
+  ln -s /proc/self/fd ${chroot_dir}/dev/fd
+}
+
 ##
 
 function next_ctid() {
