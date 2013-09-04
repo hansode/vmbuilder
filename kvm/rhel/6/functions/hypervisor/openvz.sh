@@ -31,10 +31,32 @@ function before_mount_dev() {
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
+  # http://www.powerpbx.org/content/are-you-sure-you-want-revert-revision-sat-12102011-1203
+
+  local dev_path
+
   while read name mode type major minor; do
-    [[ -a ${chroot_dir}/dev/${name} ]] || \
-      mknod -m ${mode} ${chroot_dir}/dev/${name} ${type} ${major} ${minor}
+    for dev_path in dev etc/udev/devices; do
+      [[ -d ${chroot_dir}/${dev_path} ]] || mkdir -p  ${chroot_dir}/${dev_path}
+      [[ -a ${chroot_dir}/${dev_path}/${name} ]] || {
+        mknod -m ${mode} ${chroot_dir}/${dev_path}/${name} ${type} ${major} ${minor}
+      }
+    done
   done < <(cat <<-EOS | egrep -v '^#|^$'
+	# common
+	null    666 c 1 3
+	zero    666 c 1 5
+	tty1    620 c 4 1
+	tty2    620 c 4 2
+	tty3    620 c 4 3
+	tty4    620 c 4 4
+	console 600 c 5 1
+	# container
+	full    666 c 1 7
+	random  666 c 1 8
+	urandom 666 c 1 9
+	ptmx    666 c 5 2
+	# openvz
 	ram0 640 b 1  0
 	mem  640 c 1  1
 	kmem 600 c 1  2
@@ -43,7 +65,10 @@ function before_mount_dev() {
 	kmsg 600 c 1 11
 	EOS
 	)
-  ln -s /proc/self/fd ${chroot_dir}/dev/fd
+
+  for dev_path in dev etc/udev/devices; do
+    ln -s /proc/self/fd   ${chroot_dir}/${dev_path}/fd
+  done
 }
 
 ##
