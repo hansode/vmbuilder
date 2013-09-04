@@ -252,21 +252,12 @@ function bootstrap() {
 
 ## os configuration
 
-function before_mount_dev() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
-  checkroot || return 1
-
-  :
-}
-
 function configure_os() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
   mount_proc               ${chroot_dir}
-  before_mount_dev         ${chroot_dir}
   mount_dev                ${chroot_dir}
 
   # TODO

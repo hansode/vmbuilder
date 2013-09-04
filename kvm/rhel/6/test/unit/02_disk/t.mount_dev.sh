@@ -17,7 +17,6 @@ function setUp() {
   mkdir -p ${chroot_dir}/dev
 
   function checkroot() { :; }
-  function before_mount_dev() { :; }
   function mount() { :; }
 }
 

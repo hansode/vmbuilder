@@ -11,25 +11,21 @@
 
 ## variables
 
-declare chroot_dir=${abs_dirname}/chroot_dir.$$
-
 ## public functions
 
 function setUp() {
-  mkdir ${chroot_dir}
+  mkdir -p ${chroot_dir}/dev
 
   function checkroot() { :; }
-  function mkdir() { echo mkdir $*; }
-  function mknod() { echo mknod $*; }
-  function ln()    { echo ln    $*; }
+  function mount() { :; }
 }
 
 function tearDown() {
   rm -rf ${chroot_dir}
 }
 
-function test_before_mount_dev() {
-  before_mount_dev ${chroot_dir} # >/dev/null
+function test_after_umount_nonroot() {
+  after_umount_nonroot ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 
