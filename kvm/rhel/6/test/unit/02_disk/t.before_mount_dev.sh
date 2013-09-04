@@ -17,7 +17,6 @@ function setUp() {
   mkdir -p ${chroot_dir}/dev
 
   function checkroot() { :; }
-  function before_mount_dev() { :; }
   function mount() { :; }
 }
 
@@ -25,8 +24,8 @@ function tearDown() {
   rm -rf ${chroot_dir}
 }
 
-function test_mount_dev() {
-  mount_dev ${chroot_dir} >/dev/null
+function test_before_mount_dev() {
+  before_mount_dev ${chroot_dir} >/dev/null
   assertEquals $? 0
 }
 
