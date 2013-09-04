@@ -114,6 +114,10 @@ function before_mount_dev() {
 	ttyae 666 c 3 190
 	ttyaf 666 c 3 191
 	EOS
+	# loop
+	for i in {0..127}; do
+	  echo loop${i} 600 b 7 ${i}
+	done
 	)
 
   for dev_path in dev etc/udev/devices; do
