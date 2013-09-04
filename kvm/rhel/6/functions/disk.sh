@@ -159,11 +159,17 @@ function mount_sys() {
   mount --bind /sys ${chroot_dir}/sys
 }
 
+function before_mount_dev() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+}
+
 function mount_dev() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
+  before_mount_dev ${chroot_dir}
   printf "[DEBUG] Mounting %s\n" ${chroot_dir}/dev
   mount --bind /dev ${chroot_dir}/dev
 }
