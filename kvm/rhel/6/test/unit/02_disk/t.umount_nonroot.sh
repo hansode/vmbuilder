@@ -18,6 +18,7 @@ function setUp() {
 
   function checkroot() { :; }
   function umount() { :; }
+  function after_umount_nonroot() { :; }
 }
 
 function tearDown() {

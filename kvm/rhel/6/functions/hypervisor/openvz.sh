@@ -26,7 +26,7 @@ function configure_hypervisor() {
   configure_container ${chroot_dir}
 }
 
-function before_mount_dev() {
+function after_umount_nonroot() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1

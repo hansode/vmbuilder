@@ -159,17 +159,11 @@ function mount_sys() {
   mount --bind /sys ${chroot_dir}/sys
 }
 
-function before_mount_dev() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
-}
-
 function mount_dev() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
-  before_mount_dev ${chroot_dir}
   printf "[DEBUG] Mounting %s\n" ${chroot_dir}/dev
   mount --bind /dev ${chroot_dir}/dev
 }
@@ -183,6 +177,11 @@ function umount_root() {
   umount -l ${chroot_dir}
 }
 
+function after_umount_nonroot() {
+  local chroot_dir=$1
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+}
+
 function umount_nonroot() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
@@ -193,6 +192,8 @@ function umount_nonroot() {
     printf "[DEBUG] Unmounting %s\n" ${mountpoint}
     umount -l ${mountpoint}
   done < <(egrep ${chroot_dir}/ /etc/mtab | awk '{print $2}')
+
+  after_umount_nonroot ${chroot_dir}
 }
 
 ## ptab
