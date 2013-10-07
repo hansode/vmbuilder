@@ -1656,7 +1656,7 @@ function run_copy() {
 
   (
   printf "[INFO] Copying files specified by copy in: %s\n" ${copy}
-  cd $(dirname ${copy})
+  cd ${copy%/*}
   while read line; do
     set ${line}
     [[ $# -ge 2 ]] || continue
@@ -1679,7 +1679,7 @@ function run_copy() {
       [[ -n "${mode}" ]] || mode=$(stat -c %a ${srcpath})
       install --mode ${mode} --owner ${owner:-root} --group ${group:-root} ${srcpath} ${dstpath}
     )
-  done < <(egrep -v '^$|^#' ${copy})
+  done < <(egrep -v '^$|^#' ${copy##*/})
   )
 }
 
