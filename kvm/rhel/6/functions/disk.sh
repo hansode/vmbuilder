@@ -36,8 +36,8 @@ function add_option_disk() {
 
   distro=${distro_name}-${distro_ver}_${distro_arch}
   distro_dir=${distro_dir:-$(pwd)/${distro}}
-  raw=${raw:-./${distro}.raw}
-  rootfs_dir=${rootfs_dir:-./rootfs}
+  raw=${raw:-$(pwd)/${distro}.raw}
+  rootfs_dir=${rootfs_dir:-$(pwd)/rootfs}
   diskless=${diskless:-}
 }
 
