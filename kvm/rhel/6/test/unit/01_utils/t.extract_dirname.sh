@@ -12,15 +12,15 @@
 ## functions
 
 function test_extract_dirname_parent_dir() {
-  assertEquals $(extract_dirname ../) $(pwd)
+  assertEquals $(extract_dirname ../) ${PWD}
 }
 
 function test_extract_dirname_current_dir() {
-  assertEquals $(extract_dirname ./) $(pwd)
+  assertEquals $(extract_dirname ./) ${PWD}
 }
 
 function test_extract_dirname_pwd() {
-  assertSame "$(extract_dirname ./)" "$(pwd)"
+  assertSame "$(extract_dirname ./)" "${PWD}"
 }
 
 function test_extract_dirname_parent_file_not_found() {
