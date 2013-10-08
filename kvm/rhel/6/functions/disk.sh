@@ -35,9 +35,9 @@ function add_option_disk() {
   chroot_dir=${chroot_dir:-/tmp/tmp$(date +%s)}
 
   distro=${distro_name}-${distro_ver}_${distro_arch}
-  distro_dir=${distro_dir:-$(pwd)/${distro}}
-  raw=${raw:-$(pwd)/${distro}.raw}
-  rootfs_dir=${rootfs_dir:-$(pwd)/rootfs}
+  distro_dir=${distro_dir:-${PWD}/${distro}}
+  raw=${raw:-${PWD}/${distro}.raw}
+  rootfs_dir=${rootfs_dir:-${PWD}/rootfs}
   diskless=${diskless:-}
 }
 
@@ -706,7 +706,7 @@ function convert_disk() {
   #
   # Convert the disk image
   #
-  local disk_filename=$1 dest_dir=${2:-$(pwd)} dest_format=${3:-vdi}
+  local disk_filename=$1 dest_dir=${2:-${PWD}} dest_format=${3:-vdi}
   [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   validate_image_format_type ${dest_format} || return 1
 

@@ -42,21 +42,21 @@ function test_convert_disk_filename() {
 }
 
 function test_convert_disk_filename_destdir() {
-  convert_disk ${disk_filename} $(pwd)
+  convert_disk ${disk_filename} ${PWD}
   assertEquals $? 0
 }
 
 #### raw -> vdi (virtualbox)
 
 function test_convert_disk_filename_destdir_destformat_vdi() {
-  convert_disk ${disk_filename} $(pwd) vdi
+  convert_disk ${disk_filename} ${PWD} vdi
   assertEquals $? 0
 }
 
 #### raw -> vmdk (vmware)
 
 function test_convert_disk_filename_destdir_destformat_vmdk() {
-  convert_disk ${disk_filename} $(pwd) vmdk
+  convert_disk ${disk_filename} ${PWD} vmdk
   assertEquals $? 0
 }
 

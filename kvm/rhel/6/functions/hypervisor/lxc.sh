@@ -86,7 +86,7 @@ function lxc_create() {
   [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
-  local lxc_config_path=$(pwd)/lxc.conf
+  local lxc_config_path=${PWD}/lxc.conf
   render_lxc_config > ${lxc_config_path}
   shlog lxc-create -f ${lxc_config_path} -n ${name}
 }
@@ -96,7 +96,7 @@ function lxc_start() {
   [[ -n "${name}" ]] || { echo "[ERROR] Invalid argument: name:${name} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   checkroot || return 1
 
-  shlog lxc-start -n ${name} -d -l DEBUG -o $(pwd)/lxc.log
+  shlog lxc-start -n ${name} -d -l DEBUG -o ${PWD}/lxc.log
 }
 
 function lxc_stop() {

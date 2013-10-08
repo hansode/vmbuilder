@@ -27,4 +27,4 @@ declare dstformat=${basename}; dstformat="${dstformat%.sh}"; dstformat="${dstfor
 ### validate
 
 [[ -a "${disk_filename}" ]] || { echo "[ERROR] file not found: ${disk_filename} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; exit 1; }
-convert_disk ${disk_filename} $(pwd) ${dstformat}
+convert_disk ${disk_filename} ${PWD} ${dstformat}

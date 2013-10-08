@@ -201,7 +201,7 @@ function build_chroot() {
   add_option_distro
   preflight_check_distro
 
-  local chroot_dir=${1:-$(pwd)/${distro_name}-${distro_ver}_${distro_arch}}
+  local chroot_dir=${1:-${PWD}/${distro_name}-${distro_ver}_${distro_arch}}
   [[ -d "${chroot_dir}" ]] && { echo "[ERROR] ${chroot_dir} already exists (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; } || :
 
   distroinfo
