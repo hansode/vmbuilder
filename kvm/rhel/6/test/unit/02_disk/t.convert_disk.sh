@@ -39,27 +39,27 @@ function test_convert_disk_filename() {
 }
 
 function test_convert_disk_filename_destdir() {
-  convert_disk ${disk_filename} $(pwd) >/dev/null
+  convert_disk ${disk_filename} ${PWD} >/dev/null
   assertEquals $? 0
 }
 
 function test_convert_disk_filename_destdir_destformat_vdi() {
-  convert_disk ${disk_filename} $(pwd) vdi >/dev/null
+  convert_disk ${disk_filename} ${PWD} vdi >/dev/null
   assertEquals $? 0
 }
 
 function test_convert_disk_filename_destdir_destformat_vmdk() {
-  convert_disk ${disk_filename} $(pwd) vmdk >/dev/null
+  convert_disk ${disk_filename} ${PWD} vmdk >/dev/null
   assertEquals $? 0
 }
 
 function test_convert_disk_filename_destdir_destformat_qcow2() {
-  convert_disk ${disk_filename} $(pwd) qcow2 >/dev/null
+  convert_disk ${disk_filename} ${PWD} qcow2 >/dev/null
   assertEquals $? 0
 }
 
 function test_convert_disk_filename_destdir_destformat_unknown() {
-  convert_disk ${disk_filename} $(pwd) unknown 2>/dev/null
+  convert_disk ${disk_filename} ${PWD} unknown 2>/dev/null
   assertNotEquals $? 0
 }
 
