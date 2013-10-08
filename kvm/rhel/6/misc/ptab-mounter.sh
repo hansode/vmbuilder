@@ -28,7 +28,7 @@ function register_options() {
 
   config_path=${config_path:-}
   image_path=${image_path:-${image_file}}
-  mntpnt_path=${mntpnt_path:-$(pwd)/mnt}
+  mntpnt_path=${mntpnt_path:-${PWD}/mnt}
 }
 
 function ptab_mounter() {

@@ -27,7 +27,7 @@ function register_options() {
   [[ -z "${debug}" ]] || set -x
 
   config_path=${config_path:-}
-  mntpnt_path=${mntpnt_path:-$(pwd)/mnt}
+  mntpnt_path=${mntpnt_path:-${PWD}/mnt}
 }
 
 function nonroot_mounter() {
