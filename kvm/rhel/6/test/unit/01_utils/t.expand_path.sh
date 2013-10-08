@@ -12,11 +12,11 @@
 ## functions
 
 function test_expand_path_parent_dir() {
-  assertEquals "$(expand_path ../)" "$(pwd)/.."
+  assertEquals "$(expand_path ../)" "${PWD}/.."
 }
 
 function test_expand_path_current_dir() {
-  assertEquals "$(expand_path ./)" "$(pwd)/."
+  assertEquals "$(expand_path ./)" "${PWD}/."
 }
 
 function test_expand_path_parent_file_not_found() {

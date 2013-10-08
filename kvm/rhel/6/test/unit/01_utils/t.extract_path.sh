@@ -12,11 +12,11 @@
 ## functions
 
 function test_extract_path_parent_dir() {
-  assertEquals $(extract_path ../) $(pwd)/..
+  assertEquals $(extract_path ../) ${PWD}/..
 }
 
 function test_extract_path_current_dir() {
-  assertEquals $(extract_path ./) $(pwd)/.
+  assertEquals $(extract_path ./) ${PWD}/.
 }
 
 function test_extract_path_parent_file_not_found() {

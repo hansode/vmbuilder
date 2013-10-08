@@ -21,7 +21,7 @@ function test_get_suffix_no_opts() {
 function test_get_suffix_opts() {
   assertEquals "$(get_suffix filename.raw)"           "raw"
   assertEquals "$(get_suffix filename.$$.raw)"        "raw"
-  assertEquals "$(get_suffix $(pwd)/filename.$$.raw)" "raw"
+  assertEquals "$(get_suffix ${PWD}/filename.$$.raw)" "raw"
 }
 
 ## shunit2
