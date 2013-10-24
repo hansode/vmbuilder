@@ -956,6 +956,7 @@ function install_virtualbox() {
   #    ex) --addpkg [name] ...
   #        --addpkg make --addpkg kernel-devel --addpkg gcc --addpkg perl
   #
+  run_yum ${chroot_dir} install make kernel-devel gcc perl
   run_in_target ${chroot_dir} yum install -y VirtualBox-4.2
 }
 

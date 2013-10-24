@@ -17,6 +17,7 @@ function setUp() {
 
   function curl() { echo curl $*; }
   function chroot() { echo chroot $*; }
+  function run_yum() { echo run_yum $*; }
 }
 
 function tearDown() {
@@ -25,6 +26,9 @@ function tearDown() {
 
 function test_install_virtualbox() {
   install_virtualbox ${chroot_dir} | egrep -q -w VirtualBox-4.2
+  assertEquals $? 0
+
+  install_virtualbox ${chroot_dir} | egrep -q -w kernel-devel
   assertEquals $? 0
 }
 
