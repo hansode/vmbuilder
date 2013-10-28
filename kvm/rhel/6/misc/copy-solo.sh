@@ -37,5 +37,5 @@ extract_args $*
 
 [[ -f "${config_path}" ]] && load_config ${config_path} || :
 
-declare chroot_dir=/
+chroot_dir=${chroot_dir:-/}
 run_copies ${chroot_dir} ${CMD_ARGS}
