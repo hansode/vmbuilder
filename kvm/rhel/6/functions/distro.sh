@@ -942,7 +942,7 @@ function configure_vzconf() {
    ipt_REJECT ipt_tos ipt_limit ipt_multiport iptable_filter iptable_mangle ipt_TCPMSS ipt_tcpmss ipt_ttl ipt_length
    ipt_recent ipt_owner ipt_REDIRECT ipt_TOS ipt_LOG ip_conntrack ipt_state iptable_nat ip_nat_ftp
   "
-  sed -i "s,^IPTABLES=,IPTABLES=\"$(echo ${iptables_modules})\"," ${chroot_dir}/etc/vz/vz.conf
+  sed -i "s,^IPTABLES=.*,IPTABLES=\"$(echo ${iptables_modules})\"," ${chroot_dir}/etc/vz/vz.conf
 }
 
 
