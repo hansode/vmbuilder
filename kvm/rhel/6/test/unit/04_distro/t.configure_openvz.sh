@@ -18,6 +18,7 @@ function setUp() {
   function install_vzkernel() { echo install_vzkernel $*; }
   function install_vzutils() { echo install_vzutils $*; }
   function install_menu_lst_vzkernel() { echo install_menu_lst_vzkernel $*; }
+  function configure_vzconf() { echo configure_vzconf $@; }
 }
 
 function tearDown() {
