@@ -310,6 +310,7 @@ function configure_openvz() {
   install_vzkernel          ${chroot_dir}
   install_vzutils           ${chroot_dir}
   install_menu_lst_vzkernel ${chroot_dir}
+  configure_vzconf          ${chroot_dir}
 }
 
 function configure_virtualbox() {
@@ -931,6 +932,19 @@ function install_vzutils() {
 
   run_in_target ${chroot_dir} yum install -y vzctl vzquota
 }
+
+function configure_vzconf() {
+  local chroot_dir=$1
+
+  [[ -f ${chroot_dir}/etc/vz/vz.conf ]] || return 0
+
+  local iptables_modules="
+   ipt_REJECT ipt_tos ipt_limit ipt_multiport iptable_filter iptable_mangle ipt_TCPMSS ipt_tcpmss ipt_ttl ipt_length
+   ipt_recent ipt_owner ipt_REDIRECT ipt_TOS ipt_LOG ip_conntrack ipt_state iptable_nat ip_nat_ftp
+  "
+  sed -i "s,^IPTABLES=,IPTABLES=\"$(echo ${iptables_modules})\"," ${chroot_dir}/etc/vz/vz.conf
+}
+
 
 ### virtualbox
 
