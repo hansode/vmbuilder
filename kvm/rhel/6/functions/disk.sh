@@ -476,6 +476,9 @@ function unmapptab() {
     # Command failed
     dmsetup info ${parted_oldmap} 2>/dev/null | egrep ^State: | egrep -w ACTIVE -q || continue
     printf "[DEBUG] Removing parted old map with 'dmsetup remove %s'\n" ${parted_oldmap}
+    # TODO: ***work-around***
+    # - easy to fail not to wait for a few seconds
+    sleep 3
     dmsetup remove ${parted_oldmap}
   done < <(echo "${lsdevmap_output}")
 
