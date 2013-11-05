@@ -57,20 +57,20 @@ function test_run_copy_not_found() {
 }
 
 function test_run_copy_file_attributes_no_opts() {
-  run_copy ${chroot_dir} ${copyfile} | egrep -q "install --mode 644 --owner root --group root"
+  run_copy ${chroot_dir} ${copyfile} | egrep -q "install -p --mode 644 --owner root --group root"
   assertEquals $? 0
 }
 
 function test_run_copy_file_attributes_mode_owner_group() {
-  run_copy ${chroot_dir} ${copyfile} | egrep /sbin/baz | egrep -q "install --mode 0755 --owner owner --group group"
+  run_copy ${chroot_dir} ${copyfile} | egrep /sbin/baz | egrep -q "install -p --mode 0755 --owner owner --group group"
   assertEquals $? 0
 }
 
 function test_run_copy_file_to_keep_attribute() {
-  run_copy ${chroot_dir} ${copyfile} | egrep -q "install --mode 644 --owner root --group root ${srcdummy_644}"
+  run_copy ${chroot_dir} ${copyfile} | egrep -q "install -p --mode 644 --owner root --group root ${srcdummy_644}"
   assertEquals $? 0
 
-  run_copy ${chroot_dir} ${copyfile} | egrep -q "install --mode 755 --owner root --group root ${srcdummy_755}"
+  run_copy ${chroot_dir} ${copyfile} | egrep -q "install -p --mode 755 --owner root --group root ${srcdummy_755}"
   assertEquals $? 0
 }
 

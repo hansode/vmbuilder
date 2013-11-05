@@ -1692,7 +1692,7 @@ function run_copy() {
 
       # keep original file mode
       [[ -n "${mode}" ]] || mode=$(stat -c %a ${srcpath})
-      install --mode ${mode} --owner ${owner:-root} --group ${group:-root} ${srcpath} ${dstpath}
+      install -p --mode ${mode} --owner ${owner:-root} --group ${group:-root} ${srcpath} ${dstpath}
     )
   done < <(egrep -v '^$|^#' ${copy##*/})
   )
