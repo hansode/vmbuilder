@@ -17,9 +17,7 @@ function add_option_distro_rhel7() {
   7) distro_ver=7.0 ;;
   esac
 
-  preferred_filesystem=ext4
-  preferred_initrd=initramfs
-  preferred_rpmdb_hash_ver=9
+  preferred_grub=grub2
 
   baseurl=http://ftp.redhat.com/redhat/rhel/beta/7/${basearch}/os
   gpgkey="${baseurl}/RPM-GPG-KEY-redhat-beta ${baseurl}/RPM-GPG-KEY-redhat-release"
