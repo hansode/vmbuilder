@@ -1365,15 +1365,21 @@ function configure_serial_console() {
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   printf "[INFO] Configuring console\n"
-  [[ -f ${chroot_dir}/etc/sysconfig/init ]] && {
-    sed -i "s,^ACTIVE_CONSOLES=.*,ACTIVE_CONSOLES=\"/dev/tty[1-6] /dev/ttyS0\"", ${chroot_dir}/etc/sysconfig/init
-  } || :
 
-  # rhel5
   (
     eval "$(detect_distro ${chroot_dir})"
     case "${DISTRIB_RELEASE}" in
-    5.*) echo "S0:2345:respawn:/sbin/agetty ttyS0 115200 linux" >> ${chroot_dir}/etc/inittab ;;
+    5.*)
+      echo "S0:2345:respawn:/sbin/agetty ttyS0 115200 linux" >> ${chroot_dir}/etc/inittab
+      ;;
+    6.*)
+      [[ -f ${chroot_dir}/etc/sysconfig/init ]] && {
+        sed -i "s,^ACTIVE_CONSOLES=.*,ACTIVE_CONSOLES=\"/dev/tty[1-6] /dev/ttyS0\"", ${chroot_dir}/etc/sysconfig/init
+      } || :
+      ;;
+    7.*)
+      ln -s /usr/lib/systemd/system/getty@.service ${chroot_dir}/etc/systemd/system/getty.target.wants/getty@ttyS0.service
+      ;;
     esac
   )
 
