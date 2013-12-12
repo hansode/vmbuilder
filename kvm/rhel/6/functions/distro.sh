@@ -1602,6 +1602,7 @@ function detect_distro() {
   # CentOS release 5.6 (Final)
   # CentOS Linux release 6.0 (Final)
   # Red Hat Enterprise Linux Server release 6.0 (Santiago)
+  # Red Hat Enterprise Linux Everything release 7.0 Beta (Maipo)
   # Scientific Linux release 6.0 (Carbon)
 
   local DISTRIB_ID=
@@ -1648,9 +1649,9 @@ function detect_distro() {
   fi
 
   cat <<-EOS
-	DISTRIB_FLAVOR=${DISTRIB_FLAVOR}
-	DISTRIB_ID=${DISTRIB_ID}
-	DISTRIB_RELEASE=${DISTRIB_RELEASE}
+	DISTRIB_FLAVOR="${DISTRIB_FLAVOR}"
+	DISTRIB_ID="${DISTRIB_ID}"
+	DISTRIB_RELEASE="${DISTRIB_RELEASE}"
 	EOS
 }
 
