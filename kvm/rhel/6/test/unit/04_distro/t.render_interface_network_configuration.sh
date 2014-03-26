@@ -27,30 +27,30 @@ function tearDown() {
 
 ### set value
 
-function test_render_interface_netowrk_configuration_no_opts() {
-  eval "$(render_interface_netowrk_configuration)"
+function test_render_interface_network_configuration_no_opts() {
+  eval "$(render_interface_network_configuration)"
   assertEquals "${BOOTPROTO}" "dhcp"
 }
 
-function test_render_interface_netowrk_configuration_ip() {
+function test_render_interface_network_configuration_ip() {
   local ip=192.0.2.1
 
-  eval "$(render_interface_netowrk_configuration)"
+  eval "$(render_interface_network_configuration)"
   assertEquals "${IPADDR}" "${ip}"
 }
 
-function test_render_interface_netowrk_configuration_onboot() {
+function test_render_interface_network_configuration_onboot() {
   local onboot=no
 
-  eval "$(render_interface_netowrk_configuration)"
+  eval "$(render_interface_network_configuration)"
   assertEquals "${ONBOOT}" "${onboot}"
 }
 
-function test_render_interface_netowrk_configuration_dnses() {
+function test_render_interface_network_configuration_dnses() {
   local dns1=8.8.8.8 dns2=8.8.4.4
   local dns="${dns1} ${dns2}"
 
-  eval "$(render_interface_netowrk_configuration)"
+  eval "$(render_interface_network_configuration)"
   assertEquals "${DNS1}" "${dns1}"
   assertEquals "${DNS2}" "${dns2}"
 }
