@@ -1441,12 +1441,12 @@ function install_interface() {
 
   {
     render_interface_${iftype} ${ifname}
-    render_interface_netowrk_configuration
+    render_interface_network_configuration
   } | egrep -v '^$' > ${chroot_dir}/${ifcfg_path}
   cat ${chroot_dir}/${ifcfg_path}
 }
 
-function render_interface_netowrk_configuration() {
+function render_interface_network_configuration() {
   [[ -z "${ip}" ]] && {
     local bootproto
 
