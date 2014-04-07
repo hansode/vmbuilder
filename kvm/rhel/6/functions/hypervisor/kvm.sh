@@ -65,7 +65,7 @@ function configure_hypervisor() {
 ## command path
 
 function qemu_kvm_path() {
-  local execs="/usr/libexec/qemu-kvm /usr/bin/kvm"
+  local execs="/usr/libexec/qemu-kvm /usr/bin/kvm /usr/bin/qemu-kvm"
 
   local command_path exe
   for exe in ${execs}; do
