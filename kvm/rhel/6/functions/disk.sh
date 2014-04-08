@@ -497,7 +497,7 @@ function unmapptab() {
   local mapped_lodev=$(mapped_lodev ${disk_filename})
   [[ -n "${mapped_lodev}" ]] || return 0
 
-  losetup -d ${mapped_lodev}
+  losetup -d /dev/${mapped_lodev}
 }
 
 function mapped_lodev() {

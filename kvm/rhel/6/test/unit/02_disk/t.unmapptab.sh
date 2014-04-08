@@ -19,7 +19,7 @@ function setUp() {
   function checkroot() { :; }
   function kpartx() { :; }
   function dmsetup() { :; }
-  function losetup() { :; }
+  function losetup() { echo losetup ${@}; }
   function mapped_lodev() { :; }
   function lsdevmap() { cat <<-EOS
 	loop0p1
@@ -34,7 +34,14 @@ function tearDown() {
 
 function test_unmapptab() {
   unmapptab ${disk_filename} >/dev/null
-  assertEquals $? 0
+  assertEquals 0 ${?}
+}
+
+function test_unmapptab_mapped() {
+  function mapped_lodev() { echo loop0; }
+
+  unmapptab ${disk_filename} >/dev/null
+  assertEquals 0 ${?}
 }
 
 ## shunit2
