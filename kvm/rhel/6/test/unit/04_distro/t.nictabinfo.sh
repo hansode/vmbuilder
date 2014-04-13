@@ -16,21 +16,25 @@
 
 function test_nictabinfo_all_zero() {
   assertEquals \
-                             "ifname=eth0 ip= mask= net= bcast= gw= dns=\"\" mac= onboot= iftype=ethernet" \
-   "$(nictabinfo | egrep -w "^ifname=eth0 ip= mask= net= bcast= gw= dns=\"\" mac= onboot= iftype=ethernet")"
+                             "ifname=eth0 ip= mask= net= bcast= gw= dns=\"\" mac= hw= onboot= iftype=ethernet" \
+   "$(nictabinfo | egrep -w "^ifname=eth0 ip= mask= net= bcast= gw= dns=\"\" mac= hw= onboot= iftype=ethernet")"
 }
 
 function test_nictabinfo_ifname_eth0() {
   local ifname=eth0
 
-  assertEquals "$(nictabinfo | egrep -w "^ifname=${ifname} ip= mask= net= bcast= gw= dns=\"\" mac= onboot= iftype=ethernet")" "ifname=${ifname} ip= mask= net= bcast= gw= dns=\"\" mac= onboot= iftype=ethernet"
+  assertEquals \
+                             "ifname=${ifname} ip= mask= net= bcast= gw= dns=\"\" mac= hw= onboot= iftype=ethernet" \
+   "$(nictabinfo | egrep -w "^ifname=${ifname} ip= mask= net= bcast= gw= dns=\"\" mac= hw= onboot= iftype=ethernet")"
 }
 
 function test_nictabinfo_ifname_eth1() {
   # ifname is always eth0
   local ifname=eth1
 
-  assertNotEquals "$(nictabinfo | egrep -w "^ifname=${ifname} ip= mask= net= bcast= gw=")" "ifname=${ifname} ip= mask= net= bcast= gw="
+  assertNotEquals \
+                              "ifname=${ifname} ip= mask= net= bcast= gw=" \
+    "$(nictabinfo | egrep -w "^ifname=${ifname} ip= mask= net= bcast= gw=")"
 }
 
 function test_nictabinfo_set_args() {
@@ -42,8 +46,11 @@ function test_nictabinfo_set_args() {
   local gw=192.0.2.1
   local dns=8.8.4.4
   local mac=01:23:45:67:89:ab
+  local hw=01:23:45:67:89:ab
 
-  assertEquals "$(nictabinfo | egrep -w "^ifname=${ifname} ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns=\"${dns}\" mac=${mac} onboot= iftype=ethernet")" "ifname=${ifname} ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns=\"${dns}\" mac=${mac} onboot= iftype=ethernet"
+  assertEquals \
+                              "ifname=${ifname} ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns=\"${dns}\" mac=${mac} hw=${hw} onboot= iftype=ethernet" \
+    "$(nictabinfo | egrep -w "^ifname=${ifname} ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns=\"${dns}\" mac=${mac} hw=${hw} onboot= iftype=ethernet")"
 }
 
 function test_nictabinfo_set_args_multi_line_dns() {
@@ -58,8 +65,11 @@ function test_nictabinfo_set_args_multi_line_dns() {
  8.8.8.8
 "
   local mac=01:23:45:67:89:ab
+  local hw=01:23:45:67:89:ab
 
-  assertEquals "$(nictabinfo | egrep -w "^ifname=${ifname} ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns=\"$(echo ${dns})\" mac=${mac} onboot= iftype=ethernet")" "ifname=${ifname} ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns=\"$(echo ${dns})\" mac=${mac} onboot= iftype=ethernet"
+  assertEquals \
+                              "ifname=${ifname} ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns=\"$(echo ${dns})\" mac=${mac} hw=${hw} onboot= iftype=ethernet" \
+    "$(nictabinfo | egrep -w "^ifname=${ifname} ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns=\"$(echo ${dns})\" mac=${mac} hw=${hw} onboot= iftype=ethernet")"
 }
 
 ## shunit2
