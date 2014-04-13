@@ -19,6 +19,7 @@ function setUp() {
   BOOTPROTO= IPADDR= NETMASK= NETWORK= BROADCAST= GATEWAY=
   DNS1= DNS2= DNS3=
   ifname= ip= mask= net= bcast= gw= dns= onboot= iftype=
+  mac= hw=
 }
 
 function tearDown() {
