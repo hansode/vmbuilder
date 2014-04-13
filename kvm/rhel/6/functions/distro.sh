@@ -73,6 +73,7 @@ function add_option_distro() {
   bcast=${bcast:-}
   gw=${gw:-}
   dns=${dns:-}
+  mac=${mac:-}
   hostname=${hostname:-}
 
   # settings for the initial user
@@ -1395,7 +1396,7 @@ function nictabinfo() {
     } || {
       # "echo ${dns}" means removing new-line(s).
       cat <<-EOS
-	ifname=eth0 ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns="$(echo ${dns})" onboot=${onboot} iftype=ethernet
+	ifname=eth0 ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns="$(echo ${dns})" mac=${mac} onboot=${onboot} iftype=ethernet
 	EOS
     }
   } | egrep -v '^$|^#'
@@ -1408,7 +1409,7 @@ function config_interfaces() {
   local line=
   while read line; do
     (
-      ifname= ip= mask= net= bcast= gw= dns= onboot= iftype=
+      ifname= ip= mask= net= bcast= gw= dns= mac= onboot= iftype=
       eval ${line}
       install_interface ${chroot_dir} ${ifname} ${iftype}
     )
@@ -1479,6 +1480,7 @@ function render_interface_network_configuration() {
   done
 
   cat <<-EOS
+	$([[ -z "${mac}" ]] || echo "MACADDR=${mac}")
 	ONBOOT=${onboot:-yes}
 	EOS
 }
