@@ -21,6 +21,7 @@ function setUp() {
   BOOTPROTO= IPADDR= NETMASK= NETWORK= BROADCAST= GATEWAY=
   DNS1= DNS2= DNS3=
   ifname= ip= mask= net= bcast= gw= dns= onboot= iftype=
+  mac= hw=
 }
 
 function tearDown() {
@@ -39,6 +40,8 @@ function test_config_interfaces_dhcp() {
   assertEquals "${NETWORK}"   ""
   assertEquals "${NETMASK}"   ""
   assertEquals "${BROADCAST}" ""
+  assertEquals "${MACADDR}"   ""
+  assertEquals "${HWADDR}"    ""
 }
 
 ### set value
@@ -59,6 +62,8 @@ function test_config_interfaces_static_ip() {
   assertEquals "${BROADCAST}" ""
   assertEquals "${GATEWAY}"   ""
   assertEquals "${ONBOOT}"    "yes"
+  assertEquals "${MACADDR}"   ""
+  assertEquals "${HWADDR}"    ""
 }
 
 function test_config_interfaces_static_ip_net() {
@@ -77,6 +82,8 @@ function test_config_interfaces_static_ip_net() {
   assertEquals "${BROADCAST}" ""
   assertEquals "${GATEWAY}"   ""
   assertEquals "${ONBOOT}"    "yes"
+  assertEquals "${MACADDR}"   ""
+  assertEquals "${HWADDR}"    ""
 }
 
 function test_config_interfaces_static_ip_net_mask() {
@@ -95,6 +102,8 @@ function test_config_interfaces_static_ip_net_mask() {
   assertEquals "${BROADCAST}" ""
   assertEquals "${GATEWAY}"   ""
   assertEquals "${ONBOOT}"    "yes"
+  assertEquals "${MACADDR}"   ""
+  assertEquals "${HWADDR}"    ""
 }
 
 function test_config_interfaces_static_ip_net_mask_bcast() {
@@ -113,6 +122,8 @@ function test_config_interfaces_static_ip_net_mask_bcast() {
   assertEquals "${BROADCAST}" "${bcast}"
   assertEquals "${GATEWAY}"   ""
   assertEquals "${ONBOOT}"    "yes"
+  assertEquals "${MACADDR}"   ""
+  assertEquals "${HWADDR}"    ""
 }
 
 function test_config_interfaces_static_ip_net_mask_bcast_gw() {
@@ -130,6 +141,8 @@ function test_config_interfaces_static_ip_net_mask_bcast_gw() {
   assertEquals "${NETMASK}"   "${mask}"
   assertEquals "${BROADCAST}" "${bcast}"
   assertEquals "${GATEWAY}"   "${gw}"
+  assertEquals "${MACADDR}"   ""
+  assertEquals "${HWADDR}"    ""
 }
 
 function test_config_interfaces_static_ip_net_mask_bcast_gw_onboot() {
@@ -147,6 +160,8 @@ function test_config_interfaces_static_ip_net_mask_bcast_gw_onboot() {
   assertEquals "${NETMASK}"   "${mask}"
   assertEquals "${BROADCAST}" "${bcast}"
   assertEquals "${GATEWAY}"   "${gw}"
+  assertEquals "${MACADDR}"   ""
+  assertEquals "${HWADDR}"    ""
 }
 
 function test_config_interfaces_static_ip_net_mask_bcast_gw_onboot_dns() {
@@ -167,6 +182,29 @@ function test_config_interfaces_static_ip_net_mask_bcast_gw_onboot_dns() {
   assertEquals "${GATEWAY}"   "${gw}"
   assertEquals "${DNS1}"      "${dns1}"
   assertEquals "${DNS2}"      "${dns2}"
+  assertEquals "${MACADDR}"   ""
+  assertEquals "${HWADDR}"    ""
+}
+
+function test_config_interfaces_static_ip_mac_hw() {
+  local ip=192.0.2.10
+  local mac=aa:bb:cc:dd:ee:ff hw=00:11:22:33:44:55
+
+  config_interfaces ${chroot_dir} >/dev/null
+  . ${ifcfg_path}
+
+  assertEquals "${DEVICE}"    "eth0"
+  assertEquals "${TYPE}"      "Ethernet"
+  assertEquals "${BOOTPROTO}" "static"
+  assertEquals "${ONBOOT}"    "yes"
+  assertEquals "${IPADDR}"    "${ip}"
+  assertEquals "${NETWORK}"   ""
+  assertEquals "${NETMASK}"   ""
+  assertEquals "${BROADCAST}" ""
+  assertEquals "${GATEWAY}"   ""
+  assertEquals "${ONBOOT}"    "yes"
+  assertEquals "${MACADDR}"   "${mac}"
+  assertEquals "${HWADDR}"    "${hw}"
 }
 
 ### set empty
