@@ -75,6 +75,7 @@ function add_option_distro() {
   dns=${dns:-}
   mac=${mac:-}
   hw=${hw:-}
+  physdev=${physdev:-}
   hostname=${hostname:-}
 
   # settings for the initial user
@@ -1362,6 +1363,24 @@ function config_host_and_domainname() {
   }
 }
 
+function configure_vlan_conf() {
+  local chroot_dir=${1}
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  local line=
+
+  # TODO: enable to select "VLAN_NAME_TYPE"
+  while read line; do
+    egrep -w "^${line}" ${chroot_dir}/etc/sysconfig/network -q || {
+      echo "${line}" >> ${chroot_dir}/etc/sysconfig/network
+    }
+  done < <(cat <<-EOS
+	VLAN=yes
+	VLAN_NAME_TYPE=VLAN_PLUS_VID_NO_PAD
+	EOS
+  )
+}
+
 function configure_serial_console() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
@@ -1397,7 +1416,7 @@ function nictabinfo() {
     } || {
       # "echo ${dns}" means removing new-line(s).
       cat <<-EOS
-	ifname=eth0 ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns="$(echo ${dns})" mac=${mac} hw=${hw} onboot=${onboot} iftype=ethernet
+	ifname=eth0 ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns="$(echo ${dns})" mac=${mac} hw=${hw} physdev=${physdev} onboot=${onboot} iftype=ethernet
 	EOS
     }
   } | egrep -v '^$|^#'
@@ -1410,7 +1429,7 @@ function config_interfaces() {
   local line=
   while read line; do
     (
-      ifname= ip= mask= net= bcast= gw= dns= mac= hw= onboot= iftype=
+      ifname= ip= mask= net= bcast= gw= dns= mac= hw= physdev= onboot= iftype=
       eval ${line}
       install_interface ${chroot_dir} ${ifname} ${iftype}
     )
@@ -1428,6 +1447,9 @@ function install_interface() {
   iftype=$(echo ${iftype} | tr A-Z a-z)
   case ${iftype} in
   ethernet|ovsport|ovsbridge)
+    ;;
+  vlan)
+    configure_vlan_conf ${chroot_dir}
     ;;
   bridge)
     run_yum ${chroot_dir} install bridge-utils
@@ -1504,6 +1526,16 @@ function render_interface_tap() {
 	DEVICE=${ifname}
 	TYPE=Tap
 	$([[ -z "${bridge}" ]] || echo "BRIDGE=${bridge}")
+	EOS
+}
+
+function render_interface_vlan() {
+  local ifname=${1:-vlan0}
+
+  cat <<-EOS
+	DEVICE=${ifname}
+	$([[ -z "${physdev}" ]] || echo "PHYSDEV=${physdev}")
+	$([[ -z "${bridge}"  ]] || echo "BRIDGE=${bridge}")
 	EOS
 }
 
