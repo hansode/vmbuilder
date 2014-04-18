@@ -1363,6 +1363,24 @@ function config_host_and_domainname() {
   }
 }
 
+function configure_vlan_conf() {
+  local chroot_dir=${1}
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  local line=
+
+  # TODO: enable to select "VLAN_NAME_TYPE"
+  while read line; do
+    egrep -w "^${line}" ${chroot_dir}/etc/sysconfig/network -q || {
+      echo "${line}" >> ${chroot_dir}/etc/sysconfig/network
+    }
+  done < <(cat <<-EOS
+	VLAN=yes
+	VLAN_NAME_TYPE=VLAN_PLUS_VID_NO_PAD
+	EOS
+  )
+}
+
 function configure_serial_console() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
