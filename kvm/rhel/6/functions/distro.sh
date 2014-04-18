@@ -1428,7 +1428,10 @@ function install_interface() {
 
   iftype=$(echo ${iftype} | tr A-Z a-z)
   case ${iftype} in
-  ethernet|vlan|ovsport|ovsbridge)
+  ethernet|ovsport|ovsbridge)
+    ;;
+  vlan)
+    # TODO: /etc/sysconfig/networking configuration
     ;;
   bridge)
     run_yum ${chroot_dir} install bridge-utils
