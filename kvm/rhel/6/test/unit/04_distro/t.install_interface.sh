@@ -14,7 +14,10 @@
 
 function setUp() {
   mkdir -p ${chroot_dir}/etc/sysconfig/network-scripts
-  function run_yum() { echo run_yum $*; }
+  touch ${chroot_dir}/etc/sysconfig/network
+
+  function run_yum() { echo run_yum "${@}"; }
+  function configure_vlan_conf() { echo configure_vlan_conf "${@}"; }
 }
 
 function tearDown() {

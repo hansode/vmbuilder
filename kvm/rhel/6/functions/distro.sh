@@ -1449,7 +1449,7 @@ function install_interface() {
   ethernet|ovsport|ovsbridge)
     ;;
   vlan)
-    # TODO: /etc/sysconfig/networking configuration
+    configure_vlan_conf ${chroot_dir}
     ;;
   bridge)
     run_yum ${chroot_dir} install bridge-utils
