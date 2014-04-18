@@ -75,6 +75,7 @@ function add_option_distro() {
   dns=${dns:-}
   mac=${mac:-}
   hw=${hw:-}
+  physdev=${physdev:-}
   hostname=${hostname:-}
 
   # settings for the initial user
