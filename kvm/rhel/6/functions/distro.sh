@@ -1475,7 +1475,7 @@ function render_interface_network_configuration() {
   if [[ -z "${ip}" ]]; then
     bootproto=${bootproto:-dhcp}
 
-    if [[ -n "${bridge}" || -n "${physdev}" ]]; then
+    if [[ -n "${bridge}" ]]; then
       bootproto=none
     fi
 

@@ -49,13 +49,6 @@ function test_render_interface_network_configuration_onboot() {
   assertEquals "dhcp"      "${BOOTPROTO}"
 }
 
-function test_render_interface_network_configuration_physdev() {
-  local physdev=eth0
-
-  eval "$(render_interface_network_configuration)"
-  assertEquals "none" "${BOOTPROTO}"
-}
-
 function test_render_interface_network_configuration_dnses() {
   local dns1=8.8.8.8 dns2=8.8.4.4
   local dns="${dns1} ${dns2}"
