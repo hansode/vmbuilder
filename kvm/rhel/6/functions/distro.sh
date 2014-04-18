@@ -1507,6 +1507,16 @@ function render_interface_tap() {
 	EOS
 }
 
+function render_interface_vlan() {
+  local ifname=${1:-vlan0}
+
+  cat <<-EOS
+	DEVICE=${ifname}
+	$([[ -z "${physdev}" ]] || echo "PHYSDEV=${physdev}")
+	$([[ -z "${bridge}"  ]] || echo "BRIDGE=${bridge}")
+	EOS
+}
+
 function render_interface_bridge() {
   local ifname=${1:-br0}
 
