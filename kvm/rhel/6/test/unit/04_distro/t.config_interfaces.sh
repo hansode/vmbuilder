@@ -21,7 +21,7 @@ function setUp() {
   BOOTPROTO= IPADDR= NETMASK= NETWORK= BROADCAST= GATEWAY=
   DNS1= DNS2=
   MACADDR= HWADDR=
-  ifname= ip= mask= net= bcast= gw= dns= onboot= iftype=
+  ifname= ip= mask= net= bcast= gw= dns= bootproto= onboot= iftype=
   mac= hw=
 }
 
@@ -208,6 +208,33 @@ function test_config_interfaces_static_ip_mac_hw() {
   assertEquals "${HWADDR}"    "${hw}"
 }
 
+function test_config_interfaces_static_bootproto_none() {
+  local bootproto=none
+
+  config_interfaces ${chroot_dir} >/dev/null
+  . ${ifcfg_path}
+
+  assertEquals "${bootproto}" "${BOOTPROTO}"
+}
+
+function test_config_interfaces_static_bootproto_static() {
+  local bootproto=static
+
+  config_interfaces ${chroot_dir} >/dev/null
+  . ${ifcfg_path}
+
+  assertEquals "${bootproto}" "${BOOTPROTO}"
+}
+
+function test_config_interfaces_static_bootproto_dhcp() {
+  local bootproto=dhcp
+
+  config_interfaces ${chroot_dir} >/dev/null
+  . ${ifcfg_path}
+
+  assertEquals "${bootproto}" "${BOOTPROTO}"
+}
+
 ### set empty
 
 function test_config_interfaces_ip_empty() {
@@ -253,6 +280,15 @@ function test_config_interfaces_gw_empty() {
   . ${ifcfg_path}
 
   assertEquals "${GATEWAY}"   "${gw}"
+}
+
+function test_config_interfaces_bootproto_empty() {
+  local bootproto=
+
+  config_interfaces ${chroot_dir} >/dev/null
+  . ${ifcfg_path}
+
+  assertEquals "dhcp" "${BOOTPROTO}"
 }
 
 function test_config_interfaces_onboot_empty() {

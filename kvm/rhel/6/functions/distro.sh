@@ -76,6 +76,7 @@ function add_option_distro() {
   mac=${mac:-}
   hw=${hw:-}
   physdev=${physdev:-}
+  onboot=${onboot:-}
   hostname=${hostname:-}
 
   # settings for the initial user
@@ -1411,14 +1412,14 @@ function configure_serial_console() {
 
 function nictabinfo() {
   {
-    [[ -n "${nictab}" && -f "${nictab}" ]] && {
+    if [[ -n "${nictab}" && -f "${nictab}" ]]; then
       cat ${nictab}
-    } || {
+    else
       # "echo ${dns}" means removing new-line(s).
       cat <<-EOS
-	ifname=eth0 ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns="$(echo ${dns})" mac=${mac} hw=${hw} physdev=${physdev} onboot=${onboot} iftype=ethernet
+	ifname=eth0 ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns="$(echo ${dns})" mac=${mac} hw=${hw} physdev=${physdev} bootproto=${bootproto} onboot=${onboot} iftype=ethernet
 	EOS
-    }
+    fi
   } | egrep -v '^$|^#'
 }
 
@@ -1429,7 +1430,7 @@ function config_interfaces() {
   local line=
   while read line; do
     (
-      ifname= ip= mask= net= bcast= gw= dns= mac= hw= physdev= onboot= iftype=
+      ifname= ip= mask= net= bcast= gw= dns= mac= hw= physdev= bootproto= onboot= iftype=
       eval ${line}
       install_interface ${chroot_dir} ${ifname} ${iftype}
     )
@@ -1471,19 +1472,17 @@ function install_interface() {
 }
 
 function render_interface_network_configuration() {
-  [[ -z "${ip}" ]] && {
-    local bootproto
+  if [[ -z "${ip}" ]]; then
+    bootproto=${bootproto:-dhcp}
 
-    [[ -z "${bridge}" ]] && {
-      bootproto=dhcp
-    } || {
+    if [[ -n "${bridge}" ]]; then
       bootproto=none
-    }
+    fi
 
     cat <<-EOS
 	BOOTPROTO=${bootproto}
 	EOS
-  } || {
+  else
     cat <<-EOS
 	BOOTPROTO=static
 	IPADDR=${ip}
@@ -1492,7 +1491,7 @@ function render_interface_network_configuration() {
 	$([[ -z "${bcast}"  ]] || echo "BROADCAST=${bcast}")
 	$([[ -z "${gw}"     ]] || echo "GATEWAY=${gw}")
 	EOS
-  }
+  fi
 
   local dnssv= i=1
   for dnssv in ${dns}; do

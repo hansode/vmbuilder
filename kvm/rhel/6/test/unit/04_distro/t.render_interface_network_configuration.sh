@@ -30,21 +30,23 @@ function tearDown() {
 
 function test_render_interface_network_configuration_no_opts() {
   eval "$(render_interface_network_configuration)"
-  assertEquals "${BOOTPROTO}" "dhcp"
+  assertEquals "dhcp" "${BOOTPROTO}"
 }
 
 function test_render_interface_network_configuration_ip() {
   local ip=192.0.2.1
 
   eval "$(render_interface_network_configuration)"
-  assertEquals "${IPADDR}" "${ip}"
+  assertEquals "${ip}"  "${IPADDR}"
+  assertEquals "static" "${BOOTPROTO}"
 }
 
 function test_render_interface_network_configuration_onboot() {
   local onboot=no
 
   eval "$(render_interface_network_configuration)"
-  assertEquals "${ONBOOT}" "${onboot}"
+  assertEquals "${onboot}" "${ONBOOT}"
+  assertEquals "dhcp"      "${BOOTPROTO}"
 }
 
 function test_render_interface_network_configuration_dnses() {
@@ -52,8 +54,8 @@ function test_render_interface_network_configuration_dnses() {
   local dns="${dns1} ${dns2}"
 
   eval "$(render_interface_network_configuration)"
-  assertEquals "${DNS1}" "${dns1}"
-  assertEquals "${DNS2}" "${dns2}"
+  assertEquals "${dns1}" "${DNS1}"
+  assertEquals "${dns2}" "${DNS2}"
 }
 
 ## shunit2
