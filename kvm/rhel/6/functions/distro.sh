@@ -1412,14 +1412,14 @@ function configure_serial_console() {
 
 function nictabinfo() {
   {
-    [[ -n "${nictab}" && -f "${nictab}" ]] && {
+    if [[ -n "${nictab}" && -f "${nictab}" ]]; then
       cat ${nictab}
-    } || {
+    else
       # "echo ${dns}" means removing new-line(s).
       cat <<-EOS
-	ifname=eth0 ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns="$(echo ${dns})" mac=${mac} hw=${hw} physdev=${physdev} onboot=${onboot} iftype=ethernet
+	ifname=eth0 ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns="$(echo ${dns})" mac=${mac} hw=${hw} physdev=${physdev} bootproto=${bootproto} onboot=${onboot} iftype=ethernet
 	EOS
-    }
+    fi
   } | egrep -v '^$|^#'
 }
 
@@ -1430,7 +1430,7 @@ function config_interfaces() {
   local line=
   while read line; do
     (
-      ifname= ip= mask= net= bcast= gw= dns= mac= hw= physdev= onboot= iftype=
+      ifname= ip= mask= net= bcast= gw= dns= mac= hw= physdev= bootproto= onboot= iftype=
       eval ${line}
       install_interface ${chroot_dir} ${ifname} ${iftype}
     )
@@ -1473,12 +1473,14 @@ function install_interface() {
 
 function render_interface_network_configuration() {
   if [[ -z "${ip}" ]]; then
+    bootproto=${bootproto:-dhcp}
+
     if [[ -n "${bridge}" || -n "${physdev}" ]]; then
       bootproto=none
     fi
 
     cat <<-EOS
-	BOOTPROTO=${bootproto:-dhcp}
+	BOOTPROTO=${bootproto}
 	EOS
   else
     cat <<-EOS
