@@ -76,6 +76,7 @@ function add_option_distro() {
   mac=${mac:-}
   hw=${hw:-}
   physdev=${physdev:-}
+  onboot=${onboot:-}
   hostname=${hostname:-}
 
   # settings for the initial user
@@ -1471,19 +1472,15 @@ function install_interface() {
 }
 
 function render_interface_network_configuration() {
-  [[ -z "${ip}" ]] && {
-    local bootproto
-
-    [[ -z "${bridge}" ]] && {
-      bootproto=dhcp
-    } || {
+  if [[ -z "${ip}" ]]; then
+    if [[ -n "${bridge}" || -n "${physdev}" ]]; then
       bootproto=none
-    }
+    fi
 
     cat <<-EOS
-	BOOTPROTO=${bootproto}
+	BOOTPROTO=${bootproto:-dhcp}
 	EOS
-  } || {
+  else
     cat <<-EOS
 	BOOTPROTO=static
 	IPADDR=${ip}
@@ -1492,7 +1489,7 @@ function render_interface_network_configuration() {
 	$([[ -z "${bcast}"  ]] || echo "BROADCAST=${bcast}")
 	$([[ -z "${gw}"     ]] || echo "GATEWAY=${gw}")
 	EOS
-  }
+  fi
 
   local dnssv= i=1
   for dnssv in ${dns}; do
