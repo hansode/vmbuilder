@@ -1416,7 +1416,7 @@ function nictabinfo() {
     } || {
       # "echo ${dns}" means removing new-line(s).
       cat <<-EOS
-	ifname=eth0 ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns="$(echo ${dns})" mac=${mac} hw=${hw} onboot=${onboot} iftype=ethernet
+	ifname=eth0 ip=${ip} mask=${mask} net=${net} bcast=${bcast} gw=${gw} dns="$(echo ${dns})" mac=${mac} hw=${hw} physdev=${physdev} onboot=${onboot} iftype=ethernet
 	EOS
     }
   } | egrep -v '^$|^#'
@@ -1429,7 +1429,7 @@ function config_interfaces() {
   local line=
   while read line; do
     (
-      ifname= ip= mask= net= bcast= gw= dns= mac= hw= onboot= iftype=
+      ifname= ip= mask= net= bcast= gw= dns= mac= hw= physdev= onboot= iftype=
       eval ${line}
       install_interface ${chroot_dir} ${ifname} ${iftype}
     )

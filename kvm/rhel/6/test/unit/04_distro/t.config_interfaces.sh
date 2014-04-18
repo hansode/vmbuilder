@@ -19,7 +19,8 @@ function setUp() {
 
   DEVICE= TYPE=
   BOOTPROTO= IPADDR= NETMASK= NETWORK= BROADCAST= GATEWAY=
-  DNS1= DNS2= DNS3=
+  DNS1= DNS2=
+  MACADDR= HWADDR=
   ifname= ip= mask= net= bcast= gw= dns= onboot= iftype=
   mac= hw=
 }
