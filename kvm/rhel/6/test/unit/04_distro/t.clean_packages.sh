@@ -15,8 +15,8 @@
 function setUp() {
   mkdir -p ${chroot_dir}
 
-  function run_yum() { echo run_yum $*; }
-  function run_in_target() { echo run_in_target $*; }
+  function run_yum() { echo run_yum "${@}"; }
+  function run_in_target() { echo run_in_target "${@}"; }
 }
 
 function tearDown() {
@@ -24,29 +24,8 @@ function tearDown() {
 }
 
 function test_clean_packages() {
-  clean_packages ${chroot_dir} | egrep -q -w 'clean packages'
-  assertEquals $? 0
-}
-
-function test_clean_packages_keepcache_0() {
-  local keepcache=0
-
-  clean_packages ${chroot_dir} | egrep -q -w 'clean packages'
-  assertEquals $? 0
-}
-
-function test_clean_packages_keepcache_1() {
-  local keepcache=1
-
-  clean_packages ${chroot_dir} | egrep -q -w 'clean packages'
-  assertNotEquals $? 0
-}
-
-function test_clean_packages_keepcache_2() {
-  local keepcache=2
-
-  clean_packages ${chroot_dir} | egrep -q -w 'clean packages'
-  assertEquals $? 0
+  clean_packages ${chroot_dir} | egrep -q -w 'rpm -vv --rebuilddb'
+  assertEquals 0 ${?}
 }
 
 ## shunit2

@@ -425,19 +425,16 @@ function clean_packages() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
-  case "${keepcache}" in
-  1) ;;
-  *) keepcache=0 ;;
-  esac
+  # make sure to rebuild rpmdb in target.
+  # bacause most package is installed via host yum command.
+  run_in_target ${chroot_dir} rpm -vv --rebuilddb
 
-  case "${keepcache}" in
-  0)
-    run_yum       ${chroot_dir} clean packages
-    run_in_target ${chroot_dir} yum clean packages
-    ;;
-  *)
-    ;;
-  esac
+  # # yum clean packages
+  # > Loaded plugins: product-id, subscription-manager
+  # > This system is not registered to Red Hat Subscription Management. You can use subscription-manager to register.
+  # > There are no enabled repos.
+  # > Run "yum repolist all" to see the repos you have.
+  # > You can enable repos with yum-config-manager --enable <repo>
 }
 
 ## other system configuration
