@@ -421,31 +421,6 @@ function list_rpmdb_file() {
   done < <(ls ${chroot_dir}/var/lib/rpm/)
 }
 
-function convert_rpmdb_hash() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
-
-  local preferred_rpmdb_hash_ver=$(preferred_rpmdb_hash_ver)
-  printf "[INFO] Converting rpmdb hash version: %s\n" ${preferred_rpmdb_hash_ver}
-
-  local db_load_cmd
-  case "${preferred_rpmdb_hash_ver}" in
-  8)
-    # under rhel5
-    db_load_cmd=db43_load ;;
-  9|*)
-    # over rhel6
-    return 0 ;;
-  esac
-
-  local rpmdb_file
-  while read rpmdb_file; do
-    file ${rpmdb_file} | egrep -q "version ${preferred_rpmdb_hash_ver}" && continue
-    db_dump ${rpmdb_file} | ${db_load_cmd} ${rpmdb_file}.old.$$
-    mv -f ${rpmdb_file}.old.$$ ${rpmdb_file}
-  done < <(list_rpmdb_file ${chroot_dir})
-}
-
 function clean_packages() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
