@@ -21,7 +21,7 @@
 #          mount_dev, mount_sys, configure_networking, configure_mounting, configure_keepcache
 #          configure_hypervisor, configure_selinux
 #          configure_sshd_password_authentication, configure_sshd_gssapi_authentication, configure_sshd_permit_root_login, configure_sudo_requiretty, configure_sshd_use_dns
-#          run_copies, xsync_dir, run_execscripts, run_xexecscripts, install_firstboot, install_everyboot, install_firstlogin, convert_rpmdb_hash, clean_packages, cleanup_distro
+#          run_copies, xsync_dir, run_execscripts, run_xexecscripts, install_firstboot, install_everyboot, install_firstlogin, clean_packages, cleanup_distro
 #
 
 ## depending on global variables
@@ -199,7 +199,6 @@ function install_os() {
 
   install_epel         ${chroot_dir}
   install_addedpkgs    ${chroot_dir}
-  convert_rpmdb_hash   ${chroot_dir}
   clean_packages       ${chroot_dir}
 
   # copy

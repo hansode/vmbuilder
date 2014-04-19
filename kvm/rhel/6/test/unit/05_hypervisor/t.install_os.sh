@@ -43,7 +43,6 @@ function setUp() {
   function install_bootloader() { echo install_bootloader $*; }
   function install_epel() { echo install_epel $*; }
   function install_addedpkgs() { echo install_addedpkgs $*; }
-  function convert_rpmdb_hash() { echo convert_rpmdb_hash $*; }
   function clean_packages() { echo clean_packages $*; }
   function run_copies()     { echo run_copies     $*; }
   function xsync_dir()      { echo xsync_dir      $*; }
