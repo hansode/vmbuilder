@@ -191,7 +191,7 @@ function umount_nonroot() {
   while read mountpoint; do
     printf "[DEBUG] Unmounting %s\n" ${mountpoint}
     umount -l ${mountpoint}
-  done < <(egrep ${chroot_dir}/ /etc/mtab | awk '{print $2}')
+  done < <(egrep ${chroot_dir}/ /etc/mtab | awk '{print $2}' | egrep -v '/proc/sys/fs/binfmt_misc$')
 
   after_umount_nonroot ${chroot_dir}
 }
