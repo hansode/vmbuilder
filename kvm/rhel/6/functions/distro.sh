@@ -452,7 +452,7 @@ function clean_packages() {
 
   # make sure to rebuild rpmdb in target.
   # bacause most package is installed via host yum command.
-  run_in_target ${chroot_dir} rpm -vv --rebuilddb
+  run_in_target ${chroot_dir} rpm --rebuilddb
 
   # # yum clean packages
   # > Loaded plugins: product-id, subscription-manager
