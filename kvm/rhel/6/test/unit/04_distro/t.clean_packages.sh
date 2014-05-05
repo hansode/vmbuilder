@@ -24,7 +24,7 @@ function tearDown() {
 }
 
 function test_clean_packages() {
-  clean_packages ${chroot_dir} | egrep -q -w 'rpm -vv --rebuilddb'
+  clean_packages ${chroot_dir} | egrep -q -w 'rpm --rebuilddb'
   assertEquals 0 ${?}
 }
 
