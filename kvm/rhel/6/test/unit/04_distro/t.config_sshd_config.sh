@@ -57,6 +57,15 @@ function test_config_sshd_config_disabled_comment_whitespace() {
   assertEquals $? 0
 }
 
+function test_config_sshd_config_with_slash() {
+  cat <<-EOS > ${sshd_config_path}
+	# AuthorizedKeysFile .ssh/authorized_keys
+	EOS
+
+  config_sshd_config ${sshd_config_path} AuthorizedKeysFile .ssh/authorized_keys
+  assertEquals $? 0
+}
+
 function test_config_sshd_config_disabled_comment_not_exists() {
   cat <<-EOS > ${sshd_config_path}
 	EOS
