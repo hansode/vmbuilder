@@ -1379,6 +1379,29 @@ function configure_vlan_conf() {
   )
 }
 
+function configure_bonding_conf() {
+  local chroot_dir=${1}
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  local line=
+
+  if ! [[ -f ${chroot_dir}/etc/modprobe.d/bonding.conf ]]; then
+    : > ${chroot_dir}/etc/modprobe.d/bonding.conf
+  fi
+
+  local ifname=
+  for ifname in ${slaves}; do
+    while read line; do
+      egrep -w "^${line}" ${chroot_dir}/etc/modprobe.d/bonding.conf -q || {
+        echo "${line}" >> ${chroot_dir}/etc/modprobe.d/bonding.conf
+      }
+    done < <(cat <<-EOS
+	alias ${ifname} bonding
+	EOS
+    )
+  done
+}
+
 function configure_serial_console() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
@@ -1449,6 +1472,9 @@ function install_interface() {
   vlan)
     configure_vlan_conf ${chroot_dir}
     ;;
+  bonding)
+    configure_bonding_conf ${chroot_dir}
+    ;;
   bridge)
     run_yum ${chroot_dir} install bridge-utils
     ;;
@@ -1512,6 +1538,8 @@ function render_interface_ethernet() {
 	DEVICE=${ifname}
 	TYPE=Ethernet
 	$([[ -z "${bridge}" ]] || echo "BRIDGE=${bridge}")
+	$([[ -z "${master}" ]] || echo "MASTER=${master}")
+	$([[ -z "${master}" ]] || echo "SLAVE=yes")
 	EOS
 }
 
@@ -1532,6 +1560,15 @@ function render_interface_vlan() {
 	DEVICE=${ifname}
 	$([[ -z "${physdev}" ]] || echo "PHYSDEV=${physdev}")
 	$([[ -z "${bridge}"  ]] || echo "BRIDGE=${bridge}")
+	EOS
+}
+
+function render_interface_bonding() {
+  local ifname=${1:-bond0}
+
+  cat <<-EOS
+	DEVICE=${ifname}
+	BONDING_OPTS="${bonding_opts}"
 	EOS
 }
 
