@@ -37,6 +37,14 @@ function test_render_interface_ethernet_eth0_br0() {
   assertEquals "${BRIDGE}" "br0"
 }
 
+function test_render_interface_ethernet_eth0_bonding() {
+  local master=bond0
+  eval "$(render_interface_ethernet eth0)"
+
+  assertEquals "bond0" "${MASTER}"
+  assertEquals "yes"   "${SLAVE}"
+}
+
 ## shunit2
 
 . ${shunit2_file}

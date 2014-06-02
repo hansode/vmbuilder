@@ -1512,6 +1512,8 @@ function render_interface_ethernet() {
 	DEVICE=${ifname}
 	TYPE=Ethernet
 	$([[ -z "${bridge}" ]] || echo "BRIDGE=${bridge}")
+	$([[ -z "${master}" ]] || echo "MASTER=${master}")
+	$([[ -z "${master}" ]] || echo "SLAVE=yes")
 	EOS
 }
 
