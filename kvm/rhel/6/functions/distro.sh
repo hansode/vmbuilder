@@ -1379,6 +1379,27 @@ function configure_vlan_conf() {
   )
 }
 
+function configure_bonding_conf() {
+  local chroot_dir=${1} ifname=${2}
+  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${ifname}"     ]] || { echo "[ERROR] Invalid argument: ifname:${ifname} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+
+  local line=
+
+  if ! [[ -f ${chroot_dir}/etc/modprobe.d/bonding.conf ]]; then
+    : > ${chroot_dir}/etc/modprobe.d/bonding.conf
+  fi
+
+  while read line; do
+    egrep -w "^${line}" ${chroot_dir}/etc/modprobe.d/bonding.conf -q || {
+      echo "${line}" >> ${chroot_dir}/etc/modprobe.d/bonding.conf
+    }
+  done < <(cat <<-EOS
+	alias ${ifname} bonding
+	EOS
+  )
+}
+
 function configure_serial_console() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
