@@ -14,6 +14,7 @@
 
 function setUp() {
   mkdir -p ${chroot_dir}/etc/sysconfig/network-scripts
+  mkdir -p ${chroot_dir}/etc/modprobe.d
   touch ${chroot_dir}/etc/sysconfig/network
 
   function run_yum() { echo run_yum "${@}"; }
@@ -48,6 +49,15 @@ function test_install_interface_vlan_vlan0() {
   install_interface ${chroot_dir} vlan0 vlan >/dev/null
 
   [[ -f ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-vlan0 ]]
+  assertEquals 0 ${?}
+}
+
+## bonding
+
+function test_install_interface_bonding_bond0() {
+  install_interface ${chroot_dir} bond0 bonding >/dev/null
+
+  [[ -f ${chroot_dir}/etc/sysconfig/network-scripts/ifcfg-bond0 ]]
   assertEquals 0 ${?}
 }
 

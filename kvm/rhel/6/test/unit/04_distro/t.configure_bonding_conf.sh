@@ -26,7 +26,9 @@ function test_configure_bonding_conf_no_opts() {
 }
 
 function test_configure_bonding_conf_opts() {
-  configure_bonding_conf ${chroot_dir} eth0
+  local slaves="eth0"
+
+  configure_bonding_conf ${chroot_dir}
   assertEquals 0 ${?}
   assertEquals "alias eth0 bonding" "$(< ${chroot_dir}/etc/modprobe.d/bonding.conf)"
 
@@ -36,6 +38,8 @@ function test_configure_bonding_conf_opts() {
 }
 
 function test_configure_bonding_conf_opts_2nics() {
+  local slaves="eth0 eth1"
+
   configure_bonding_conf ${chroot_dir} eth0
   assertEquals 0 ${?}
 
