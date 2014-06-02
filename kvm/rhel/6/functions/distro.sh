@@ -1558,6 +1558,15 @@ function render_interface_vlan() {
 	EOS
 }
 
+function render_interface_bonding() {
+  local ifname=${1:-bond0}
+
+  cat <<-EOS
+	DEVICE=${ifname}
+	BONDING_OPTS="${bonding_opts}"
+	EOS
+}
+
 function render_interface_bridge() {
   local ifname=${1:-br0}
 
