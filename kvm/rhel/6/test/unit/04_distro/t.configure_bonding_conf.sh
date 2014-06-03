@@ -26,28 +26,24 @@ function test_configure_bonding_conf_no_opts() {
 }
 
 function test_configure_bonding_conf_opts() {
-  local slaves="eth0"
-
-  configure_bonding_conf ${chroot_dir}
+  configure_bonding_conf ${chroot_dir} bond0
   assertEquals 0 ${?}
-  assertEquals "alias eth0 bonding" "$(< ${chroot_dir}/etc/modprobe.d/bonding.conf)"
+  assertEquals "alias bond0 bonding" "$(< ${chroot_dir}/etc/modprobe.d/bonding.conf)"
 
-  configure_bonding_conf ${chroot_dir} eth0
+  configure_bonding_conf ${chroot_dir} bond0
   assertEquals 0 ${?}
-  assertEquals "alias eth0 bonding" "$(< ${chroot_dir}/etc/modprobe.d/bonding.conf)"
+  assertEquals "alias bond0 bonding" "$(< ${chroot_dir}/etc/modprobe.d/bonding.conf)"
 }
 
 function test_configure_bonding_conf_opts_2nics() {
-  local slaves="eth0 eth1"
-
-  configure_bonding_conf ${chroot_dir} eth0
+  configure_bonding_conf ${chroot_dir} bond0
   assertEquals 0 ${?}
 
-  configure_bonding_conf ${chroot_dir} eth1
+  configure_bonding_conf ${chroot_dir} bond1
   assertEquals 0 ${?}
 
-  assertEquals "alias eth0 bonding
-alias eth1 bonding" "$(< ${chroot_dir}/etc/modprobe.d/bonding.conf)"
+  assertEquals "alias bond0 bonding
+alias bond1 bonding" "$(< ${chroot_dir}/etc/modprobe.d/bonding.conf)"
 }
 
 ## shunit2

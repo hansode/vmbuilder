@@ -11,4 +11,8 @@
 #
 ifname=eth0 iftype=ethernet bootproto=none
 ifname=eth1 iftype=ethernet bootproto=none
-ifname=bond0 ip=192.0.2.10 mask=255.255.255.0 net=192.0.2.0 bcast=192.0.2.255 gw=192.0.2.1 iftype=bonding slaves="eth0 eth1"
+ifname=eth2 iftype=ethernet bootproto=none
+ifname=eth3 iftype=ethernet bootproto=none
+
+ifname=bond0 ip=192.0.2.10 mask=255.255.255.0 net=192.0.2.0 bcast=192.0.2.255 gw=192.0.2.1 iftype=bonding
+ifname=bond1 ip=192.0.4.10 mask=255.255.255.0 net=192.0.4.0 bcast=192.0.2.255 gw=192.0.4.1 iftype=bonding
