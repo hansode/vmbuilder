@@ -1380,8 +1380,9 @@ function configure_vlan_conf() {
 }
 
 function configure_bonding_conf() {
-  local chroot_dir=${1}
+  local chroot_dir=${1} ifname=${2}
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+  [[ -n "${ifname}"     ]] || { echo "[ERROR] Invalid argument: ifname:${ifname} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
   local line=
 
@@ -1389,17 +1390,14 @@ function configure_bonding_conf() {
     : > ${chroot_dir}/etc/modprobe.d/bonding.conf
   fi
 
-  local ifname=
-  for ifname in ${slaves}; do
-    while read line; do
-      egrep -w "^${line}" ${chroot_dir}/etc/modprobe.d/bonding.conf -q || {
-        echo "${line}" >> ${chroot_dir}/etc/modprobe.d/bonding.conf
-      }
-    done < <(cat <<-EOS
+  while read line; do
+    egrep -w "^${line}" ${chroot_dir}/etc/modprobe.d/bonding.conf -q || {
+      echo "${line}" >> ${chroot_dir}/etc/modprobe.d/bonding.conf
+    }
+  done < <(cat <<-EOS
 	alias ${ifname} bonding
 	EOS
-    )
-  done
+  )
 }
 
 function configure_serial_console() {
@@ -1473,7 +1471,7 @@ function install_interface() {
     configure_vlan_conf ${chroot_dir}
     ;;
   bonding)
-    configure_bonding_conf ${chroot_dir}
+    configure_bonding_conf ${chroot_dir} ${ifname}
     ;;
   bridge)
     run_yum ${chroot_dir} install bridge-utils
