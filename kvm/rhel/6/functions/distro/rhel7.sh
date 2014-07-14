@@ -19,6 +19,6 @@ function add_option_distro_rhel7() {
 
   preferred_grub=grub2
 
-  baseurl=http://ftp.redhat.com/redhat/rhel/beta/7/${basearch}/os
-  gpgkey="${baseurl}/RPM-GPG-KEY-redhat-beta ${baseurl}/RPM-GPG-KEY-redhat-release"
+ #baseurl=http://ftp.redhat.com/redhat/rhel/beta/7/${basearch}/os
+ #gpgkey="${baseurl}/RPM-GPG-KEY-redhat-beta ${baseurl}/RPM-GPG-KEY-redhat-release"
 }
