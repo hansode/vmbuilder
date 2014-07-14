@@ -40,7 +40,7 @@ function add_option_distro() {
 
   local driver_name="${distro_name}$(get_distro_major_ver ${distro_ver})"
   case "${driver_name}" in
-  rhel7)
+  rhel7|centos7)
     load_distro_driver ${driver_name}
     ;;
   rhel6|centos6|sl6)
