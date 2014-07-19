@@ -1189,6 +1189,17 @@ function install_menu_lst_grub2() {
 
   printf "[INFO] Generating /boot/grub2/grub.cfg\n"
 
+  cat <<-'EOS' > ${chroot_dir}/etc/default/grub
+	GRUB_TIMEOUT=5
+	GRUB_DISTRIBUTOR="$(sed 's, release .*$,,g' /etc/system-release)"
+	GRUB_DEFAULT=saved
+	GRUB_DISABLE_SUBMENU=true
+	GRUB_TERMINAL_OUTPUT="console"
+	GRUB_CMDLINE_LINUX="vconsole.keymap=us crashkernel=auto vconsole.font=latarcyrheb-sun16"
+	GRUB_DISABLE_RECOVERY="true"
+	GRUB_DISABLE_OS_PROBER=true
+	EOS
+
   run_in_target ${chroot_dir} grub2-mkconfig -o /boot/grub2/grub.cfg
   run_in_target ${chroot_dir} grub2-set-default 0
 
