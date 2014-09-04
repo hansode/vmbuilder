@@ -18,7 +18,7 @@ function test_preflight_check_uri_empty() {
 }
 
 function test_preflight_check_uri_http() {
-  preflight_check_uri http://ftp.riken.go.jp/pub/Linux/centos/6/os/x86_64/ >/dev/null
+  preflight_check_uri http://vault.centos.org/6.0/os/x86_64/ >/dev/null
   assertEquals $? 0
 }
 

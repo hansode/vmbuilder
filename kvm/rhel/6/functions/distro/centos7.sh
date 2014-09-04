@@ -18,6 +18,6 @@ function add_option_distro_centos7() {
   7.0) distro_ver=7.0.1406 ;;
   esac
 
-  baseurl=${baseurl:-http://ftp.riken.go.jp/pub/Linux/centos/${distro_ver}/os/${basearch}}
+  baseurl=${baseurl:-http://vault.centos.org/${distro_ver}/os/${basearch}}
   gpgkey=${gpgkey:-${baseurl}/RPM-GPG-KEY-CentOS-7}
 }
