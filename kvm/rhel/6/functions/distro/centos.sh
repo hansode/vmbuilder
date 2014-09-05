@@ -12,4 +12,6 @@
 
 function add_option_distro_centos() {
   yumrepo=base
+
+  baseurl=${baseurl:-http://vault.centos.org/${distro_ver}/os/${basearch}}
 }
