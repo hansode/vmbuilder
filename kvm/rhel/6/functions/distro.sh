@@ -179,8 +179,8 @@ function preflight_check_uri() {
 }
 
 function preflight_check_distro() {
-  [[ -n "${baseurl}" ]] || { echo "[ERROR] Invalid argument: baseurl:${baseurl} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
-  preflight_check_uri "${baseurl}" || return 1
+ #[[ -n "${baseurl}" ]] || { echo "[ERROR] Invalid argument: baseurl:${baseurl} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
+ #preflight_check_uri "${baseurl}" || return 1
 
   [[ -n "${gpgkey}" ]] || { echo "[ERROR] Invalid argument: gpgkey:${gpgkey} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
   for i in ${gpgkey}; do
