@@ -121,10 +121,10 @@ function after_umount_nonroot() {
 	)
 
   for dev_path in dev etc/udev/devices; do
-    ln -s /proc/self/fd   ${chroot_dir}/${dev_path}/fd
-    ln -s /proc/self/fd/0 ${chroot_dir}/${dev_path}/stdin
-    ln -s /proc/self/fd/1 ${chroot_dir}/${dev_path}/stdout
-    ln -s /proc/self/fd/2 ${chroot_dir}/${dev_path}/stderr
+    [[ -a ${chroot_dir}/${dev_path}/fd     ]] || ln -s /proc/self/fd   ${chroot_dir}/${dev_path}/fd
+    [[ -a ${chroot_dir}/${dev_path}/stdin  ]] || ln -s /proc/self/fd/0 ${chroot_dir}/${dev_path}/stdin
+    [[ -a ${chroot_dir}/${dev_path}/stdout ]] || ln -s /proc/self/fd/1 ${chroot_dir}/${dev_path}/stdout
+    [[ -a ${chroot_dir}/${dev_path}/stderr ]] || ln -s /proc/self/fd/2 ${chroot_dir}/${dev_path}/stderr
   done
 }
 
