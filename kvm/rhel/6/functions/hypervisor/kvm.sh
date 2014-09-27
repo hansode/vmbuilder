@@ -67,7 +67,7 @@ function configure_hypervisor() {
 function qemu_kvm_path() {
   local execs="/usr/libexec/qemu-kvm /usr/bin/kvm /usr/bin/qemu-kvm"
 
-  local command_path exe
+  local command_path= exe=
   for exe in ${execs}; do
     [[ -x "${exe}" ]] && command_path=${exe} || :
   done
@@ -79,7 +79,7 @@ function qemu_kvm_path() {
 ## command builder
 
 function build_vif_opt() {
-  local vif_name macaddr bridge_if
+  local vif_name= macaddr= bridge_if=
 
   viftabproc <<-'EOS'
     local offset=$((${index} - 1))

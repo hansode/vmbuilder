@@ -33,7 +33,7 @@ function after_umount_nonroot() {
 
   # http://www.powerpbx.org/content/are-you-sure-you-want-revert-revision-sat-12102011-1203
 
-  local dev_path
+  local dev_path=
 
   while read name mode type major minor; do
     for dev_path in dev etc/udev/devices; do

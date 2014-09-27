@@ -222,7 +222,7 @@ function cleanup_distro() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
-  local varlog
+  local varlog=
   while read varlog; do
     cp /dev/null ${varlog}
   done < <(find ${chroot_dir}/var/log/ -type f)
@@ -414,7 +414,7 @@ function list_rpmdb_file() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
-  local rpmdb_file
+  local rpmdb_file=
   while read rpmdb_file; do
     file ${chroot_dir}/var/lib/rpm/${rpmdb_file} | egrep -q "Berkeley DB" || continue
     echo ${chroot_dir}/var/lib/rpm/${rpmdb_file}
@@ -428,7 +428,7 @@ function convert_rpmdb_hash() {
   local preferred_rpmdb_hash_ver=$(preferred_rpmdb_hash_ver)
   printf "[INFO] Converting rpmdb hash version: %s\n" ${preferred_rpmdb_hash_ver}
 
-  local db_load_cmd
+  local db_load_cmd=
   case "${preferred_rpmdb_hash_ver}" in
   8)
     # under rhel5
@@ -438,7 +438,7 @@ function convert_rpmdb_hash() {
     return 0 ;;
   esac
 
-  local rpmdb_file
+  local rpmdb_file=
   while read rpmdb_file; do
     file ${rpmdb_file} | egrep -q "version ${preferred_rpmdb_hash_ver}" && continue
     db_dump ${rpmdb_file} | ${db_load_cmd} ${rpmdb_file}.old.$$
@@ -853,7 +853,7 @@ function add_authorized_keys() {
   # make sure to create file
   [[ -f "${authorized_keys_path}" ]] || : > ${authorized_keys_path}
 
-  local ssh_key_path
+  local ssh_key_path=
   for ssh_key_path in ${ssh_key_paths}; do
     printf "[DEBUG] Adding authorized_keys %s\n" ${ssh_key_path}
     cat ${ssh_key_path} >> ${authorized_keys_path}
@@ -1776,7 +1776,7 @@ function run_copy() {
     # $ rsync -aHA ${1} ${chroot_dir}${2} || :
     # don't keep symlink
     # $ cp -LpR ${1} ${chroot_dir}${2}
-    local mode
+    local mode=
     (
       # 1. src dst [options]
       # 2. [options]
