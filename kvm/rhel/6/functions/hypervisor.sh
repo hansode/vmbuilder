@@ -252,7 +252,7 @@ function viftabinfo() {
 function viftabproc() {
   local blk="$(cat)"
 
-  local index vif_name macaddr bridge_if
+  local index= vif_name= macaddr= bridge_if=
   while read index vif_name macaddr bridge_if; do
     eval "${blk}"
   done < <(viftabinfo | cat -n)
