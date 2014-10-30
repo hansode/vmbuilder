@@ -305,7 +305,6 @@ function configure_container() {
   # make sure to make device files & directories at post install phase
   mkdevice              ${chroot_dir}
 
-  prevent_udev_starting ${chroot_dir}
   reconfigure_fstab     ${chroot_dir}
   reconfigure_mtab      ${chroot_dir}
 }
@@ -617,15 +616,6 @@ function unprevent_daemons_starting() {
   # *obsolete*
   # should use cause_daemons_starting
   cause_daemons_starting $@
-}
-
-function prevent_udev_starting() {
-  local chroot_dir=$1
-  [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
-
-  sed -i 's,/sbin/start_udev,#\0,' \
-    ${chroot_dir}/etc/rc.sysinit   \
-    ${chroot_dir}/etc/rc.d/rc.sysinit
 }
 
 function prevent_plymouth_starting() {
