@@ -52,7 +52,7 @@ function add_option_distro() {
   rhel4|centos4)
     load_distro_driver ${driver_name}
     ;;
-  fedora[7-9]|fedora1[0-7])
+  fedora[7-9]|fedora1[0-9]|fedora20)
     load_distro_driver ${driver_name}
     ;;
   *)
