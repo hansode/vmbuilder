@@ -13,5 +13,5 @@
 function add_option_distro_fedora19() {
   load_distro_driver fedora18
 
-  gpgkey=https://fedoraproject.org/static/BA094068.txt
+  gpgkey=https://fedoraproject.org/static/FB4B18E6.txt
 }
