@@ -1094,7 +1094,10 @@ function install_bootloader() {
     grub_cmd="grub2-bios-setup --boot-image=i386-pc/boot.img --core-image=i386-pc/core.img ${target_device}"
 
     install_grub2 ${chroot_dir}
-    run_in_target ${chroot_dir} grub2-install ${target_device}
+    # > grub2-install: error: /usr/lib/grub/x86_64-efi/modinfo.sh doesn't exist. Please specify --target or --directory.
+    # if not --target=i386-pc used, an efi based host gets an above error.
+    # --target=i386-pc uses not efi but bios.
+    run_in_target ${chroot_dir} grub2-install ${target_device} --target=i386-pc
     # => Installation finished. No error reported.
     ;;
   esac
