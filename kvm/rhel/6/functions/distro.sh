@@ -623,9 +623,12 @@ function prevent_udev_starting() {
   local chroot_dir=$1
   [[ -d "${chroot_dir}" ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
 
-  sed -i 's,/sbin/start_udev,#\0,' \
-    ${chroot_dir}/etc/rc.sysinit   \
-    ${chroot_dir}/etc/rc.d/rc.sysinit
+  # rhel6 does not have /etc/rc.sysinit and /etc/rc.d/rc.sysinit.
+  local i=
+  for i in ${chroot_dir}/etc/rc.sysinit ${chroot_dir}/etc/rc.d/rc.sysinit; do
+    [[ -f ${i} ]] || continue
+    sed -i 's,/sbin/start_udev,#\0,' ${i}
+  done
 }
 
 function prevent_plymouth_starting() {
