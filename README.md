@@ -8,4 +8,4 @@ vmbuilder.sh
 RHEL 6.x / CentOS 6.x
 ---------------------
 
-+ https://github.com/hansode/vmbuilder/tree/master/kvm/rhel/6
++ [kvm/rhel/6](kvm/rhel/6)
