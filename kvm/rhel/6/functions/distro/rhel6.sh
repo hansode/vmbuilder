@@ -13,7 +13,7 @@
 function add_option_distro_rhel6() {
   load_distro_driver rhel5
 
-  distro_ver_latest=6.6
+  distro_ver_latest=6.7
 
   case ${distro_ver} in
   6) distro_ver=${distro_ver_latest} ;;
