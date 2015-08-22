@@ -363,6 +363,10 @@ function repofile() {
 	EOS
 }
 
+function yum() {
+  $(type -P dnf 2>&1 || type -P yum) "${@}"
+}
+
 function run_yum() {
   local chroot_dir=$1; shift
   [[ -d "${chroot_dir}"  ]] || { echo "[ERROR] directory not found: ${chroot_dir} (${BASH_SOURCE[0]##*/}:${LINENO})" >&2; return 1; }
